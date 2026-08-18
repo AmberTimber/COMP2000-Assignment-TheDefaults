@@ -38,4 +38,12 @@ public class Aircraft {
     public String getStatus() {
         return status;
     }
+
+    public void displayInfo() {
+        System.out.println("Aircarft-ID: " + getAircraftID());
+        System.out.println("Airlines: " + getairlines());
+        System.out.println("Model: " + getModel());
+        System.out.println("Current Status: " + getStatus());
+        System.out.println("Passenger-Capacity: " + getCapacity());
+    }
 }
