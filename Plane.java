@@ -26,6 +26,11 @@ public class Plane {
     }
 
     public boolean getBording(){
+        if (bording == true){
+            System.out.print("Plane bording.");
+        } else {
+            System.out.print("Plane is not bording.");
+        }
         return bording;
     }
 
