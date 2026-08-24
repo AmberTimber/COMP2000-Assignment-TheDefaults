@@ -41,9 +41,18 @@ public class Aircraft {
 
     public void displayInfo() {
         System.out.println("Aircarft-ID: " + getAircraftID());
-        System.out.println("Airlines: " + getairlines());
+        System.out.println("Airlines: " + getOperator());
         System.out.println("Model: " + getModel());
         System.out.println("Current Status: " + getStatus());
         System.out.println("Passenger-Capacity: " + getCapacity());
+    }
+
+    //Setters section
+    public void setaircraftID(String aircraftID) {
+        this.aircraftID = aircraftID;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
     }
 }
