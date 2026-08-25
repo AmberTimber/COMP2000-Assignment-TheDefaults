@@ -1,6 +1,6 @@
 public class Main {
     public static void main(String[] args) {
-        Commercial passengerPlane = new Commercial(
+        /*Commercial passengerPlane = new Commercial(
                 "QF101", "Qantas", "Airbus A320", 82.5, 180, 145);
 
         Cargo cargoPlane = new Cargo(
@@ -53,6 +53,10 @@ public class Main {
         System.out.println("Cargo weight now: "
                 + cargoPlane.getCurrentWeight() + " kg");
 
-        System.out.println("\n========== SIMULATION COMPLETE ==========");
+        System.out.println("\n========== SIMULATION COMPLETE ==========");*/
+
+        Aircraft tester = new Aircraft();
+        tester.setAircraft("89797", "Billy", "SuperBus", 50.00, 20, "Grounded");
+        
     }
 }
