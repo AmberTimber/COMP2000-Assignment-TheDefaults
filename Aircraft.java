@@ -6,7 +6,7 @@ public class Aircraft {
     private int capacity;
     private String status;
 
-    public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
+    public void setAircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
         this.aircraftID = aircraftID;
         this.operator = operator;
         this.model = model;
@@ -54,5 +54,21 @@ public class Aircraft {
 
     public void setOperator(String operator) {
         this.operator = operator;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public void setFuelLevel(double fuelLevel) {
+        this.fuelLevel = fuelLevel;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
