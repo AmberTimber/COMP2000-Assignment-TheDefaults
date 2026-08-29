@@ -1,4 +1,4 @@
-public class Aircraft {
+public abstract class Aircraft {
     private final String aircraftID;
     private String operator;
     private String model;

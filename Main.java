@@ -55,8 +55,8 @@ public class Main {
 
         System.out.println("\n========== SIMULATION COMPLETE ==========");*/
 
-        Aircraft tester = new Aircraft();
-        tester.setAircraft("89797", "Billy", "SuperBus", 50.00, 20, "Grounded");
+       /* Aircraft tester = new Aircraft();
+        tester.setAircraft("89797", "Billy", "SuperBus", 50.00, 20, "Grounded");*/
         
     }
 }
