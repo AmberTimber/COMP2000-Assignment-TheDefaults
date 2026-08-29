@@ -1,27 +1,37 @@
-public class CargoPlane extends Aircraft {
-    private double maxWeight; //in KG
+public class CargoPlane extends Aircraft{
+    private final double maxWeight; // in KG
     private double currentWeight;
 
-    public void SetCargo (double maxWeight, double currentWeight) {
+    public CargoPlane(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status, double maxWeight, double currentWeight) {
+        super(aircraftID, operator, model, fuelLevel, capacity, status);
         this.maxWeight = maxWeight;
-        this.currentWeight = currentWeight;
-    }
-    
-    // getters
-    public double getmaxWeight() {
-        return maxWeight;
+        setCurrentWeight(currentWeight); //call setter from constructor so it would check setter first 
     }
 
-    public double getcurrentWeight() {
+    //setter
+    public void setCurrentWeight(double currentWeight){
+        if (currentWeight >= 0 && currentWeight <= maxWeight){
+            this.currentWeight = currentWeight;
+        }
+    }
+    
+    /* No setter for maxWeight because it is fixed when the plane is created */
+
+    //getters
+    public double getCurrentWeight(){
         return currentWeight;
     }
 
-    //setters
-    public void setmaxWeight(double maxWeight) {
-        this.maxWeight = maxWeight;
+    public double getMaxWeight(){
+        return maxWeight;
     }
 
-    public void setcurrentWeight(double currentWeight) {
-        this.currentWeight = currentWeight;
+    @Override
+    public void displayInfo(){
+        super.displayInfo();
+        
+        System.out.println("This is a Cargo Plane.");
+        System.out.println("Max Weight: " + maxWeight);
+        System.out.println("Current Weight: " + currentWeight);
     }
 }

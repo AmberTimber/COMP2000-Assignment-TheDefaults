@@ -1,12 +1,13 @@
 public class Aircraft {
-    private String aircraftID;
+    private final String aircraftID;
     private String operator;
     private String model;
     private double fuelLevel;
-    private int capacity;
+    private final int capacity;
     private String status;
 
-    public void setAircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
+
+    public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
         this.aircraftID = aircraftID;
         this.operator = operator;
         this.model = model;
@@ -15,6 +16,26 @@ public class Aircraft {
         this.status = "GROUNDED"; // Default status of an Aircraft
     }
 
+    //setters 
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public void setFuelLevel(double fuelLevel) {
+        if (fuelLevel >= 0) {
+            this.fuelLevel = fuelLevel;
+        }
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    //getters
     public String getAircraftID() {
         return aircraftID;
     }
@@ -36,39 +57,22 @@ public class Aircraft {
     }
 
     public String getStatus() {
+        if(status.equals("GOUNDED")){
+            System.out.println("Status: " + aircraftID + " is grounded.");
+        } else if (status.equals("BOARDING")){
+            System.out.println("Status: " + aircraftID + " is boarding.");
+        } else if (status.equals("IN-FLIGHT")){
+            System.out.println("Status: " + aircraftID + " is in-flight.");
+        }
         return status;
     }
 
     public void displayInfo() {
-        System.out.println("Aircarft-ID: " + getAircraftID());
-        System.out.println("Airlines: " + getOperator());
-        System.out.println("Model: " + getModel());
-        System.out.println("Current Status: " + getStatus());
-        System.out.println("Passenger-Capacity: " + getCapacity());
-    }
-
-    //Setters section
-    public void setaircraftID(String aircraftID) {
-        this.aircraftID = aircraftID;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public void setFuelLevel(double fuelLevel) {
-        this.fuelLevel = fuelLevel;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+        System.out.println("Aircraft ID: " + aircraftID);
+        System.out.println("Operator: " + operator);
+        System.out.println("Model: " + model);
+        System.out.println("Fuel Level: " + fuelLevel);
+        System.out.println("Capacity: " + capacity);
+        System.out.println(getStatus());
     }
 }

@@ -1,29 +1,21 @@
-/**
- * 
- * ABSTRACT CLASS: AirportPath
- * 
- * Why this class exists:
- * Both Runway and Taxiway represent physical ground paths that planes travel
- * across,
- * sharing attributes like length, unique IDs, and availability status.
- * 
- * It is Abstract to prevent direct instantiation - AirportPath is a generic
- * concept
- */
-public abstract class AirportPath {
-  private String id;
-  private double lengthInMeters;
+public abstract class AirportPath{
+    private final String pathID;
+    private final double lengthInMeters;
+    
+    public AirportPath (String pathID, double lengthInMeters){
+        this. pathID = pathID;
+        this.lengthInMeters = lengthInMeters;
+    }
 
-  // Constructor(called by child classes using super())
-  public AirportPath(String id, double lengthInMeters) {
-    this.id = id;
-    this.lengthInMeters = lengthInMeters;
-  }
+    /*
+    AirportPath class don't need setters because pathID and path length will never change its values.
+    */
 
-  public String getId() {
-    return id;
-  }
+    public String getPathID(){
+        return pathID;
+    }
 
-  // Child class needs to override with appropriate return instance
-  public abstract boolean canAcceptAircraft(Aircraft aircraft);
+    public double getLengthInMeters(){
+        return lengthInMeters;
+    }
 }
