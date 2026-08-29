@@ -1,10 +1,10 @@
 public class Moveable {
-    private float xPos;
-    private float yPos;
+    private float xPos = (int)(Math.random() * (100 - 1 + 1)) + 1;
+    private float yPos = (int)(Math.random() * (100 - 1 + 1)) + 1;
 
     public void SetMove (float xpos, float ypos) {
-        this.xPos = xpos;
-        this.yPos = ypos;
+        setxPos(xpos);
+        setyPos(ypos);
     }
 
     // getters
