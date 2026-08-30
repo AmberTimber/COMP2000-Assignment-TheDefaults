@@ -5,6 +5,7 @@ public abstract class Aircraft {
     private double fuelLevel;
     private final int capacity;
     private String status;
+    private Moveable aircraftPosition = new Moveable();
 
 
     public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
