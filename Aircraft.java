@@ -10,9 +10,9 @@ public abstract class Aircraft {
 
     public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
         this.aircraftID = aircraftID;
-        this.operator = operator;
-        this.model = model;
-        this.fuelLevel = fuelLevel;
+        setOperator(operator);
+        setModel(model);
+        setFuelLevel(fuelLevel);
         this.capacity = capacity;
         this.status = "GROUNDED"; // Default status of an Aircraft
     }
@@ -34,6 +34,30 @@ public abstract class Aircraft {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setTarget(Vector2 newPos) {
+        this.aircraftPosition.setTarget(newPos);
+    }
+
+    public void changeTarget() {
+        this.aircraftPosition.changeTarget();
+    }
+
+    public void moveTowards(int speed) {
+        aircraftPosition.moveTowards(speed);
+    }
+
+    public Moveable getLocation() {
+        return aircraftPosition;
+    }
+
+    public boolean getReachedTarget() {
+        return aircraftPosition.getReachedTarget();
+    }
+
+    public void setReachedTarget(boolean value) {
+        aircraftPosition.setReachedTarget(value);
     }
 
     //getters

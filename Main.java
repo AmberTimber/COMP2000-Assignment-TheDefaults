@@ -62,17 +62,17 @@ public class Main {
        /* Aircraft tester = new Aircraft();
         tester.setAircraft("89797", "Billy", "SuperBus", 50.00, 20, "Grounded");*/
         
-        /* tests by Tim, pls do not move, I need to test JPanel !!!!!!
+        //tests by Tim, pls do not move, I need to test JPanel !!!!!!
         JFrame mainPanel = new JFrame();
         mainPanel.setName("This is the simulation"); // ID
         mainPanel.setTitle("Airport Simulation"); // title of tab
-        mainPanel.setSize(1000, 1000); // size, duh
+        mainPanel.setSize(1000, 800); // size, duh
         mainPanel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // ensure jpanel tab can close
         JPanelVisualizer plaeTemp = new JPanelVisualizer(); // creates objects
         // adding the elements
         mainPanel.add(plaeTemp); // adds objects
         
         mainPanel.setVisible(true); // whoa, i can see clearly now
-        */
+        
     }
 }

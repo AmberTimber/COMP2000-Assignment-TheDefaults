@@ -1,67 +1,81 @@
+import java.lang.annotation.Target;
+
 public class Moveable {
-    private float xPos = (int)(Math.random() * (100 - 1 + 1)) + 1;
-    private float yPos = (int)(Math.random() * (100 - 1 + 1)) + 1;
-    private float minDist = 1f;
-    private Moveable target;
+    private int xPos = (int)(Math.random() * (900 - 1 + 1)) + 1;
+    private int yPos = (int)(Math.random() * (800 - 1 + 1)) + 1;
+    private float minDist = 0.5f;
+    private Vector2 target;
     private boolean reachTarget = false;
 
-    public void SetMove (float xpos, float ypos) {
+    public void SetMove (int xpos, int ypos) {
         setxPos(xpos);
         setyPos(ypos);
     }
 
     // getters
-    public float getxPos() {
+    public int getxPos() {
         return xPos;
     }
 
-    public float getyPos() {
+    public int getyPos() {
         return yPos;
     }
 
+    public boolean getReachedTarget() {
+        return reachTarget;
+    }
+
+    public void setReachedTarget(boolean value) {
+        reachTarget = value;
+    }
+
     // setters
-    public void setxPos(float xpos) {
+    public void setxPos(int xpos) {
         this.xPos = xpos;
     }
 
-    public void setyPos(float ypos) {
+    public void setyPos(int ypos) {
         this.yPos = ypos;
     }
 
-    public void setTarget(Moveable targetPosition) {
+    public void setTarget(Vector2 targetPosition) {
         target = targetPosition;
     }
 
+    public void moveTowards(int speed) {
+        moveTowardsTargetXAxis(speed);
+        moveTowardsTargetYAxis(speed);
+    }
+
     public void moveTowardsTargetXAxis(int speed) {
-        if (target.getxPos() > this.xPos) {
+        if (target.getXPos() > this.xPos) {
             xPos += speed;
         }
-        if (target.getxPos() < this.xPos) {
-            xPos -= speed;
+        if (target.getXPos() < this.xPos) {
+            xPos += -speed;
         }
     }
 
     public void moveTowardsTargetYAxis(int speed) {
-        if (target.getxPos() > this.xPos) {
+        if (target.getyPos() > this.yPos) {
             yPos += speed;
         }
-        if (target.getxPos() < this.xPos) {
-            yPos -= speed;
+        if (target.getyPos() < this.yPos) {
+            yPos += -speed;
         }
     }
 
-    public void checkIfReachTarget() {
-        if (this.xPos - target.getxPos() < minDist) {
-            reachTarget = true;
-            this.xPos = target.getxPos();
-        } else {
-            reachTarget = false;
+    public boolean checkIfReachTarget() {
+        if (this.xPos == target.getXPos() && this.yPos == target.getyPos()) {
+            return true;
         }
-        if (this.yPos - target.getyPos() < minDist) {
-            reachTarget = true;
-            this.yPos = target.getxPos();
-        } else {
-            reachTarget = false;
-        }
+        return false;
+    }
+
+    public void changeTarget() {
+        int newXpos = (int)(Math.random() * (1000 - 1 + 1)) + 1;
+        int newYpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
+        target = new Vector2(newXpos, newYpos);
+        System.out.println("New pos is: " + newXpos + " x value, " + newYpos + " y value.");
     }
 }
