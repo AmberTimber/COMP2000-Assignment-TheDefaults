@@ -32,32 +32,8 @@ public abstract class Aircraft {
         }
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setTarget(Vector2 newPos) {
-        this.aircraftPosition.setTarget(newPos);
-    }
-
-    public void changeTarget() {
-        this.aircraftPosition.changeTarget();
-    }
-
-    public void moveTowards(int speed) {
-        aircraftPosition.moveTowards(speed);
-    }
-
-    public Moveable getLocation() {
+    public Moveable setAircraftStuff() { // related to moving
         return aircraftPosition;
-    }
-
-    public boolean getReachedTarget() {
-        return aircraftPosition.getReachedTarget();
-    }
-
-    public void setReachedTarget(boolean value) {
-        aircraftPosition.setReachedTarget(value);
     }
 
     //getters

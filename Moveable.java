@@ -1,28 +1,25 @@
 import java.lang.annotation.Target;
 
-public class Moveable {
-    private int xPos = (int)(Math.random() * (900 - 1 + 1)) + 1;
-    private int yPos = (int)(Math.random() * (800 - 1 + 1)) + 1;
+public class Moveable extends Vector2 {
     private float minDist = 0.5f;
     private Vector2 target;
     private boolean reachTarget = false;
 
-    public void SetMove (int xpos, int ypos) {
-        setxPos(xpos);
-        setyPos(ypos);
+    public Moveable() {} // goes with just random position
+
+    public Moveable (int xpos, int ypos) {
+        setXPos(xpos);
+        setYPos(ypos);
     }
 
     // getters
-    public int getxPos() {
-        return xPos;
-    }
-
-    public int getyPos() {
-        return yPos;
-    }
 
     public boolean getReachedTarget() {
         return reachTarget;
+    }
+
+    public Vector2 getTarget() {
+        return target;
     }
 
     public void setReachedTarget(boolean value) {
@@ -30,13 +27,6 @@ public class Moveable {
     }
 
     // setters
-    public void setxPos(int xpos) {
-        this.xPos = xpos;
-    }
-
-    public void setyPos(int ypos) {
-        this.yPos = ypos;
-    }
 
     public void setTarget(Vector2 targetPosition) {
         target = targetPosition;
@@ -45,29 +35,58 @@ public class Moveable {
     public void moveTowards(int speed) {
         moveTowardsTargetXAxis(speed);
         moveTowardsTargetYAxis(speed);
+        checkIfReachTarget();
     }
 
     public void moveTowardsTargetXAxis(int speed) {
-        if (target.getXPos() > this.xPos) {
-            xPos += speed;
+        if (target.getXPos() > this.getXPos()) {
+            this.setXPos(this.getXPos() + speed);
         }
-        if (target.getXPos() < this.xPos) {
-            xPos += -speed;
+        if (target.getXPos() < this.getXPos()) {
+            this.setXPos(this.getXPos() + -speed);
         }
     }
 
     public void moveTowardsTargetYAxis(int speed) {
-        if (target.getyPos() > this.yPos) {
-            yPos += speed;
+        if (target.getYPos() > this.getYPos()) {
+            this.setYPos(this.getYPos() + speed);
         }
-        if (target.getyPos() < this.yPos) {
-            yPos += -speed;
+        if (target.getYPos() < this.getYPos()) {
+            this.setYPos(this.getYPos() + -speed);
         }
     }
 
-    public boolean checkIfReachTarget() {
-        if (this.xPos == target.getXPos() && this.yPos == target.getyPos()) {
-            return true;
+    public void checkIfReachTarget() {
+        if (checkReachXAxis() == true && checkReachYAxis() == true || this.getXPos() == target.getXPos() && this.getYPos() == target.getYPos()) {
+            reachTarget = true;
+            System.out.println("Reached pos!");
+            changeTarget();
+        }
+    }
+
+    private boolean checkReachXAxis () {
+        if (target.getXPos() < this.getXPos()) { // if target x is less than current position
+            if ((this.getXPos() - target.getXPos()) <= minDist) {
+                return true;
+            }
+        } else if (target.getXPos() > this.getXPos()) { // if target x is more than current position
+            if ((target.getXPos() - this.getXPos()) <= minDist) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private boolean checkReachYAxis () {
+        if (target.getYPos() < this.getYPos()) { // if target x is less than current position
+            if ((this.getYPos() - target.getYPos()) <= minDist) {
+                return true;
+            }
+        } else if (target.getYPos() > this.getYPos()) { // if target x is more than current position
+            if ((target.getYPos() - this.getYPos()) <= minDist) {
+                return true;
+            }
         }
         return false;
     }
@@ -77,5 +96,6 @@ public class Moveable {
         int newYpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
         target = new Vector2(newXpos, newYpos);
         System.out.println("New pos is: " + newXpos + " x value, " + newYpos + " y value.");
+        reachTarget = false;
     }
 }

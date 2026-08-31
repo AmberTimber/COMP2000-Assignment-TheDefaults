@@ -66,7 +66,7 @@ public class Main {
         JFrame mainPanel = new JFrame();
         mainPanel.setName("This is the simulation"); // ID
         mainPanel.setTitle("Airport Simulation"); // title of tab
-        mainPanel.setSize(1000, 800); // size, duh
+        mainPanel.setSize(1000, 1000); // size, duh
         mainPanel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // ensure jpanel tab can close
         JPanelVisualizer plaeTemp = new JPanelVisualizer(); // creates objects
         // adding the elements
