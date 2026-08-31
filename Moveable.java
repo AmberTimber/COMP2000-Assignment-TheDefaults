@@ -1,4 +1,3 @@
-import java.lang.annotation.Target;
 
 public class Moveable extends Vector2 {
     private float minDist = 0.5f;
