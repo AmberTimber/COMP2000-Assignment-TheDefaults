@@ -23,9 +23,11 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     private Image airportRef = new ImageIcon("Folder JUMPSCARE/airportRef.png").getImage();
     private int aircraftCount = (int)(Math.random() * (10 - 1 + 1)) + 1;
     private Aircraft[] aircrafts = new Aircraft[aircraftCount];
+    private JFrame JframeRef;
 
     // intializes time
-    public JPanelVisualizer() {
+    public JPanelVisualizer(JFrame jframePanel) {
+        JframeRef = jframePanel;
         for (int i = 0; i < aircrafts.length; i++) {
             aircrafts[i] = new CargoPlane("Aircraft " + i, "Harry Potter the " + i, "Hawking404", 30.00, 50,"Fly my minions", 500.00, 250.00);
             int newXpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
@@ -59,12 +61,13 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     protected void paintComponent(Graphics g) {
         // put anything you want to redraw, like images or shapes here, otherwise they won't be redrawn
         super.paintComponent(g);// put anything drawn after this line
-        g.drawImage(catImage, 100, 20, this);
         g.drawImage(airportRef, 0, 0, this); // ref img
         // draw airfield
         g.setColor(Color.GRAY);
-        g.fillRect(0, 0, 1000, 200);
-        g.fillRect(0, 700, 1000, 200);
+        g.fillRect(0, 0, JframeRef.getWidth(), 200);
+        g.fillRect(0, 700, JframeRef.getWidth(), 200);
+        // air traffic control
+        g.drawImage(catImage, JframeRef.getWidth()/2, JframeRef.getHeight()/2 - 200, 150, 150, this);
         // draw plane line
         for (int i = 0; i < aircrafts.length; i++) {
             g.setColor(Color.YELLOW);
