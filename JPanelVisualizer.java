@@ -32,7 +32,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             aircrafts[i] = new CargoPlane("Aircraft " + i, "Harry Potter the " + i, "Hawking404", 30.00, 50,"Fly my minions", 500.00, 250.00);
             int newXpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
             int newYpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
-            aircrafts[i].setAircraftStuff().setTarget(new Vector2(newXpos, newYpos));
+            aircrafts[i].setTarget(new Vector2(newXpos, newYpos));
         }
 
         timer = new Timer(secondsPerFrame, this); // every secondsPerFrame time, = 1 frame
@@ -44,13 +44,13 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         // this entire function is used to update this element every frame
         // key note: increase in xPos = more to right, increase in Y makes it go down
         for (int i = 0; i < aircrafts.length; i++) {
-            aircrafts[i].setAircraftStuff().moveTowards(1);
-            if (aircrafts[i].setAircraftStuff().getReachedTarget() == true) {
-                aircrafts[i].setAircraftStuff().changeTarget();
-                aircrafts[i].setAircraftStuff().setReachedTarget(false);
+            aircrafts[i].moveTowards(1);
+            if (aircrafts[i].getReachedTarget() == true) {
+                aircrafts[i].changeTarget();
+                aircrafts[i].setReachedTarget(false);
                 System.out.println("New target set!");
             }
-            System.out.println("Target location is " + aircrafts[i].setAircraftStuff().getXPos() +"x, " + aircrafts[i].setAircraftStuff().getYPos() + "y. Target pos is " + aircrafts[i].setAircraftStuff().getTarget().getXPos() + "x, " + aircrafts[i].setAircraftStuff().getTarget().getYPos() + "y.");
+            System.out.println("Target location is " + aircrafts[i].getXPos() +"x, " + aircrafts[i].getYPos() + "y. Target pos is " + aircrafts[i].getTarget().getXPos() + "x, " + aircrafts[i].getTarget().getYPos() + "y.");
         }
         
         // updates the panel
@@ -71,9 +71,9 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         // draw plane line
         for (int i = 0; i < aircrafts.length; i++) {
             g.setColor(Color.YELLOW);
-            g.fillOval(aircrafts[i].setAircraftStuff().getXPos(), aircrafts[i].setAircraftStuff().getYPos(), 50, 50);
+            g.fillOval(aircrafts[i].getXPos(), aircrafts[i].getYPos(), 50, 50);
             g.setColor(Color.BLACK);
-            g.drawString("This is plane " + aircrafts[i].getAircraftID(), aircrafts[i].setAircraftStuff().getXPos(), aircrafts[i].setAircraftStuff().getYPos());
+            g.drawString("This is plane " + aircrafts[i].getAircraftID(), aircrafts[i].getXPos(), aircrafts[i].getYPos());
         }
     }
 }
