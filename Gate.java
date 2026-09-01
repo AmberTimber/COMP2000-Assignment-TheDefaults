@@ -13,9 +13,11 @@ public class Gate extends Vector2 {
                     containsNumb++;
                 }
             }
-            if (containsNumb <= 0) {
+            if (containsNumb <= 0) { // ensure number is Unique
                 this.gateNumber = gateNumber;
                 allGateNumbers.add(gateNumber);
+            } else {
+                System.out.println("Why is the gate number not Unique?");
             }
         }
         

@@ -1,11 +1,10 @@
-import javax.swing.ImageIcon;
-import java.awt.Image;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -65,9 +64,9 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         // draw airfield
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, JframeRef.getWidth(), 200);
-        g.fillRect(0, 700, JframeRef.getWidth(), 200);
+        g.fillRect(0, JframeRef.getHeight() - 200, JframeRef.getWidth(), 200);
         // air traffic control
-        g.drawImage(catImage, JframeRef.getWidth()/2, JframeRef.getHeight()/2 - 200, 150, 150, this);
+        g.drawImage(catImage, JframeRef.getWidth()/2, JframeRef.getHeight()/2 - 150, 150, 150, this);
         // draw plane line
         for (int i = 0; i < aircrafts.length; i++) {
             g.setColor(Color.YELLOW);
