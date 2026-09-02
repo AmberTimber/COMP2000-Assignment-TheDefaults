@@ -1,3 +1,7 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import javax.swing.JFrame;
+
 public class Runway extends AirportPath{
     private int capacity;
     private String status;
@@ -44,4 +48,8 @@ public class Runway extends AirportPath{
         return false;
     }
 
+    public void visualizer(Graphics g, JFrame JframeRef, int x, int y, int width, int height) {
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, JframeRef.getWidth(), 200);
+    }
 }

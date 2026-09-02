@@ -19,7 +19,6 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     private int secondsPerFrame = 10; // in miliseconds
 
     private Image catImage = new ImageIcon("Folder JUMPSCARE/cat.PNG").getImage();
-    private Image airportRef = new ImageIcon("Folder JUMPSCARE/airportRef.png").getImage();
     private int aircraftCount = (int)(Math.random() * (10 - 1 + 1)) + 1;
     private Aircraft[] aircrafts = new Aircraft[aircraftCount];
     private JFrame JframeRef;
@@ -60,13 +59,35 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     protected void paintComponent(Graphics g) {
         // put anything you want to redraw, like images or shapes here, otherwise they won't be redrawn
         super.paintComponent(g);// put anything drawn after this line
-        g.drawImage(airportRef, 0, 0, this); // ref img
         // draw airfield
         g.setColor(Color.GRAY);
-        g.fillRect(0, 0, JframeRef.getWidth(), 200);
-        g.fillRect(0, JframeRef.getHeight() - 200, JframeRef.getWidth(), 200);
+        g.fillRect(0, 0, JframeRef.getWidth(), 150);
+        g.setColor(Color.white);
+        g.drawLine(0, 75, JframeRef.getWidth(), 75);
+        // making road to airfield
+        g.setColor(Color.GRAY);
+        for (int i = 0; i < 8; i++) {
+            if (i%2 == 0) {
+                g.fillRect(JframeRef.getWidth()/7 * i, 150, JframeRef.getWidth()/7 , 150);
+            }
+        }
+        // making taxiway
+        g.fillRect(0, 300, JframeRef.getWidth(), 150);
+        // making road to gate
+        for (int i = 0; i < 5; i++) {
+            if (i%2 == 0) {
+                g.fillRect(JframeRef.getWidth()/5 * i, 450, JframeRef.getWidth()/5 , 150);
+            }
+        }
+        // making gates
+        g.setColor(Color.GREEN);
+        for (int i = 0; i < 10; i++) {
+            if (i%2 == 0) {
+                g.fillRect(JframeRef.getWidth()/9 * i, 600, JframeRef.getWidth()/9 , 200);
+            }
+        }
         // air traffic control
-        g.drawImage(catImage, JframeRef.getWidth()/2, JframeRef.getHeight()/2 - 150, 150, 150, this);
+        g.drawImage(catImage, JframeRef.getWidth()/2, JframeRef.getHeight() - 300, 150, 150, this);
         // draw plane line
         for (int i = 0; i < aircrafts.length; i++) {
             g.setColor(Color.YELLOW);

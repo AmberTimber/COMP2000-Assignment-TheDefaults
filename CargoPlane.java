@@ -1,4 +1,4 @@
-public class CargoPlane extends Aircraft{
+public class CargoPlane extends Aircraft implements flyable {
     private final double maxWeight; // in KG
     private double currentWeight;
 
@@ -33,5 +33,25 @@ public class CargoPlane extends Aircraft{
         System.out.println("This is a Cargo Plane.");
         System.out.println("Max Weight: " + maxWeight);
         System.out.println("Current Weight: " + currentWeight);
+    }
+
+    // for flyable implement
+    @Override
+    public boolean flying() {
+        if (this.getStatus() == "Flying") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public Vector2 getDestinationPostion() {
+        return this.getTarget();
+    }
+    
+    @Override
+    public void setLocation(Vector2 newPos) {
+        this.setTarget(newPos);
     }
 }

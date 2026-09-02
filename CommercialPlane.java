@@ -1,4 +1,4 @@
-public class CommercialPlane extends Aircraft {
+public class CommercialPlane extends Aircraft implements flyable {
     private final int numSeats;
     private int currentPassengers;
 
@@ -33,4 +33,23 @@ public class CommercialPlane extends Aircraft {
         System.out.println("Current Passengers: " + currentPassengers);
     }
 
+    // for flyable implement
+    @Override
+    public boolean flying() {
+        if (this.getStatus() == "Flying") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public Vector2 getDestinationPostion() {
+        return this.getTarget();
+    }
+    
+    @Override
+    public void setLocation(Vector2 newPos) {
+        this.setTarget(newPos);
+    }
 }
