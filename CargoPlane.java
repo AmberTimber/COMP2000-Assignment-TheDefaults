@@ -54,4 +54,22 @@ public class CargoPlane extends Aircraft implements flyable {
     public void setLocation(Vector2 newPos) {
         this.setTarget(newPos);
     }
+
+    @Override
+    public boolean isReadyForLanding() {
+        if (this.getStatus() == "ReadyForLanding") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isReadyForTakeoff() {
+        if (this.getStatus() == "ReadyForTakeoff") {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

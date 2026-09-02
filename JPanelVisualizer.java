@@ -86,6 +86,9 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 g.fillRect(JframeRef.getWidth()/9 * i, 600, JframeRef.getWidth()/9 , 200);
             }
         }
+        // Making terminal
+        g.setColor(Color.BLUE);
+        g.fillRect(0, 800, JframeRef.getWidth(), 200);
         // air traffic control
         g.drawImage(catImage, JframeRef.getWidth()/2, JframeRef.getHeight() - 300, 150, 150, this);
         // draw plane line
