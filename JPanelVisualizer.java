@@ -20,11 +20,13 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     private Timer timer;
     private int secondsPerFrame = 10; // in miliseconds
 
-    private Image catImage = new ImageIcon("Folder JUMPSCARE/cat.PNG").getImage();
     private int aircraftCount = (int)(Math.random() * (10 - 1 + 1)) + 1;
     private Aircraft[] aircrafts = new Aircraft[1];
     private JFrame JframeRef;
     private ArrayList<Node> flightPath = new ArrayList<>();
+    private ArrayList<Node> airportNav = new ArrayList<>();
+    private ArrayList<Aircraft> aircraftsOnSite = new ArrayList<>();
+    private AirTrafficControl airControl = new AirTrafficControl(aircraftsOnSite,  airportNav,new Vector2(500, 800));
     private Aircraft testFlight;
     private int count = 0;
 
@@ -75,13 +77,13 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         TaxiWayNode3.setRightNode(TaxiWayNode4);
 
 
-        flightPath = TaxiWayNode1.findNode("C4", flightPath);
-        flightPath = TaxiWayNode1.shortestPathNode(flightPath);
+        flightPath = airControl.calculateRoute("A3", TaxiWayNode1);
         
 
         testFlight = new CargoPlane("Test aircraft", "Time the greek", "Hawking404", 30.00, 50,"Fly my minions", 500.00, 250.00);
         testFlight.setVector2(JframeRef.getWidth()/9 + (JframeRef.getWidth()/9)/2, 600);
         testFlight.setTarget(TaxiWayNode1.getPosition());
+        aircraftsOnSite.add(testFlight);
 
         if (flightPath != null && !flightPath.isEmpty()) {
         for (int i = 0; i < flightPath.size(); i++) {
@@ -91,7 +93,6 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     } else {
         System.out.println("This node stuff isn't working yo, it can't find path");
     }
-    System.out.println(airfieldNode1.rightNode.NodeID);
 
         timer = new Timer(secondsPerFrame, this); // every secondsPerFrame time, = 1 frame
         timer.start(); // starts the timer
@@ -163,7 +164,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         g.setColor(Color.BLUE);
         g.fillRect(0, 800, JframeRef.getWidth(), 200);
         // air traffic control
-        g.drawImage(catImage, JframeRef.getWidth()/2, JframeRef.getHeight() - 300, 150, 150, this);
+        airControl.visualRepresentation(g);
+        //g.drawImage(catImage, JframeRef.getWidth()/2, JframeRef.getHeight() - 300, 150, 150, this);
         // draw plane line
         /*for (int i = 0; i < aircrafts.length; i++) {
             g.setColor(Color.YELLOW);

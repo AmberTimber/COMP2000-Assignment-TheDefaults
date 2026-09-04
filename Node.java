@@ -8,8 +8,9 @@ public class Node implements Position {
     Node leftNode;
     public Node rightNode;
     Vector2 nodePosition;
+    boolean isOccupied = false;
     
-
+    // maker
     public Node (Node upperNode, Node bottomNode, Node leftNode, Node rightNode, Vector2 nodePosition, String NodeID) {
         setUpperNode(upperNode);
         setBottomNode(bottomNode);
@@ -21,37 +22,6 @@ public class Node implements Position {
 
     public Vector2 getPosition () {
         return nodePosition;
-    }
-
-    public ArrayList<Node> shortestPathNode(ArrayList<Node> givenArray) {
-        ArrayList<Node> copy = new ArrayList<>(givenArray);
-        Node lastNode = null; // used to remove anything beyond the last waypoint
-        if (givenArray != null && !givenArray.isEmpty()) {
-            lastNode = givenArray.get(givenArray.size() - 1);
-            for (int i = 0; i < givenArray.size(); i++) { // starting node to check if future nodes are neighbors
-                int furtherProgression = 0; // used to compare which node is further down
-                for (int c = i; c < givenArray.size(); c++) {
-                    if (copy.get(i).checkIfNeighboring(givenArray.get(c))) { // detects whether a neighboring node has a vector2
-                        if (furtherProgression <= c && (i+1) < givenArray.size()) {
-                            copy.set(i + 1, givenArray.get(c));
-                            furtherProgression = c;
-                        }
-                    }
-                    
-                }
-            }
-        }
-
-        boolean reachedEnd = false; // detect if the waypoint has reached last
-        for (int i = 0; i < copy.size(); i++) {
-            if (copy.get(i).equals(lastNode)) {
-                reachedEnd = true;
-            } else if (reachedEnd == true) {
-                copy.remove(i); // removes any waypoints beyond the end waypoint
-                i--;
-            }
-        }
-        return copy;
     }
 
     public boolean checkIfNeighboring(Node targetedVector) { // detects whether a neighboring node has a targetedVector
@@ -69,40 +39,6 @@ public class Node implements Position {
             return true;
         }
         return false;
-    }
-
-        // used to create a navigational arraylist of points on the airport
-        public ArrayList<Node> findNode(String TargetedNode, ArrayList<Node> givenArray) {
-        if (givenArray.contains(this)) { // ensure that a node can only be gone on once
-            return null;
-        }
-
-        if (this.NodeID != null && this.NodeID.equals(TargetedNode)) {
-            givenArray.add(this);
-            return givenArray;
-        }
-
-        if (upperNode != null && !givenArray.contains(upperNode)) {
-            givenArray.add(this);
-            return upperNode.findNode(TargetedNode, givenArray);
-        }
-
-        if (bottomNode != null && !givenArray.contains(bottomNode)) {
-            givenArray.add(this);
-            return bottomNode.findNode(TargetedNode, givenArray);
-        }
-
-        if (leftNode != null && !givenArray.contains(leftNode)) {
-            givenArray.add(this);
-            return leftNode.findNode(TargetedNode, givenArray);
-        }
-
-        if (rightNode != null && !givenArray.contains(rightNode)) {
-            givenArray.add(this);
-            return rightNode.findNode(TargetedNode, givenArray);
-        }
-        
-        return null; // after checking that all other slots are null, meaning this branch isn't it
     }
 
     // setters
@@ -130,6 +66,10 @@ public class Node implements Position {
         nodePosition.yPos = ypos;
     }
 
+    public void setOccupied(boolean value) {
+        isOccupied = value;
+    }
+
     // getters
     public Node getUpperNode() {
         return upperNode;
@@ -153,5 +93,9 @@ public class Node implements Position {
 
     public int getYPos() {
         return nodePosition.yPos;
+    }
+
+    public boolean getOccupied() {
+        return isOccupied;
     }
 }

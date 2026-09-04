@@ -1,8 +1,11 @@
 
+import java.util.ArrayList;
+
 public class Moveable extends Vector2 {
     private float minDist = 0.5f;
     private Vector2 target;
     private boolean reachTarget = false;
+    private ArrayList<Node> flightPath = new ArrayList<>();
 
     public Moveable() {} // goes with just random position
 
@@ -11,8 +14,17 @@ public class Moveable extends Vector2 {
         setYPos(ypos);
     }
 
-    // getters
+    public void setFlightPath(ArrayList<Node> givenPath) {
+        flightPath = givenPath;
+    }
 
+    public void moveTowards(int speed) { // moves towards target at a speed
+        moveTowardsTargetXAxis(speed);
+        moveTowardsTargetYAxis(speed);
+        checkIfReachTarget();
+    }
+
+    // getters
     public boolean getReachedTarget() {
         return reachTarget;
     }
@@ -26,15 +38,8 @@ public class Moveable extends Vector2 {
     }
 
     // setters
-
     public void setTarget(Vector2 targetPosition) {
         target = targetPosition;
-    }
-
-    public void moveTowards(int speed) {
-        moveTowardsTargetXAxis(speed);
-        moveTowardsTargetYAxis(speed);
-        checkIfReachTarget();
     }
 
     public void moveTowardsTargetXAxis(int speed) {
