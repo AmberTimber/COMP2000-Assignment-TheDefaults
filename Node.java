@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Node {
+public class Node implements Position {
     public String NodeID;
     Node upperNode;
     Node bottomNode;
@@ -42,12 +42,12 @@ public class Node {
             }
         }
 
-        boolean reachedEnd = false;
+        boolean reachedEnd = false; // detect if the waypoint has reached last
         for (int i = 0; i < copy.size(); i++) {
             if (copy.get(i).equals(lastNode)) {
                 reachedEnd = true;
             } else if (reachedEnd == true) {
-                copy.remove(i);
+                copy.remove(i); // removes any waypoints beyond the end waypoint
                 i--;
             }
         }
@@ -71,46 +71,7 @@ public class Node {
         return false;
     }
 
-
-    /*public ArrayList<Vector2> findNode(String TargetedNode, ArrayList<Vector2> givenArray) {
-        if (givenArray.contains(nodePosition)) { // ensure that a node can only be gone on once
-            return null;
-        }
-
-        if (this.NodeID != null && this.NodeID.equals(TargetedNode)) {
-            givenArray.add(nodePosition);
-            return givenArray;
-        }
-
-        if (upperNode != null && !givenArray.contains(upperNode.getPosition())) {
-            givenArray.add(nodePosition);
-            return upperNode.findNode(TargetedNode, givenArray);
-        }
-
-        if (bottomNode != null && !givenArray.contains(bottomNode.getPosition())) {
-            givenArray.add(nodePosition);
-            return bottomNode.findNode(TargetedNode, givenArray);
-        }
-
-        if (leftNode != null && !givenArray.contains(leftNode.getPosition())) {
-            givenArray.add(nodePosition);
-            return leftNode.findNode(TargetedNode, givenArray);
-        }
-
-        if (rightNode != null && !givenArray.contains(rightNode.getPosition())) {
-            /*ArrayList<Vector2> result = new ArrayList<>(currentPath);
-            result.add(nodePosition);
-            result = rightNode.findNode(TargetedNode, currentPath);
-            if (result != null) {
-                return result;
-            }
-            givenArray.add(nodePosition);
-            return rightNode.findNode(TargetedNode, givenArray);
-        }
-        
-        return null; // after checking that all other slots are null, meaning this branch isn't it
-    }*/
-
+        // used to create a navigational arraylist of points on the airport
         public ArrayList<Node> findNode(String TargetedNode, ArrayList<Node> givenArray) {
         if (givenArray.contains(this)) { // ensure that a node can only be gone on once
             return null;
@@ -144,7 +105,7 @@ public class Node {
         return null; // after checking that all other slots are null, meaning this branch isn't it
     }
 
-
+    // setters
     public void setUpperNode(Node newNode) {
         this.upperNode = newNode;
     }
@@ -159,6 +120,14 @@ public class Node {
 
     public void setRightNode(Node newNode) {
         this.rightNode = newNode;
+    }
+    
+    public void setXPos(int xpos) {
+        nodePosition.xPos = xpos;
+    }
+
+    public void setYPos(int ypos) {
+        nodePosition.yPos = ypos;
     }
 
     // getters
@@ -176,5 +145,13 @@ public class Node {
 
     public Node getRightNode() {
         return rightNode;
+    }
+
+    public int getXPos() {
+        return nodePosition.xPos;
+    }
+
+    public int getYPos() {
+        return nodePosition.yPos;
     }
 }
