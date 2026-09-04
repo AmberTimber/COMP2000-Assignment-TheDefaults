@@ -59,7 +59,7 @@ public class Moveable extends Vector2 {
         if (checkReachXAxis() == true && checkReachYAxis() == true || this.getXPos() == target.getXPos() && this.getYPos() == target.getYPos()) {
             reachTarget = true;
             System.out.println("Reached pos!");
-            changeTarget();
+            //changeTarget();
         }
     }
 
@@ -94,7 +94,7 @@ public class Moveable extends Vector2 {
         int newXpos = (int)(Math.random() * (1000 - 1 + 1)) + 1;
         int newYpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
         target = new Vector2(newXpos, newYpos);
-        System.out.println("New pos is: " + newXpos + " x value, " + newYpos + " y value.");
+        //System.out.println("New pos is: " + newXpos + " x value, " + newYpos + " y value.");
         reachTarget = false;
     }
 }
