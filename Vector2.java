@@ -63,7 +63,7 @@ public class Vector2 implements Position {
         Vector2 otherVector2 = (Vector2) otherObject;
         
         // Compare the actual field values
-        return xPos == otherVector2.xPos && Objects.equals(xPos, otherVector2.xPos) && yPos == otherVector2.yPos && Objects.equals(yPos, otherVector2.yPos);
+        return xPos == otherVector2.xPos && yPos == otherVector2.yPos;
     }
 
     // Override hashCode()
