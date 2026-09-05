@@ -18,8 +18,12 @@ public class AirTrafficControl implements drawable {
 
     public ArrayList<Node> calculateRoute(String NodeID, Node StartingNode) {
         ArrayList<Node> path = new ArrayList<>();
+        if (NodeID != null && StartingNode != null) {
         path = findNode(NodeID, path, StartingNode);
         path = shortestPathNode(path);
+        } else {
+            throw new NullPointerException("Route calculations NodeID or startingNode is null or a incorrect data type!");
+        }
 
         return path;
     }
@@ -91,11 +95,18 @@ public class AirTrafficControl implements drawable {
     }
     
     // for drawing elements of airtraffic control
-    public void visualRepresentation(Graphics drawer) {
+    public void visualRepresentation(Graphics drawer, int width, int height) {
         Image catImage = new ImageIcon("Folder JUMPSCARE/cat.PNG").getImage();
         drawer.setColor(Color.GRAY);
-        drawer.fillRect(Location.getXPos(), Location.getYPos(), 50, 50);
+        drawer.fillRect(Location.getXPos(), Location.getYPos(), width, height);
         drawer.setColor(Color.CYAN);
-        drawer.fillRect(Location.getXPos(), Location.getYPos(), 25, 25);
+        drawer.fillRect(Location.getXPos(), Location.getYPos(), width, height);
+    }
+
+    // allows air traffic control to decide whether a plane can takeoff or not
+    public void ClearAircraftForTakeOff(Aircraft selectedAircraft, Node otherAirportLocation) {
+        if (selectedAircraft.canFly() == true) {
+            selectedAircraft.setTarget(otherAirportLocation.getPosition());
+        }
     }
 }

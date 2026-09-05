@@ -39,21 +39,23 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             int newYpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
             aircrafts[i].setTarget(new Vector2(newXpos, newYpos));
         }*/
+       Node leftFlyOfff = new Node(null, null, null, null, new Vector2(-100, 75), null, "Outside");
+        Node rightFlyOfff = new Node(null, null, null, null, new Vector2(jframePanel.getWidth() + 100, 75), null, "Outside");
+        
+        Node airfieldNode1 = new Node(null, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 75), "A1", "Runway");
+        Node airfieldNode2 = new Node(null, null, airfieldNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 75), "A2", "RUNWAY");
+        Node airfieldNode3 = new Node(null, null, airfieldNode2, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 75), "A3", "RUNWAY");
+        Node airfieldNode4 = new Node(null, null, airfieldNode3, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 75), "A4", "RUNWAY");
 
-        Node airfieldNode1 = new Node(null, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 75), "A1");
-        Node airfieldNode2 = new Node(null, null, airfieldNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 75), "A2");
-        Node airfieldNode3 = new Node(null, null, airfieldNode2, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 75), "A3");
-        Node airfieldNode4 = new Node(null, null, airfieldNode3, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 75), "A4");
+        Node miniRoadNode1 = new Node(airfieldNode1, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 225), "B1", "WAITINGBAY");
+        Node miniRoadNode2 = new Node(airfieldNode2, null, miniRoadNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 225), "B2", "WAITINGBAY");
+        Node miniRoadNode3 = new Node(airfieldNode3, null, miniRoadNode2, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 225), "B3", "WAITINGBAY");
+        Node miniRoadNode4 = new Node(airfieldNode4, null, miniRoadNode3, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 225), "B4", "WAITINGBAY");
 
-        Node miniRoadNode1 = new Node(airfieldNode1, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 225), "B1");
-        Node miniRoadNode2 = new Node(airfieldNode2, null, miniRoadNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 225), "B2");
-        Node miniRoadNode3 = new Node(airfieldNode3, null, miniRoadNode2, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 225), "B3");
-        Node miniRoadNode4 = new Node(airfieldNode4, null, miniRoadNode3, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 225), "B4");
-
-        Node TaxiWayNode1 = new Node(miniRoadNode1, null, null, null, new Vector2(JframeRef.getWidth()/5 * 0 + JframeRef.getWidth()/5, 525), "C1");
-        Node TaxiWayNode2 = new Node(miniRoadNode2, null, TaxiWayNode1, null, new Vector2(JframeRef.getWidth()/5 * 1 + JframeRef.getWidth()/5, 525), "C2");
-        Node TaxiWayNode3 = new Node(miniRoadNode3, null, TaxiWayNode2, null, new Vector2(JframeRef.getWidth()/5 * 2 + JframeRef.getWidth()/5, 525), "C3");
-        Node TaxiWayNode4 = new Node(miniRoadNode4, null, TaxiWayNode3, null, new Vector2(JframeRef.getWidth()/5 * 3 + JframeRef.getWidth()/5, 525), "C4");
+        Node TaxiWayNode1 = new Node(miniRoadNode1, null, null, null, new Vector2(JframeRef.getWidth()/5 * 0 + JframeRef.getWidth()/5, 525), "C1", "TAXIWAY");
+        Node TaxiWayNode2 = new Node(miniRoadNode2, null, TaxiWayNode1, null, new Vector2(JframeRef.getWidth()/5 * 1 + JframeRef.getWidth()/5, 525), "C2", "TAXIWAY");
+        Node TaxiWayNode3 = new Node(miniRoadNode3, null, TaxiWayNode2, null, new Vector2(JframeRef.getWidth()/5 * 2 + JframeRef.getWidth()/5, 525), "C3", "TAXIWAY");
+        Node TaxiWayNode4 = new Node(miniRoadNode4, null, TaxiWayNode3, null, new Vector2(JframeRef.getWidth()/5 * 3 + JframeRef.getWidth()/5, 525), "C4", "TAXIWAY");
 
         airfieldNode1.setBottomNode(miniRoadNode1);
         airfieldNode1.setRightNode(airfieldNode2);
@@ -75,6 +77,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         TaxiWayNode1.setRightNode(TaxiWayNode2);
         TaxiWayNode2.setRightNode(TaxiWayNode3);
         TaxiWayNode3.setRightNode(TaxiWayNode4);
+
 
 
         flightPath = airControl.calculateRoute("A3", TaxiWayNode1);
@@ -116,10 +119,12 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             testFlight.setTarget(flightPath.get(count).getPosition().getVector2());
             testFlight.moveTowards(1);
     
-             if (testFlight.getReachedTarget() == true && flightPath.size() > count + 1) {
+             if (testFlight.getReachedTarget() == true && flightPath.size() > count + 1 && flightPath.get(count+1).getOccupied() == false) {
+                flightPath.get(count).setOccupied(false); // frees up node for other aircrafts to go to
                 count++;
                 testFlight.setTarget(flightPath.get(count).getPosition().getVector2());
                 testFlight.setReachedTarget(false);
+                flightPath.get(count).setOccupied(true); // ensure no other aircrafts can go to the node
                 System.out.println("New target set!");
             }
         }
@@ -164,7 +169,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         g.setColor(Color.BLUE);
         g.fillRect(0, 800, JframeRef.getWidth(), 200);
         // air traffic control
-        airControl.visualRepresentation(g);
+        airControl.visualRepresentation(g, 50,50);
         //g.drawImage(catImage, JframeRef.getWidth()/2, JframeRef.getHeight() - 300, 150, 150, this);
         // draw plane line
         /*for (int i = 0; i < aircrafts.length; i++) {

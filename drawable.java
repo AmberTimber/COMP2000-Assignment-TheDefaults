@@ -5,5 +5,5 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public interface drawable { // used for visualising items
-    void visualRepresentation(Graphics drawer);
+    void visualRepresentation(Graphics drawer, int width, int height);
 }

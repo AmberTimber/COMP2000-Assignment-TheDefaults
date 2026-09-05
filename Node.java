@@ -8,20 +8,26 @@ public class Node implements Position {
     Node leftNode;
     public Node rightNode;
     Vector2 nodePosition;
-    boolean isOccupied = false;
+    boolean isOccupied = false; // determines if a node is obstructed or not
+    String locatedIn;
     
     // maker
-    public Node (Node upperNode, Node bottomNode, Node leftNode, Node rightNode, Vector2 nodePosition, String NodeID) {
+    public Node (Node upperNode, Node bottomNode, Node leftNode, Node rightNode, Vector2 nodePosition, String NodeID, String Location) {
         setUpperNode(upperNode);
         setBottomNode(bottomNode);
         setLeftNode(leftNode);
         setRightNode(rightNode);
         this.nodePosition = nodePosition;
         this.NodeID = NodeID;
+        locatedIn = Location;
     }
 
     public Vector2 getPosition () {
         return nodePosition;
+    }
+
+    public String getNodeTileRepresentation() {
+        return locatedIn;
     }
 
     public boolean checkIfNeighboring(Node targetedVector) { // detects whether a neighboring node has a targetedVector
