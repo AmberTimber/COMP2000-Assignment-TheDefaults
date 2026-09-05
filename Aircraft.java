@@ -32,6 +32,10 @@ public abstract class Aircraft extends Moveable {
         }
     }
 
+    public void setStatus(String newStatus) {
+        status = newStatus;
+    }
+
     //getters
     public String getAircraftID() {
         return aircraftID;
@@ -74,9 +78,10 @@ public abstract class Aircraft extends Moveable {
     }
 
     public boolean canFly() {
-        if (getReachedTarget() == true && getTarget() == getFlightPath().get(getFlightPath().size()-1).getPosition()) {
+        if (getReachedTarget() == true && getVector2().compareVectors(getFlightPath().get(getFlightPath().size()-1).getPosition()) == true) {
             Node lastNodeRef = getFlightPath().get(getFlightPath().size()-1);
             if (lastNodeRef.getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) {
+                setStatus("Flying");
                 return true;
             }
         }

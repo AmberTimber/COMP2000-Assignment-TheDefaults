@@ -107,6 +107,8 @@ public class AirTrafficControl implements drawable {
     public void ClearAircraftForTakeOff(Aircraft selectedAircraft, Node otherAirportLocation) {
         if (selectedAircraft.canFly() == true) {
             selectedAircraft.setTarget(otherAirportLocation.getPosition());
+            selectedAircraft.setReachedTarget(false);
+            System.out.println("Go for takeoff!!!");
         }
     }
 }

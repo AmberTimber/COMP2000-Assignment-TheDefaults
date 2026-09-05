@@ -7,6 +7,7 @@ public class Moveable extends Vector2 {
     private Vector2 target;
     private boolean reachTarget = false;
     private ArrayList<Node> flightPath = new ArrayList<>();
+    private int NavigationIndex = 0;
 
     public Moveable(){}
 
@@ -112,5 +113,24 @@ public class Moveable extends Vector2 {
         target = new Vector2(newXpos, newYpos);
         //System.out.println("New pos is: " + newXpos + " x value, " + newYpos + " y value.");
         reachTarget = false;
+    }
+
+    public void MoveThroughFlightPath(int speed) {
+        if (flightPath != null && !flightPath.isEmpty()) {
+            if (flightPath.size() > NavigationIndex) {
+                setTarget(flightPath.get(NavigationIndex).getPosition().getVector2());
+                moveTowards(speed);
+                checkIfReachTarget();
+    
+                if (getReachedTarget() == true && flightPath.size() > NavigationIndex + 1 && flightPath.get(NavigationIndex +1).getOccupied() == false) {
+                    flightPath.get(NavigationIndex).setOccupied(false); // frees up node for other aircrafts to go to
+                    NavigationIndex++;
+                    setTarget(flightPath.get(NavigationIndex).getPosition().getVector2());
+                    setReachedTarget(false);
+                    flightPath.get(NavigationIndex).setOccupied(true); // ensure no other aircrafts can go to the node
+                    System.out.println("New target set!");
+                }
+            }
+        }
     }
 }

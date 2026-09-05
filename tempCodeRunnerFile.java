@@ -1,1 +1,0 @@
-flightPath.size() >

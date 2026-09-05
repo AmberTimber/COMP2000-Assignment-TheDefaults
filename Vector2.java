@@ -20,6 +20,13 @@ public class Vector2 implements Position {
         setYPos(yPos);
     }
 
+    public boolean compareVectors(Vector2 otherVector) {
+        if (getXPos() == otherVector.getXPos() && getYPos() == otherVector.getYPos()) {
+            return true;
+        }
+        return false;
+    }
+
     // getters
     @Override
     public int getXPos () {

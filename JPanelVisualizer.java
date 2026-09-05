@@ -39,8 +39,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             int newYpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
             aircrafts[i].setTarget(new Vector2(newXpos, newYpos));
         }*/
-        Node leftFlyOff = new Node(null, null, null, null, new Vector2(-100, 75), null, "Outside");
-        Node rightFlyOfff = new Node(null, null, null, null, new Vector2(jframePanel.getWidth() + 100, 75), null, "Outside");
+        Node leftFlyOff = new Node(null, null, null, null, new Vector2(-100, 75), "LeftExit", "Outside");
+        Node rightFlyOfff = new Node(null, null, null, null, new Vector2(jframePanel.getWidth() + 100, 75), "RightExit", "Outside");
         
         Node airfieldNode1 = new Node(null, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 75), "A1", "Runway");
         Node airfieldNode2 = new Node(null, null, airfieldNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 75), "A2", "RUNWAY");
@@ -80,22 +80,28 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
 
 
 
-        flightPath = airControl.calculateRoute("A1", TaxiWayNode1);
+        flightPath = airControl.calculateRoute("A4", TaxiWayNode1);
+        ArrayList<Node> flightPath2 = airControl.calculateRoute("B1", TaxiWayNode4);
         
 
         testFlight = new CargoPlane("Test aircraft", "Time the greek", "Hawking404", 30.00, 50,"Fly my minions", 500.00, 250.00);
         testFlight.setVector2(JframeRef.getWidth()/9 + (JframeRef.getWidth()/9)/2, 600);
-        testFlight.setTarget(TaxiWayNode1.getPosition());
+        testFlight.setFlightPath(flightPath);
         aircraftsOnSite.add(testFlight);
+
+        Aircraft testFlight2 = new CargoPlane("Test aircraft2", "Albert Minestein", "Blimper64", 30.00, 50,"Gravity Finder", 500.00, 250.00);
+        testFlight2.setVector2(TaxiWayNode4.getXPos()-100, TaxiWayNode4.getYPos());
+        testFlight2.setFlightPath(flightPath2);
+        aircraftsOnSite.add(testFlight2);
+
 
         if (flightPath != null && !flightPath.isEmpty()) {
         for (int i = 0; i < flightPath.size(); i++) {
-            //System.out.println(flightPath.get(i).xPos + ", " + flightPath.get(i).yPos);
             System.out.println(flightPath.get(i).getPosition().getXPos() + ", " + flightPath.get(i).getPosition().yPos);
         }
-    } else {
-        System.out.println("This node stuff isn't working yo, it can't find path");
-    }
+        } else {
+            System.out.println("This node stuff isn't working yo, it can't find path");
+        }
 
         timer = new Timer(secondsPerFrame, this); // every secondsPerFrame time, = 1 frame
         timer.start(); // starts the timer
@@ -115,7 +121,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             System.out.println("Target location is " + aircrafts[i].getXPos() +"x, " + aircrafts[i].getYPos() + "y. Target pos is " + aircrafts[i].getTarget().getXPos() + "x, " + aircrafts[i].getTarget().getYPos() + "y.");
         }*/
 
-        if (flightPath.size() > count) {
+        /*if (flightPath.size() > count) {
             testFlight.setTarget(flightPath.get(count).getPosition().getVector2());
             testFlight.moveTowards(1);
     
@@ -126,11 +132,18 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 testFlight.setReachedTarget(false);
                 flightPath.get(count).setOccupied(true); // ensure no other aircrafts can go to the node
                 System.out.println("New target set!");
-            } else if (testFlight.canFly() == true) {
-            Node leftFlyOff = new Node(null, null, null, null, new Vector2(-100, 75), null, "Outside");
-            airControl.ClearAircraftForTakeOff(testFlight, leftFlyOff);
-            System.out.println("Go for takeoff!!!");
-        }
+            } else*/ 
+
+            for (int i = 0; i < aircraftsOnSite.size(); i++) {
+            if (aircraftsOnSite.get(i).canFly() == true) {
+                Node leftFlyOff = new Node(null, null, null, null, new Vector2(-100, 75), null, "Outside");
+                airControl.ClearAircraftForTakeOff(aircraftsOnSite.get(i), leftFlyOff);
+                aircraftsOnSite.get(i).moveTowards(1);
+            } else if (testFlight.canFly() == false && testFlight.getStatus().equalsIgnoreCase("GROUNDED")) {
+                aircraftsOnSite.get(i).MoveThroughFlightPath(1);
+            } else {
+                aircraftsOnSite.get(i).moveTowards(1); // once in flight, moves to target
+            }
         }
             
         
@@ -182,7 +195,9 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             g.setColor(Color.BLACK);
             g.drawString("This is plane " + aircrafts[i].getAircraftID(), aircrafts[i].getXPos(), aircrafts[i].getYPos());
         }*/
+       for (int i = 0; i < aircraftsOnSite.size(); i++) {
         g.setColor(Color.YELLOW);
-        g.fillOval(testFlight.getXPos(), testFlight.getYPos(), 50, 50);
+        g.fillOval(aircraftsOnSite.get(i).getXPos(), aircraftsOnSite.get(i).getYPos(), 50, 50);
+       }
     }
 }
