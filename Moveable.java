@@ -8,6 +8,8 @@ public class Moveable extends Vector2 {
     private boolean reachTarget = false;
     private ArrayList<Node> flightPath = new ArrayList<>();
 
+    public Moveable(){}
+
     public Moveable(Vector2 position) {
         setXPos(position.xPos);
         setYPos(position.yPos);

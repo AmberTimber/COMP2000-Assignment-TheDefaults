@@ -7,7 +7,8 @@ public abstract class Aircraft extends Moveable {
     private String status;
 
 
-    public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status, Node targetLocation) {
+    public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
+        
         this.aircraftID = aircraftID;
         setOperator(operator);
         setModel(model);

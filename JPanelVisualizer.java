@@ -39,7 +39,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             int newYpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
             aircrafts[i].setTarget(new Vector2(newXpos, newYpos));
         }*/
-       Node leftFlyOfff = new Node(null, null, null, null, new Vector2(-100, 75), null, "Outside");
+        Node leftFlyOff = new Node(null, null, null, null, new Vector2(-100, 75), null, "Outside");
         Node rightFlyOfff = new Node(null, null, null, null, new Vector2(jframePanel.getWidth() + 100, 75), null, "Outside");
         
         Node airfieldNode1 = new Node(null, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 75), "A1", "Runway");
@@ -80,7 +80,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
 
 
 
-        flightPath = airControl.calculateRoute("A3", TaxiWayNode1);
+        flightPath = airControl.calculateRoute("A1", TaxiWayNode1);
         
 
         testFlight = new CargoPlane("Test aircraft", "Time the greek", "Hawking404", 30.00, 50,"Fly my minions", 500.00, 250.00);
@@ -115,7 +115,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             System.out.println("Target location is " + aircrafts[i].getXPos() +"x, " + aircrafts[i].getYPos() + "y. Target pos is " + aircrafts[i].getTarget().getXPos() + "x, " + aircrafts[i].getTarget().getYPos() + "y.");
         }*/
 
-            if (flightPath.size() > count) {
+        if (flightPath.size() > count) {
             testFlight.setTarget(flightPath.get(count).getPosition().getVector2());
             testFlight.moveTowards(1);
     
@@ -126,7 +126,11 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 testFlight.setReachedTarget(false);
                 flightPath.get(count).setOccupied(true); // ensure no other aircrafts can go to the node
                 System.out.println("New target set!");
-            }
+            } else if (testFlight.canFly() == true) {
+            Node leftFlyOff = new Node(null, null, null, null, new Vector2(-100, 75), null, "Outside");
+            airControl.ClearAircraftForTakeOff(testFlight, leftFlyOff);
+            System.out.println("Go for takeoff!!!");
+        }
         }
             
         
