@@ -1,7 +1,7 @@
 
 import java.util.ArrayList;
 
-public class Moveable extends Vector2 {
+public class Moveable extends Vector2  {
     private float minDist = 0.5f;
     private Vector2 target;
     private boolean reachTarget = false;
@@ -103,7 +103,7 @@ public class Moveable extends Vector2 {
     }
 
     // used for moving the object to a position
-    public void moveTowardsTargetXAxis(int speed) {
+    private void moveTowardsTargetXAxis(int speed) {
         if (target.getXPos() > this.getXPos()) {
             this.setXPos(this.getXPos() + speed);
         }
@@ -112,7 +112,7 @@ public class Moveable extends Vector2 {
         }
     }
 
-    public void moveTowardsTargetYAxis(int speed) {
+    private void moveTowardsTargetYAxis(int speed) {
         if (target.getYPos() > this.getYPos()) {
             this.setYPos(this.getYPos() + speed);
         }

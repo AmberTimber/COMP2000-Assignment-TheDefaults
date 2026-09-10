@@ -2,7 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
-public class AirTrafficControl implements drawable {
+public class AirTrafficControl implements drawable, Position {
     private static ArrayList<Aircraft> aircraftsInAirport;
     private static ArrayList<Node> airportNavigation;
     private Vector2 Location;
@@ -14,6 +14,26 @@ public class AirTrafficControl implements drawable {
         aircraftsInAirport = aircraftCount;
         airportNavigation = airportMap;
         Location = buildingLocation;
+    }
+
+    public int getXPos() {
+        return Location.xPos;
+    }
+
+    public int getYPos() {
+        return Location.yPos;
+    }
+
+    public void setXPos(int xPos) {
+        Location.xPos = xPos;
+    }
+    
+    public void setYPos(int yPos) {
+
+    }
+
+    public Vector2 getPosition() {
+        return Location;
     }
 
     public boolean getOccupiedAirfield() {
@@ -139,7 +159,7 @@ public class AirTrafficControl implements drawable {
     }
 
     // changes all airfield nodes to be a value
-    public void AirfieldNodeChanger (ArrayList<Node> airfieldRef) {
+    private void AirfieldNodeChanger (ArrayList<Node> airfieldRef) {
         if (airfieldRef != null && !airfieldRef.isEmpty())
         for (int i = 0; i < airfieldRef.size(); i++) {
             airfieldRef.get(i).setOccupied(OccupiedAirfield);
@@ -193,7 +213,7 @@ public class AirTrafficControl implements drawable {
     }
 
     // resets flight path of aircraft
-    public void ResetAircraft (Aircraft selectedAircraft) {
+    private void ResetAircraft (Aircraft selectedAircraft) {
         if (selectedAircraft != null) {
             selectedAircraft.resetIndex();
             selectedAircraft.setReachedTarget(false);
