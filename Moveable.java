@@ -72,6 +72,9 @@ public class Moveable extends Vector2 {
         if (givenPath != null && !givenPath.isEmpty()) {
             if (flightPath != null && !flightPath.isEmpty()) {
                 currentNode.setOccupied(false);
+                for (int i = 0; i < flightPath.size(); i++) {
+                    flightPath.get(i).setOccupied(false);
+                }
                 reachTarget = false;
             }
         resetIndex();
@@ -160,6 +163,9 @@ public class Moveable extends Vector2 {
 
     public void MoveThroughFlightPath(int speed) { // moves through given node movement
         if (flightPath != null && !flightPath.isEmpty()) {
+            if (!currentNode.getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) {
+                selected = false;
+            }
             if (flightPath.size() > NavigationIndex) {
                 moveTowards(speed);
                 checkIfReachTarget();
@@ -207,7 +213,26 @@ public class Moveable extends Vector2 {
         }
     }
 
+    // returns last node in flight path
     public Node getLastNodeInFlightPath() {
         return flightPath.get(flightPath.size()-1);
+    }
+
+    public boolean isAtLastNode() { // detects whether at last node
+        if (NavigationIndex >= flightPath.size()-1 || flightPath.get(flightPath.size()-1).CompareNodes(currentNode)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // used to reverse aircraft
+    public void reverseAircraft() {
+        if (NavigationIndex > 0) {
+            currentNode.setOccupied(false);
+            NavigationIndex--;
+        } else {
+            System.out.println("Cannot reverse, path is already at start!");
+        }
     }
 }

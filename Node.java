@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Node implements Position {
-    public String NodeID;
+    private String NodeID;
     Node upperNode;
     Node bottomNode;
     Node leftNode;

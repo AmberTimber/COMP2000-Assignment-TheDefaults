@@ -98,6 +98,28 @@ public class AirwayGate implements drawable {
         }
     }
 
+    // check if reached a gate
+    public void PlaneAtGate (Aircraft selectedAircraft) {
+        if (selectedAircraft != null && selectedAircraft.checkIfEndOfPath() && !selectedAircraft.getStatus().equalsIgnoreCase("DOCKED")) {
+                if (selectedAircraft.getPosition().compareVectors(this.getGateNode().getPosition()) && this.getStatus() == true) {
+                    try {
+                    selectedAircraft.setDocked(true);
+                    selectedAircraft.setStatus("DOCKED");
+                    int cooldown = (int)(Math.random() * (1000 - 300 + 1)) + 300;
+                    selectedAircraft.setCountdown(cooldown); // pretend that people are getting on board + refueling
+                    this.parkPlane(selectedAircraft);
+                    selectedAircraft.setGate(this);
+                    } catch (OccupancyException e) {
+                    System.out.println("Occupancy Error at gate: " + e.getMessage());
+                    } catch (Exception e) {
+                       System.out.println("Error occured at gate: " + e.getMessage()); 
+                }
+            }
+        } else {
+            System.out.println("Aircraft not at this gate!"); 
+        }
+    }
+
     // for drawing elements of gate
     @Override
     public void visualRepresentation(Graphics drawer, int width, int height) {

@@ -42,7 +42,8 @@ public class AirTrafficControl implements drawable {
             for (int i = 0; i < givenArray.size(); i++) { // starting node to check if future nodes are neighbors
                 int furtherProgression = 0; // used to compare which node is further down
                 for (int c = i; c < givenArray.size(); c++) {
-                    if (copy.get(i).checkIfNeighboring(givenArray.get(c)) && copy.get(i).getOccupied() == false || copy.get(i).checkIfNeighboring(givenArray.get(c)) && givenArray.get(i) == givenArray.get(givenArray.size()-1) || copy.get(i).checkIfNeighboring(givenArray.get(c)) && givenArray.get(i).getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) { // detects whether a neighboring node has a vector2
+                    if (copy.get(i).checkIfNeighboring(givenArray.get(c))) { // detects whether a neighboring node has a vector2
+                        //  && copy.get(i).getOccupied() == false || copy.get(i).checkIfNeighboring(givenArray.get(c)) && givenArray.get(i) == givenArray.get(givenArray.size()-1) || copy.get(i).checkIfNeighboring(givenArray.get(c)) && givenArray.get(i).getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")
                         if (furtherProgression <= c && (i+1) < givenArray.size()) {
                             copy.set(i + 1, givenArray.get(c));
                             furtherProgression = c;
@@ -73,7 +74,7 @@ public class AirTrafficControl implements drawable {
             return null;
         }
 
-        if (startingNode.NodeID != null && startingNode.NodeID.equals(TargetedNode)) {
+        if (startingNode.getNodeID() != null && startingNode.getNodeID().equals(TargetedNode)) {
             givenArray.add(startingNode);
             return givenArray;
         }
@@ -196,28 +197,6 @@ public class AirTrafficControl implements drawable {
         if (selectedAircraft != null) {
             selectedAircraft.resetIndex();
             selectedAircraft.setReachedTarget(false);
-        }
-    }
-
-    // check if reached a gate
-    public void PlaneAtGate (Aircraft selectedAircraft, ArrayList<AirwayGate> gateList) {
-        if (selectedAircraft != null && gateList != null && !gateList.isEmpty() && selectedAircraft.checkIfEndOfPath() && !selectedAircraft.getStatus().equalsIgnoreCase("DOCKED")) {
-            for (int i = 0; i < gateList.size(); i++) {
-                if (selectedAircraft.getPosition().compareVectors(gateList.get(i).getGateNode().getPosition()) && gateList.get(i).getStatus() == true) {
-                    try {
-                    selectedAircraft.setDocked(true);
-                    selectedAircraft.setStatus("DOCKED");
-                    int cooldown = (int)(Math.random() * (1000 - 300 + 1)) + 300;
-                    selectedAircraft.setCountdown(cooldown); // pretend that people are getting on board + refueling
-                    gateList.get(i).parkPlane(selectedAircraft);
-                    selectedAircraft.setGate(gateList.get(i));
-                    } catch (OccupancyException e) {
-                    System.out.println("Occupancy Error at gate: " + e.getMessage());
-                    } catch (Exception e) {
-                       System.out.println("Error occured at gate: " + e.getMessage()); 
-                    }
-                }
-            }
         }
     }
 
