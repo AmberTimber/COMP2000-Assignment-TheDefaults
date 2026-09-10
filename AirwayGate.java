@@ -87,6 +87,7 @@ public class AirwayGate implements drawable {
             ArrayList<Node> path = airController.calculateRoute(locationNode, gateNode);
             currentPlane.setFlightPath(path);
             currentPlane.setStatus("GROUNDED");
+            currentPlane.setGate(null);
             currentPlane.setDocked(false);
             removePlane();
             } catch (NullPointerException e) {

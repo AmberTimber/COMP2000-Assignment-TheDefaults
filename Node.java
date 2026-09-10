@@ -108,4 +108,13 @@ public class Node implements Position {
     public String getNodeID() {
         return NodeID;
     }
+
+    // if in same node
+    public boolean CompareNodes(Node otherNode) {
+        if (this.getPosition().compareVectors(otherNode.getPosition())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

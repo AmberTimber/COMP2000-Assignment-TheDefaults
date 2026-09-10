@@ -71,7 +71,7 @@ public class Moveable extends Vector2 {
     public void setFlightPath(ArrayList<Node> givenPath) { // set path for things to move to
         if (givenPath != null && !givenPath.isEmpty()) {
             if (flightPath != null && !flightPath.isEmpty()) {
-                flightPath.get(NavigationIndex).setOccupied(false);
+                currentNode.setOccupied(false);
                 reachTarget = false;
             }
         resetIndex();
@@ -200,10 +200,14 @@ public class Moveable extends Vector2 {
 
     // if reached end of nav path
     public boolean checkIfEndOfPath() {
-        if (flightPath != null && !flightPath.isEmpty() && flightPath.size() <= NavigationIndex + 1) {
+        if (flightPath != null && !flightPath.isEmpty() && flightPath.size() <= NavigationIndex + 1 || flightPath != null && !flightPath.isEmpty() && flightPath.get(flightPath.size()-1).getPosition().compareVectors(flightPath.get(NavigationIndex).getPosition())) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public Node getLastNodeInFlightPath() {
+        return flightPath.get(flightPath.size()-1);
     }
 }

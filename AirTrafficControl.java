@@ -42,7 +42,7 @@ public class AirTrafficControl implements drawable {
             for (int i = 0; i < givenArray.size(); i++) { // starting node to check if future nodes are neighbors
                 int furtherProgression = 0; // used to compare which node is further down
                 for (int c = i; c < givenArray.size(); c++) {
-                    if (copy.get(i).checkIfNeighboring(givenArray.get(c)) && copy.get(i).getOccupied() == false || givenArray.get(i) == givenArray.get(givenArray.size()-1) || givenArray.get(i).getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) { // detects whether a neighboring node has a vector2
+                    if (copy.get(i).checkIfNeighboring(givenArray.get(c)) && copy.get(i).getOccupied() == false || copy.get(i).checkIfNeighboring(givenArray.get(c)) && givenArray.get(i) == givenArray.get(givenArray.size()-1) || copy.get(i).checkIfNeighboring(givenArray.get(c)) && givenArray.get(i).getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) { // detects whether a neighboring node has a vector2
                         if (furtherProgression <= c && (i+1) < givenArray.size()) {
                             copy.set(i + 1, givenArray.get(c));
                             furtherProgression = c;
@@ -171,19 +171,18 @@ public class AirTrafficControl implements drawable {
     }
 
     // check if clear for landing
-    public void clearForLanding(Aircraft selectedAircraft, Node RUNWAYNode, ArrayList<Node> airfieldRef, ArrayList<Node> airportNav) {
-        if (airfieldRef != null && !airfieldRef.isEmpty() && selectedAircraft != null && RUNWAYNode != null && airportNav != null && !airportNav.isEmpty()) {
+    public void clearForLanding(Aircraft selectedAircraft, ArrayList<Node> airfieldRef, ArrayList<Node> airportNav) {
+        if (airfieldRef != null && !airfieldRef.isEmpty() && selectedAircraft != null && airportNav != null && !airportNav.isEmpty()) {
             Node aircraftNodeRef = selectedAircraft.getFlightPath().get(selectedAircraft.getFlightPath().size()-1);
             if (selectedAircraft.getFlying() && selectedAircraft.compareVectors(aircraftNodeRef.getPosition())) {
-                if (OccupiedAirfield == false && flyingAircraft == null && flyingAircraft == null) {
+                if (OccupiedAirfield == false && flyingAircraft == null) {
                     selectedAircraft.getCurrentNode().setOccupied(false);
                     flyingAircraft = selectedAircraft;
                     ResetAircraft(flyingAircraft);
                     flyingAircraft.setSelected(true);
-                    flyingAircraft.setTarget(RUNWAYNode.getPosition());
-                    flyingAircraft.setStatus("GROUNDED");
                     flyingAircraft.setFlying(false);
                     flyingAircraft.setFlightPath(airportNav);
+                    flyingAircraft.setStatus("GROUNDED");
                     OccupiedAirfield = true;
                     AirfieldNodeChanger(airfieldRef);
                     System.out.println("attempting to land!");
@@ -211,6 +210,7 @@ public class AirTrafficControl implements drawable {
                     int cooldown = (int)(Math.random() * (1000 - 300 + 1)) + 300;
                     selectedAircraft.setCountdown(cooldown); // pretend that people are getting on board + refueling
                     gateList.get(i).parkPlane(selectedAircraft);
+                    selectedAircraft.setGate(gateList.get(i));
                     } catch (OccupancyException e) {
                     System.out.println("Occupancy Error at gate: " + e.getMessage());
                     } catch (Exception e) {

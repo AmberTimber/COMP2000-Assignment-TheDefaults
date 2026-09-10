@@ -10,6 +10,7 @@ public abstract class Aircraft extends Moveable implements drawable {
     private int countdown = 0;
     private int framesToConsumeFuel = 200;
     private int MaxframesToConsumeFuel = framesToConsumeFuel;
+    private AirwayGate gateAssigned = null;
 
 
     public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
@@ -49,6 +50,10 @@ public abstract class Aircraft extends Moveable implements drawable {
         countdown = value;
     }
 
+    public void setGate(AirwayGate gateselected) {
+        gateAssigned = gateselected;
+    }
+
     //getters
     public String getAircraftID() {
         return aircraftID;
@@ -72,6 +77,10 @@ public abstract class Aircraft extends Moveable implements drawable {
 
     public boolean getFlying() {
         return flying;
+    }
+
+    public AirwayGate getAssignedGate() {
+        return gateAssigned;
     }
 
     public boolean CooldownOver() {
