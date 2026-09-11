@@ -23,7 +23,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     private ArrayList<Node> flightPath = new ArrayList<>();
     private ArrayList<Node> airportNav = new ArrayList<>();
     private ArrayList<Aircraft> aircraftsOnSite = new ArrayList<>();
-    private AirTrafficControl airControl = new AirTrafficControl(aircraftsOnSite,  airportNav,new Vector2(450, 600));
+    private AirTrafficControl airControl = new AirTrafficControl(aircraftsOnSite,  airportNav,new Vector2(400, 600));
     private ArrayList<Node> runway = new ArrayList<>();
     private ArrayList<Node> waitingBay = new ArrayList<>();
     private ArrayList<Node> outsideLoop = new ArrayList<>();
@@ -195,11 +195,6 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     for (int c = 0; c < allGates.size(); c++) {
                         allGates.get(c).PlaneAtGate(selectedAircraft);
                         }
-                    } // if plane can depart
-                    selectedAircraft.decreaseCountdown();
-                    if (selectedAircraft.CooldownOver()) {
-                        selectedAircraft.getCurrentNode().setOccupied(false);;
-                        selectedAircraft.getAssignedGate().departingPlane(airControl, "A4");
                     }
                 }
 
@@ -223,10 +218,10 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             } // if blocked while moving 
             else if(selectedAircraft.isBlocked() == true && selectedAircraft.getChosenToFly() == false) { 
                 // if a aircraft path is being blocked, it regenerates a new path or goes back 1 node
-                int chosenAction = (int)(Math.random() * 2);
+                int chosenAction = (int)(Math.random() * 3);
                 if (chosenAction == 0) {
                     selectedAircraft.reverseAircraft();
-                } else { // generates new path
+                } else if (chosenAction == 1) { // generates new path
                     String NodeID = selectedAircraft.getFlightPath().get(selectedAircraft.getFlightPath().size()-1).getNodeID();
                     Node currentNode = selectedAircraft.getCurrentNode();
                     flightPath = airControl.calculateRoute(NodeID, currentNode);
@@ -246,6 +241,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 selectedAircraft.decreaseCountdown();
                 if (selectedAircraft.CooldownOver()) {
                     AirwayGate currentGate = selectedAircraft.getAssignedGate();
+                    // if plane can depart
                     if (selectedAircraft.getAssignedGate() != null && selectedAircraft.getCurrentNode().getPosition().compareVectors(currentGate.getGateNode().getPosition()) && currentGate.getStatus() == true) {
                         String selectedNodeID = airControl.getRandomNodeID(runway);
                         currentGate.departingPlane(airControl, selectedNodeID);
@@ -289,21 +285,48 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     protected void paintComponent(Graphics g) {
         // put anything you want to redraw, like images or shapes here, otherwise they won't be redrawn
         super.paintComponent(g);// put anything drawn after this line
+        // background
+        g.setColor(new Color(0,100,0));
+        g.fillRect(0, 0, JframeRef.getWidth(), JframeRef.getHeight());
         // draw airfield
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, JframeRef.getWidth(), 150);
         g.setColor(Color.white);
-        g.drawLine(0, 75, JframeRef.getWidth(), 75);
+        for (int i = 120; i < JframeRef.getWidth() - 130; i+=100) {
+            g.drawLine(i, 75, i+50, 75);
+        }
+        for (int i = 10; i < 120; i+=20) {
+            g.fillRect(10, i+10, 100, 10);
+            g.fillRect(JframeRef.getWidth() - 130, i+10, 100, 10);
+        }
+        g.drawLine(0, 10, JframeRef.getWidth(), 10);
+        g.drawLine(0, 140, JframeRef.getWidth(), 140);
         // making road to airfield
         g.setColor(Color.GRAY);
         for (int i = 0; i < 8; i++) {
             if (i%2 == 0) {
-                g.fillRect(JframeRef.getWidth()/7 * i, 150, JframeRef.getWidth()/7 , 150);
+                g.fillRect(JframeRef.getWidth()/7 * i, 150, JframeRef.getWidth()/7-10 , 150);
+            }
+        }
+        g.setColor(Color.YELLOW);
+        for (int i = 0; i < 8; i++) {
+            if (i%2 == 0) {
+                g.drawLine(JframeRef.getWidth()/7 * i + 5, 150, JframeRef.getWidth()/7 * i + 5, 300);
+                g.drawLine(JframeRef.getWidth()/7 * i + JframeRef.getWidth()/7-16, 150, JframeRef.getWidth()/7 * i + JframeRef.getWidth()/7-16, 300);
+                g.drawLine(JframeRef.getWidth()/7 * i + JframeRef.getWidth()/7/2, 150, JframeRef.getWidth()/7 * i + JframeRef.getWidth()/7/2, 300);
             }
         }
         // making taxiway
+        g.setColor(Color.GRAY);
         g.fillRect(0, 300, JframeRef.getWidth(), 150);
+        g.setColor(Color.YELLOW);
+        for (int i = 0; i < JframeRef.getWidth(); i+=100) {
+            g.drawLine(i, 375, i+50, 375);
+        }
+        g.drawLine(0, 310, JframeRef.getWidth(), 310);
+        g.drawLine(0, 440, JframeRef.getWidth(), 440);
         // making road to gate
+        g.setColor(Color.GRAY);
         for (int i = 0; i < 5; i++) {
             if (i%2 == 0) {
                 g.fillRect(JframeRef.getWidth()/5 * i, 450, JframeRef.getWidth()/5 , 150);
@@ -316,7 +339,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         }
         // Making terminal
         g.setColor(Color.BLUE);
-        g.fillRect(0, 800, JframeRef.getWidth(), 200);
+        g.fillRect(0, JframeRef.getHeight()-150, JframeRef.getWidth(), 200);
         // air traffic control
         airControl.visualRepresentation(g, 50,50);
         // visualize noeds

@@ -85,9 +85,10 @@ public class AirwayGate implements drawable {
         if (currentPlane != null && currentPlane.getStatus().equalsIgnoreCase("DOCKED") && currentPlane.CooldownOver() && locationNode != null && !locationNode.isEmpty()) {
             try {
                 gateNode.isOccupied = false;
-            ArrayList<Node> path = airController.calculateRoute(locationNode, gateNode);
+                ArrayList<Node> path = airController.calculateRoute(locationNode, gateNode);
                 if (path == null && currentPlane.CooldownOver()) {
                     currentPlane.setCountdown(100);
+                    gateNode.isOccupied = true;
                 }
                 if (path != null && currentPlane.CooldownOver()) { // ensure path no null, maybe because its blocked, and tries later
                     currentPlane.setFlightPath(path); // creates new path so it doesn't collide with other aircrafts
@@ -111,7 +112,7 @@ public class AirwayGate implements drawable {
                     try {
                     selectedAircraft.setDocked(true);
                     selectedAircraft.setStatus("DOCKED");
-                    int cooldown = (int)(Math.random() * (1000 - 300 + 1)) + 300;
+                    int cooldown = (int)(Math.random() * (1000 - 500 + 1)) + 500;
                     selectedAircraft.setCountdown(cooldown); // pretend that people are getting on board + refueling
                     this.parkPlane(selectedAircraft);
                     selectedAircraft.setGate(this);
@@ -129,7 +130,7 @@ public class AirwayGate implements drawable {
     // for drawing elements of gate
     @Override
     public void visualRepresentation(Graphics drawer, int width, int height) {
-        drawer.setColor(Color.GREEN);
+        drawer.setColor(Color.white);
         drawer.fillRect(getGateNode().getXPos()-width/2, getGateNode().getYPos(), width, height);
     }
 }
