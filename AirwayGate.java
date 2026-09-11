@@ -84,12 +84,18 @@ public class AirwayGate implements drawable {
         // if plane is docked and timer has reached 0
         if (currentPlane != null && currentPlane.getStatus().equalsIgnoreCase("DOCKED") && currentPlane.CooldownOver() && locationNode != null && !locationNode.isEmpty()) {
             try {
+                gateNode.isOccupied = false;
             ArrayList<Node> path = airController.calculateRoute(locationNode, gateNode);
-            currentPlane.setFlightPath(path);
-            currentPlane.setStatus("GROUNDED");
-            currentPlane.setGate(null);
-            currentPlane.setDocked(false);
-            removePlane();
+                if (path == null && currentPlane.CooldownOver()) {
+                    currentPlane.setCountdown(100);
+                }
+                if (path != null && currentPlane.CooldownOver()) { // ensure path no null, maybe because its blocked, and tries later
+                    currentPlane.setFlightPath(path); // creates new path so it doesn't collide with other aircrafts
+                    currentPlane.setStatus("GROUNDED");
+                    currentPlane.setGate(null);
+                    currentPlane.setDocked(false);
+                    removePlane(); // removes from gate
+                }
             } catch (NullPointerException e) {
                 System.out.println("Null pointer exception happened while leaving the gate!:" + e);
             } catch (Exception e) {

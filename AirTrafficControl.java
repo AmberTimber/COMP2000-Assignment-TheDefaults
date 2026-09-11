@@ -44,8 +44,13 @@ public class AirTrafficControl implements drawable, Position {
     public ArrayList<Node> calculateRoute(String NodeID, Node StartingNode) {
         ArrayList<Node> path = new ArrayList<>();
         if (NodeID != null && StartingNode != null) {
-        path = findNode(NodeID, path, StartingNode);
-        path = shortestPathNode(path);
+            try {
+                path = findNode(NodeID, path, StartingNode);
+                path = shortestPathNode(path);
+            } catch (NullPointerException e) {
+                System.out.println("NULL ERROR IN PATH: " + e);
+                return null;
+            }
         } else {
             throw new NullPointerException("Route calculations NodeID or startingNode is null or a incorrect data type!");
         }
@@ -90,46 +95,40 @@ public class AirTrafficControl implements drawable, Position {
 
     // used to create a navigational arraylist of points on the airport
         private ArrayList<Node> findNode(String TargetedNode, ArrayList<Node> givenArray, Node startingNode) {
-        if (givenArray.contains(startingNode)) { // ensure that a node can only be gone on once
+        if (startingNode == null || givenArray.contains(startingNode) || startingNode.isOccupied) { // ensure that a node can only be gone on once
             return null;
         }
 
+        givenArray.add(startingNode); // adds
+
+        // if correct node
         if (startingNode.getNodeID() != null && startingNode.getNodeID().equals(TargetedNode)) {
-            givenArray.add(startingNode);
             return givenArray;
         }
 
-        if (startingNode.upperNode != null && !givenArray.contains(startingNode.upperNode)) {
-            givenArray.add(startingNode);
-            return findNode(TargetedNode, givenArray, startingNode.upperNode);
-        }
-
-        if (startingNode.bottomNode != null && !givenArray.contains(startingNode.bottomNode)) {
-            givenArray.add(startingNode);
-            return findNode(TargetedNode, givenArray, startingNode.bottomNode);
-        }
-
-        if (startingNode.leftNode != null && !givenArray.contains(startingNode.leftNode)) {
-            givenArray.add(startingNode);
-            return findNode(TargetedNode, givenArray, startingNode.leftNode);
-        }
-
-        if (startingNode.rightNode != null && !givenArray.contains(startingNode.rightNode)) {
-            givenArray.add(startingNode);
-            return findNode(TargetedNode, givenArray, startingNode.rightNode);
-        }
-
-        // used to ensure that a plane doesn't get stuck in a loop
-        if (startingNode.upperNode != null && startingNode.upperNode.upperNode != null && !givenArray.contains(startingNode.upperNode.upperNode)) {
-            givenArray.add(startingNode);
-            return findNode(TargetedNode, givenArray, startingNode.upperNode.upperNode);
-        }
-
-        if (startingNode.rightNode != null && startingNode.rightNode.rightNode != null && !givenArray.contains(startingNode.rightNode.rightNode)) {
-            givenArray.add(startingNode);
-            return findNode(TargetedNode, givenArray, startingNode.rightNode.rightNode);
-        }
+        ArrayList<Node> finalPath; // used to hold all pathways and check if reached
         
+        finalPath = findNode(TargetedNode, givenArray, startingNode.upperNode);
+        if (finalPath != null) {
+            return finalPath;
+        }
+
+        finalPath = findNode(TargetedNode, givenArray, startingNode.bottomNode);
+        if (finalPath != null) {
+            return finalPath;
+        }
+
+        finalPath = findNode(TargetedNode, givenArray, startingNode.leftNode);
+        if (finalPath != null) {
+            return finalPath;
+        }
+
+        finalPath = findNode(TargetedNode, givenArray, startingNode.rightNode);
+        if (finalPath != null) {
+            return finalPath;
+        }
+
+       givenArray.remove(givenArray.size()-1);
         System.out.println("Returned null in path!");
         return null; // after checking that all other slots are null, meaning this branch isn't it
     }

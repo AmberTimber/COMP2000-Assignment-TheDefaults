@@ -228,9 +228,10 @@ public class Moveable extends Vector2  {
 
     // used to reverse aircraft
     public void reverseAircraft() {
-        if (NavigationIndex > 0) {
+        if (NavigationIndex > 0 && !flightPath.get(NavigationIndex-1).isOccupied) {
             currentNode.setOccupied(false);
             NavigationIndex--;
+            setBlocked(false);
         } else {
             System.out.println("Cannot reverse, path is already at start!");
         }

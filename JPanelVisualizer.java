@@ -204,7 +204,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     airControl.ClearAircraftForTakeOff(selectedAircraft, outsideLoop, runway); // changes path to outside route
                 }
             }// prevents stuck on runway
-            else if (selectedAircraft.isBlocked() == true && selectedAircraft.getChosenToFly()) {
+            /*else if (selectedAircraft.isBlocked() == true && selectedAircraft.getChosenToFly()) {
                 int selectedRunwayNodeRef = (int)(Math.random() * runway.size()-1);
                 if (!runway.get(selectedRunwayNodeRef).CompareNodes(selectedAircraft.getCurrentNode())) {
                     Node newAirFieldNode = runway.get(selectedRunwayNodeRef);
@@ -214,20 +214,28 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     selectedAircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
                     selectedAircraft.setBlocked(false);
                 }
-            }
+            }*/
             else if (selectedAircraft.canFly() == false && selectedAircraft.getStatus().equalsIgnoreCase("GROUNDED") && selectedAircraft.isBlocked() == false || selectedAircraft.getChosenToFly()) {
                 // moves through the airport
                 selectedAircraft.MoveThroughFlightPath(1); 
-            } else if(selectedAircraft.isBlocked() == true && selectedAircraft.getChosenToFly() == false && inWaitingBay(selectedAircraft) == false) { 
+            } else if(selectedAircraft.isBlocked() == true && selectedAircraft.getChosenToFly() == false) { 
                 // if a aircraft path is being blocked, it regenerates a new path
-                Node currentNode = selectedAircraft.getCurrentNode();
-                //String NodeID = selectedAircraft.getFlightPath().get(selectedAircraft.getFlightPath().size()-1).getNodeID();
-                currentNode.setOccupied(false);
-                //flightPath = airControl.calculateRoute(NodeID, currentNode);
-                selectedAircraft.getCurrentNode().isOccupied = false;
-                //selectedAircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
-                selectedAircraft.reverseAircraft();
-                selectedAircraft.setBlocked(false);
+                int chosenAction = (int)(Math.random() * 2);
+                if (chosenAction == 0) {
+                    selectedAircraft.reverseAircraft();
+                } else {
+                    String NodeID = selectedAircraft.getFlightPath().get(selectedAircraft.getFlightPath().size()-1).getNodeID();
+                    Node currentNode = selectedAircraft.getCurrentNode();
+                    flightPath = airControl.calculateRoute(NodeID, currentNode);
+                    selectedAircraft.decreaseCountdown();
+                    if (flightPath == null && selectedAircraft.CooldownOver()) {
+                        selectedAircraft.setCountdown(100);
+                    }
+                    if (flightPath != null && selectedAircraft.CooldownOver()) {
+                        selectedAircraft.getCurrentNode().isOccupied = false;
+                        selectedAircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
+                    }
+                }
                 System.out.println("Changed direction");
             } 
             else if (selectedAircraft.isAtGate()) {
