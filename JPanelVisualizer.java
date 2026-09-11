@@ -152,17 +152,16 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         allGates.add(Gate4);
 
         flightPath = airControl.calculateRoute("A4", TestGate1);
-        ArrayList<Node> flightPath2 = airControl.calculateRoute("A1", TestGate2);
-        
 
-        Aircraft testFlight = new CargoPlane("Test aircraft", "Time the greek", "Hawking404", 1500.00, 50,"GROUNDED", 500.00, 250.00);
+        Aircraft testFlight = new CargoPlane("Test aircraft", "Thyme the geat", "Hawking404", 1500.00, 50,"GROUNDED", 500.00, 250.00);
         testFlight.setVector2(200, 400);
         testFlight.setFlightPath(flightPath);
         aircraftsOnSite.add(testFlight);
 
-        Aircraft testFlight2 = new CommercialPlane("Test aircraft2", "Albert Minestein", "Blimper64", 1300.00, 50,"GROUNDED", 500, 250);
+        Aircraft testFlight2 = new CommercialPlane("Tester103", "Albert Minestein", "Blimper64", 1300.00, 50,"GROUNDED", 500, 250);
         testFlight2.setVector2(TaxiWayNode4.getXPos()-100, TaxiWayNode4.getYPos());
-        testFlight2.setFlightPath(flightPath2);
+        flightPath = airControl.calculateRoute("A1", TestGate2);
+        testFlight2.setFlightPath(flightPath);
         aircraftsOnSite.add(testFlight2);
 
         Aircraft testFlight3 = new CommercialPlane("12345", "Mr Joel", "AirDuck302",1400.00, 100, "GROUNDED", 1000, 779);
@@ -198,7 +197,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     }
                 }
 
-                selectedAircraft.influenceFuel();
+                selectedAircraft.influenceFuel(); // either gain fuel or spend fuel
                 
                 // checks if plane is flying
                 if (!selectedAircraft.getFlying()) {
