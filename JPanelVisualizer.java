@@ -170,6 +170,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         testFlight3.setVector2(miniRoadNode1.getXPos(), miniRoadNode1.getYPos()-50);
         testFlight3.setFlightPath(flightPath);
         aircraftsOnSite.add(testFlight3);
+        
 
         timer = new Timer(secondsPerFrame, this); // every secondsPerFrame time, = 1 frame
         timer.start(); // starts the timer
