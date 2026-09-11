@@ -95,7 +95,7 @@ public class AirTrafficControl implements drawable, Position {
 
     // used to create a navigational arraylist of points on the airport
         private ArrayList<Node> findNode(String TargetedNode, ArrayList<Node> givenArray, Node startingNode) {
-        if (startingNode == null || givenArray.contains(startingNode) || startingNode.isOccupied) { // ensure that a node can only be gone on once
+        if (startingNode == null || givenArray.contains(startingNode) || startingNode.isOccupied && !startingNode.getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) { // ensure that a node can only be gone on once
             return null;
         }
 

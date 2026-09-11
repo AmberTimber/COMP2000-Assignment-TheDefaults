@@ -182,7 +182,7 @@ public class Moveable extends Vector2  {
                 } else if (getReachedTarget() == true && flightPath.size() > NavigationIndex + 1 && flightPath.get(NavigationIndex +1).getOccupied() == true && selected == false) {
                     CheckIfNextPathIsBlocked();
                 } // if the aircraft is selected to go on airfield
-                else if (getReachedTarget() == true && flightPath.size() > NavigationIndex + 1 && selected == true && flightPath.get(NavigationIndex +1).getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) {
+                else if (getReachedTarget() == true && flightPath.size() > NavigationIndex + 1 && selected == true && flightPath.get(NavigationIndex).getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) {
                     flightPath.get(NavigationIndex).setOccupied(false);
                     NavigationIndex++;
                     setTarget(flightPath.get(NavigationIndex).getPosition());
