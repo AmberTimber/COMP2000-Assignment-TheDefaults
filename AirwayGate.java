@@ -107,7 +107,7 @@ public class AirwayGate implements drawable {
 
     // check if reached a gate
     public void PlaneAtGate (Aircraft selectedAircraft) {
-        if (selectedAircraft != null && selectedAircraft.checkIfEndOfPath() && !selectedAircraft.getStatus().equalsIgnoreCase("DOCKED")) {
+        if (selectedAircraft != null && selectedAircraft.checkIfEndOfPath() && !selectedAircraft.getStatus().equalsIgnoreCase("DOCKED") && currentPlane == null) {
                 if (selectedAircraft.getPosition().compareVectors(this.getGateNode().getPosition()) && this.getStatus() == true) {
                     try {
                     selectedAircraft.setDocked(true);
@@ -116,6 +116,7 @@ public class AirwayGate implements drawable {
                     selectedAircraft.setCountdown(cooldown); // pretend that people are getting on board + refueling
                     this.parkPlane(selectedAircraft);
                     selectedAircraft.setGate(this);
+                    gateNode.isOccupied = true;
                     } catch (OccupancyException e) {
                     System.out.println("Occupancy Error at gate: " + e.getMessage());
                     } catch (Exception e) {

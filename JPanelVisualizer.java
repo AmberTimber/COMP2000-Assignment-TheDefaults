@@ -193,7 +193,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 if (selectedAircraft.isAtLastNode() && selectedAircraft.getCurrentNode().getNodeTileRepresentation().equalsIgnoreCase("GATE") && selectedAircraft.getReachedTarget()) {
                     if (selectedAircraft.getAssignedGate() == null) {
                     for (int c = 0; c < allGates.size(); c++) {
-                        allGates.get(c).PlaneAtGate(selectedAircraft);
+                            allGates.get(c).PlaneAtGate(selectedAircraft);
                         }
                     }
                 }
@@ -216,7 +216,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 // moves through the airport
                 selectedAircraft.MoveThroughFlightPath(1); 
             } // if blocked while moving 
-            else if(selectedAircraft.isBlocked() == true && selectedAircraft.getChosenToFly() == false) { 
+            else if(selectedAircraft.isBlocked() == true) { 
                 // if a aircraft path is being blocked, it regenerates a new path or goes back 1 node
                 int chosenAction = (int)(Math.random() * 3);
                 if (chosenAction == 0) {
