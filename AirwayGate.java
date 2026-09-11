@@ -130,6 +130,6 @@ public class AirwayGate implements drawable {
     @Override
     public void visualRepresentation(Graphics drawer, int width, int height) {
         drawer.setColor(Color.GREEN);
-        drawer.fillRect(getGateNode().getXPos(), getGateNode().getYPos(), width, height);
+        drawer.fillRect(getGateNode().getXPos()-width/2, getGateNode().getYPos(), width, height);
     }
 }

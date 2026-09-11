@@ -137,7 +137,7 @@ public class AirTrafficControl implements drawable, Position {
     @Override
     public void visualRepresentation(Graphics drawer, int width, int height) {
         drawer.setColor(Color.GRAY);
-        drawer.fillRect(Location.getXPos(), Location.getYPos(), width, height);
+        drawer.fillRect(Location.getXPos()-width/2, Location.getYPos()-height/2, width, height);
         drawer.setColor(Color.CYAN);
         drawer.fillRect(Location.getXPos(), Location.getYPos(), width, height);
     }
@@ -158,7 +158,7 @@ public class AirTrafficControl implements drawable, Position {
     }
 
     // changes all airfield nodes to be a value
-    private void AirfieldNodeChanger (ArrayList<Node> airfieldRef) {
+    public void AirfieldNodeChanger (ArrayList<Node> airfieldRef) {
         if (airfieldRef != null && !airfieldRef.isEmpty())
         for (int i = 0; i < airfieldRef.size(); i++) {
             airfieldRef.get(i).setOccupied(OccupiedAirfield);
