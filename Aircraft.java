@@ -20,7 +20,18 @@ public abstract class Aircraft extends Moveable implements drawable {
         setModel(model);
         setFuelLevel(fuelLevel);
         this.capacity = capacity;
-        this.status = "GROUNDED"; // Default status of an Aircraft
+        this.status = status;
+    }
+
+    /**
+     * Bounded generic range check shared by the aircraft setters.
+     * Throws InvalidAircraftParameterException when value is outside [min, max].
+     */
+    protected static <T extends Comparable<T>> void requireInRange(T value, T min, T max, String field) {
+        if (value.compareTo(min) < 0 || value.compareTo(max) > 0) {
+            throw new InvalidAircraftParameterException(
+                field + " must be between " + min + " and " + max + " (was " + value + ")");
+        }
     }
 
     //setters 
@@ -33,9 +44,10 @@ public abstract class Aircraft extends Moveable implements drawable {
     }
 
     public void setFuelLevel(double fuelLevel) {
-        if (fuelLevel >= 0) {
-            this.fuelLevel = fuelLevel;
+        if (fuelLevel < 0) {
+            throw new InvalidAircraftParameterException("Fuel level cannot be negative (was " + fuelLevel + ")");
         }
+        this.fuelLevel = fuelLevel;
     }
 
     public void setStatus(String newStatus) {
@@ -92,13 +104,6 @@ public abstract class Aircraft extends Moveable implements drawable {
     }
 
     public String getStatus() {
-        if(status.equals("GOUNDED")){
-            System.out.println("Status: " + aircraftID + " is grounded.");
-        } else if (status.equals("BOARDING")){
-            System.out.println("Status: " + aircraftID + " is boarding.");
-        } else if (status.equals("IN-FLIGHT")){
-            System.out.println("Status: " + aircraftID + " is in-flight.");
-        }
         return status;
     }
 
@@ -108,7 +113,7 @@ public abstract class Aircraft extends Moveable implements drawable {
         System.out.println("Model: " + model);
         System.out.println("Fuel Level: " + fuelLevel);
         System.out.println("Capacity: " + capacity);
-        System.out.println(getStatus());
+        System.out.println("Status: " + getStatus());
     }
 
     public boolean canFly() {

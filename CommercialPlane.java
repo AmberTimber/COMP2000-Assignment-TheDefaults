@@ -13,9 +13,8 @@ public class CommercialPlane extends Aircraft implements flyable {
 
     //setters
     public void setCurrentPassengers (int currentPassengers) {
-        if (currentPassengers >= 0 && currentPassengers <= numSeats) {
-            this.currentPassengers = currentPassengers;
-        }
+        requireInRange(currentPassengers, 0, numSeats, "Passengers");
+        this.currentPassengers = currentPassengers;
     }
 
     //getters 
@@ -39,11 +38,7 @@ public class CommercialPlane extends Aircraft implements flyable {
     // for flyable implement
     @Override
     public boolean flying() {
-        if (this.getStatus() == "Flying") {
-            return true;
-        } else {
-            return false;
-        }
+        return "Flying".equals(this.getStatus());
     }
 
     @Override
@@ -58,20 +53,14 @@ public class CommercialPlane extends Aircraft implements flyable {
 
     @Override
     public boolean isReadyForLanding() {
-        if (this.getStatus() == "ReadyForLanding") {
-            return true;
-        } else {
-            return false;
-        }
+        // Airborne and still has fuel to complete an approach.
+        return flying() && getFuelLevel() > 0;
     }
 
     @Override
     public boolean isReadyForTakeoff() {
-        if (this.getStatus() == "ReadyForTakeoff") {
-            return true;
-        } else {
-            return false;
-        }
+        // On the ground, fuelled, and not carrying more than the cabin holds.
+        return !flying() && getFuelLevel() > 0 && currentPassengers <= numSeats;
     }
 
     @Override

@@ -140,12 +140,12 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         ArrayList<Node> flightPath2 = airControl.calculateRoute("A1", TestGate2);
         
 
-        Aircraft testFlight = new CargoPlane("Test aircraft", "Time the greek", "Hawking404", 1500.00, 50,"Fly my minions", 500.00, 250.00);
+        Aircraft testFlight = new CargoPlane("Test aircraft", "Time the greek", "Hawking404", 1500.00, 50,"GROUNDED", 500.00, 250.00);
         testFlight.setVector2(200, 400);
         testFlight.setFlightPath(flightPath);
         aircraftsOnSite.add(testFlight);
 
-        Aircraft testFlight2 = new CommercialPlane("Test aircraft2", "Albert Minestein", "Blimper64", 1300.00, 50,"Gravity Finder", 500, 250);
+        Aircraft testFlight2 = new CommercialPlane("Test aircraft2", "Albert Minestein", "Blimper64", 1300.00, 50,"GROUNDED", 500, 250);
         testFlight2.setVector2(TaxiWayNode4.getXPos()-100, TaxiWayNode4.getYPos());
         testFlight2.setFlightPath(flightPath2);
         aircraftsOnSite.add(testFlight2);
