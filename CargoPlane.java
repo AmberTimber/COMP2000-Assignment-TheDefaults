@@ -13,9 +13,8 @@ public class CargoPlane extends Aircraft implements flyable {
 
     //setter
     public void setCurrentWeight(double currentWeight){
-        if (currentWeight >= 0 && currentWeight <= maxWeight){
-            this.currentWeight = currentWeight;
-        }
+        requireInRange(currentWeight, 0.0, maxWeight, "Weight");
+        this.currentWeight = currentWeight;
     }
     
     /* No setter for maxWeight because it is fixed when the plane is created */
@@ -41,11 +40,7 @@ public class CargoPlane extends Aircraft implements flyable {
     // for flyable implement
     @Override
     public boolean flying() {
-        if (this.getStatus() == "Flying") {
-            return true;
-        } else {
-            return false;
-        }
+        return "Flying".equals(this.getStatus());
     }
 
     @Override
@@ -60,20 +55,14 @@ public class CargoPlane extends Aircraft implements flyable {
 
     @Override
     public boolean isReadyForLanding() {
-        if (this.getStatus() == "ReadyForLanding") {
-            return true;
-        } else {
-            return false;
-        }
+        // Airborne and still has fuel to complete an approach.
+        return flying() && getFuelLevel() > 0;
     }
 
     @Override
     public boolean isReadyForTakeoff() {
-        if (this.getStatus() == "ReadyForTakeoff") {
-            return true;
-        } else {
-            return false;
-        }
+        // On the ground, fuelled, and not loaded beyond the max weight.
+        return !flying() && getFuelLevel() > 0 && currentWeight <= maxWeight;
     }
 
     @Override
