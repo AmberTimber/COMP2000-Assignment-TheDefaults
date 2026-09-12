@@ -221,6 +221,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             else if(selectedAircraft.isBlocked() == true && !selectedAircraft.getFlying()) { 
                 // if a aircraft path is being blocked, it regenerates a new path or goes back 1 node
                 int chosenAction = (int)(Math.random() * 3);
+                selectedAircraft.decreaseCountdown();
                 if (chosenAction == 0) {
                     selectedAircraft.reverseAircraft();
                 } else if (chosenAction == 1) { // generates new path
@@ -233,9 +234,9 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     }
                     if (flightPath != null && selectedAircraft.CooldownOver()) {
                         selectedAircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
-                    } else {
-                        selectedAircraft.setCountdown(100); // waits for 100 frames to see if other aircrafts will do something
                     }
+                } else if (selectedAircraft.CooldownOver()) {
+                    selectedAircraft.setCountdown(100); // waits for 100 frames to see if other aircrafts will do something
                 }
             } 
             else if (selectedAircraft.isAtGate()) {
