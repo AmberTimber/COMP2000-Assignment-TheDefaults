@@ -28,6 +28,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     private ArrayList<Node> waitingBay = new ArrayList<>();
     private ArrayList<Node> outsideLoop = new ArrayList<>();
     private ArrayList<AirwayGate> allGates = new ArrayList<>();
+    private FlightBoard flightBoard = new FlightBoard(aircraftsOnSite);
 
     // intializes time
     public JPanelVisualizer(JFrame jframePanel) {
@@ -349,5 +350,10 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
        for (int i = 0; i < aircraftsOnSite.size(); i++) {
         aircraftsOnSite.get(i).visualRepresentation(g, 50, 50);
        }
+
+        // flight board, drawn last so it sits on top of everything else
+        // uses this panel's own size (not the JFrame's) so it isn't pushed past the
+        // visible area by the title bar/borders, which would clip off the bottom rows
+        flightBoard.visualRepresentation(g, getWidth(), getHeight());
     }
 }
