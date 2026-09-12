@@ -65,8 +65,7 @@ public class CommercialPlane extends Aircraft implements flyable {
 
     @Override
     public void visualRepresentation(Graphics drawer, int width, int height) {
-        drawer.setColor(Color.YELLOW);
-        drawer.fillOval(getXPos()-width/2, getYPos()-height/2, width, height);
+        drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.YELLOW);
         drawer.setColor(Color.black);
         drawer.drawString("Commercial plane: " + this.getAircraftID(), xPos + 5, yPos - 20);
         drawer.drawString("Operator: " + this.getOperator(), xPos + 5, yPos - 5);

@@ -1,3 +1,5 @@
+import java.awt.Color;
+import java.awt.Graphics;
 
 public abstract class Aircraft extends Moveable implements drawable, Status {
     private final String aircraftID;
@@ -11,6 +13,7 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
     private int framesToConsumeFuel = 200;
     private int MaxframesToConsumeFuel = framesToConsumeFuel;
     private AirwayGate gateAssigned = null;
+    private Color color = null; // lets each aircraft be told apart visually; null = subclass picks its own default
 
 
     public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
@@ -66,6 +69,10 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
         gateAssigned = gateselected;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     //getters
     public String getAircraftID() {
         return aircraftID;
@@ -93,6 +100,10 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
 
     public AirwayGate getAssignedGate() {
         return gateAssigned;
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     public boolean CooldownOver() {
@@ -140,6 +151,34 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
             countdown = 200;
             System.out.println("Preparing for takeoff");
         }
+    }
+
+    // draws an airplane silhouette (nose, swept wings, tail wings) centred on this aircraft's
+    // position, so it reads as a plane instead of a plain shape; shared by both aircraft types
+    protected void drawPlaneShape(Graphics drawer, int width, int height, Color fillColor) {
+        int cx = getXPos();
+        int cy = getYPos();
+        int[] xPoints = {
+            cx,
+            cx + scale(width, 0.08), cx + scale(width, 0.5), cx + scale(width, 0.12), cx + scale(width, 0.28), cx + scale(width, 0.06),
+            cx,
+            cx - scale(width, 0.06), cx - scale(width, 0.28), cx - scale(width, 0.12), cx - scale(width, 0.5), cx - scale(width, 0.08)
+        };
+        int[] yPoints = {
+            cy - scale(height, 0.5),
+            cy - scale(height, 0.15), cy + scale(height, 0.05), cy + scale(height, 0.15), cy + scale(height, 0.4), cy + scale(height, 0.3),
+            cy + scale(height, 0.5),
+            cy + scale(height, 0.3), cy + scale(height, 0.4), cy + scale(height, 0.15), cy + scale(height, 0.05), cy - scale(height, 0.15)
+        };
+
+        drawer.setColor(fillColor);
+        drawer.fillPolygon(xPoints, yPoints, xPoints.length);
+        drawer.setColor(Color.DARK_GRAY);
+        drawer.drawPolygon(xPoints, yPoints, xPoints.length);
+    }
+
+    private int scale(int dimension, double fraction) {
+        return (int) Math.round(dimension * fraction);
     }
 
     //Consumes fuel
