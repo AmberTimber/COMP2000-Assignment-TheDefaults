@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 // this entire class is just used to display stuff on JPanel, pls don't delete as it is useful base 
 // for drawing stuff
@@ -33,12 +35,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     // intializes time
     public JPanelVisualizer(JFrame jframePanel) {
         JframeRef = jframePanel;
-        /*for (int i = 0; i < aircrafts.length; i++) {
-            aircrafts[i] = new CargoPlane("Aircraft " + i, "Harry Potter the " + i, "Hawking404", 30.00, 50,"Fly my minions", 500.00, 250.00);
-            int newXpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
-            int newYpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
-            aircrafts[i].setTarget(new Vector2(newXpos, newYpos));
-        }*/
+
         Node leftFlyOff = new Node(null, null, null, null, new Vector2(-200, 75), "Outside left", "RUNWAY");
         Node leftTopFlyOff = new Node(null, null, null, null, new Vector2(-200, -200), "Outside top left", "Outside");
         Node rightTopFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 200, -200), "Outside top right", "Outside");
@@ -69,6 +66,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         Node TestGate3 = new Node(GatePathNode3, null, TestGate2, null, new Vector2(JframeRef.getWidth()/9 * 5, 600), "E3", "GATE");
         Node TestGate4 = new Node(GatePathNode4, null, TestGate3, null, new Vector2(JframeRef.getWidth()/9 * 7, 600), "E4", "GATE");
 
+        // setting up map nodes
         airfieldNode1.setBottomNode(miniRoadNode1);
         airfieldNode1.setRightNode(airfieldNode2);
         airfieldNode2.setBottomNode(miniRoadNode2);
@@ -152,6 +150,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         allGates.add(Gate3);
         allGates.add(Gate4);
 
+        // establishing navigational path
         flightPath = airControl.calculateRoute("A4", TestGate1);
 
         Aircraft testFlight = new CargoPlane("Test aircraft", "Thyme the geat", "Hawking404", 1500.00, 50,"GROUNDED", 500.00, 250.00);
@@ -278,7 +277,6 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
 
             airControl.AirfieldNodeChanger(runway);
         }
-            
         
         // updates the panel
         repaint();

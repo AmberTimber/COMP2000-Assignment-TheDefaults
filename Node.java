@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.Objects;
-
 public class Node implements Position {
     private String NodeID;
     Node upperNode;
@@ -64,6 +61,10 @@ public class Node implements Position {
         this.rightNode = newNode;
     }
     
+    public void setPostion(Vector2 newVector2) {
+        nodePosition = newVector2;
+    }
+
     public void setXPos(int xpos) {
         nodePosition.xPos = xpos;
     }
