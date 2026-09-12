@@ -64,7 +64,9 @@ public class Main {
         System.out.println("========== TAXIWAY SIMULATION ==========");
         demoTaxiway();
         System.out.println("========== TAXIWAY SIMULATION COMPLETE ==========\n");
-
+        System.out.println("========== STATUS SIMULATION ==========");
+        PlaneStatusDemo();
+        System.out.println("========== STATUS SIMULATION COMPLETE ==========\n");
        /* Aircraft tester = new Aircraft();
         tester.setAircraft("89797", "Billy", "SuperBus", 50.00, 20, "Grounded");*/
         
@@ -76,7 +78,7 @@ public class Main {
         mainPanel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // ensure jpanel tab can close
         JPanelVisualizer plaeTemp = new JPanelVisualizer(mainPanel); // creates objects
         // adding the elements
-        mainPanel.add(plaeTemp); // adds objects
+        mainPanel.add(plaeTemp); // adds objects to panel
         
         mainPanel.setVisible(true); // whoa, i can see clearly now
         
@@ -131,5 +133,14 @@ public class Main {
         } catch (OccupancyException e) {
             System.out.println("Unexpected occupancy error: " + e.getMessage());
         }
+    }
+
+    // used to test plane status for future development
+    private static void PlaneStatusDemo() {
+        Status statusFlight = new CargoPlane("113972", null, null, 0, 0, null, 0, 0);
+        System.out.println(statusFlight.getOverallStatus());
+        statusFlight = new DelayedDecorator(statusFlight);
+        statusFlight = new BoardingDecorator(statusFlight);
+        System.out.println(statusFlight.getOverallStatus());
     }
 }

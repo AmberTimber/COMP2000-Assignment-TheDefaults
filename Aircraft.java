@@ -1,5 +1,5 @@
 
-public abstract class Aircraft extends Moveable implements drawable {
+public abstract class Aircraft extends Moveable implements drawable, Status {
     private final String aircraftID;
     private String operator;
     private String model;

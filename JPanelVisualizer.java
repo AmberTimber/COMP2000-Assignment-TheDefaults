@@ -211,11 +211,11 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     airControl.ClearAircraftForTakeOff(selectedAircraft, outsideLoop, runway); // changes path to outside route
                 }
             } // if on ground
-            else if (selectedAircraft.canFly() == false && selectedAircraft.getStatus().equalsIgnoreCase("GROUNDED") && selectedAircraft.isBlocked() == false || selectedAircraft.getChosenToFly()) {
+            else if (selectedAircraft.canFly() == false && selectedAircraft.getStatus().equalsIgnoreCase("GROUNDED") && selectedAircraft.isBlocked() == false) {
                 // moves through the airport
                 selectedAircraft.MoveThroughFlightPath(1); 
             } // if blocked while moving 
-            else if(selectedAircraft.isBlocked() == true) { 
+            else if(selectedAircraft.isBlocked() == true && !selectedAircraft.getFlying()) { 
                 // if a aircraft path is being blocked, it regenerates a new path or goes back 1 node
                 int chosenAction = (int)(Math.random() * 3);
                 if (chosenAction == 0) {
@@ -229,11 +229,9 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                         selectedAircraft.setCountdown(100);
                     }
                     if (flightPath != null && selectedAircraft.CooldownOver()) {
-                        selectedAircraft.getCurrentNode().isOccupied = false;
                         selectedAircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
                     }
                 }
-                System.out.println("Changed direction");
             } 
             else if (selectedAircraft.isAtGate()) {
                 // if aircraft is at gate, it countsdown until 0

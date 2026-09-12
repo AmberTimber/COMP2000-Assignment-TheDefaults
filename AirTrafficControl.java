@@ -45,7 +45,9 @@ public class AirTrafficControl implements drawable, Position {
         ArrayList<Node> path = new ArrayList<>();
         if (NodeID != null && StartingNode != null) {
             try {
+                StartingNode.setOccupied(false);
                 path = findNode(NodeID, path, StartingNode);
+                StartingNode.setOccupied(true);
                 path = shortestPathNode(path);
             } catch (NullPointerException e) {
                 System.out.println("NULL ERROR IN PATH: " + e);
@@ -193,8 +195,7 @@ public class AirTrafficControl implements drawable, Position {
     // check if clear for landing
     public void clearForLanding(Aircraft selectedAircraft, ArrayList<Node> airfieldRef, ArrayList<Node> airportNav) {
         if (airfieldRef != null && !airfieldRef.isEmpty() && selectedAircraft != null && airportNav != null && !airportNav.isEmpty()) {
-            Node aircraftNodeRef = selectedAircraft.getFlightPath().get(selectedAircraft.getFlightPath().size()-1);
-            if (selectedAircraft.getFlying() && selectedAircraft.compareVectors(aircraftNodeRef.getPosition())) {
+            if (selectedAircraft.getFlying() && selectedAircraft.isAtLastNode()) {
                 if (OccupiedAirfield == false && flyingAircraft == null) {
                     selectedAircraft.getCurrentNode().setOccupied(false);
                     flyingAircraft = selectedAircraft;

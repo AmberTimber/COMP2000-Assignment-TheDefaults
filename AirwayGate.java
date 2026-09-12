@@ -107,7 +107,7 @@ public class AirwayGate implements drawable {
 
     // check if reached a gate
     public void PlaneAtGate (Aircraft selectedAircraft) {
-        if (selectedAircraft != null && selectedAircraft.checkIfEndOfPath() && !selectedAircraft.getStatus().equalsIgnoreCase("DOCKED") && currentPlane == null) {
+        if (selectedAircraft != null && selectedAircraft.isAtLastNode() && !selectedAircraft.getStatus().equalsIgnoreCase("DOCKED") && currentPlane == null) {
                 if (selectedAircraft.getPosition().compareVectors(this.getGateNode().getPosition()) && this.getStatus() == true) {
                     try {
                     selectedAircraft.setDocked(true);

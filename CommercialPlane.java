@@ -76,4 +76,10 @@ public class CommercialPlane extends Aircraft implements flyable {
         drawer.drawString("Current status: " + this.getStatus(), xPos + 5, yPos + 55);
         drawer.drawString("Current target is: " + getCurrentNode().getNodeID(), xPos + 5, yPos + 70);
     }
+
+    // allows you to built up the status for future board
+    @Override 
+    public String getOverallStatus() {
+        return "Flight number " + getAircraftID();
+    }
 }

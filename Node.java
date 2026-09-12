@@ -6,7 +6,7 @@ public class Node implements Position {
     Node upperNode;
     Node bottomNode;
     Node leftNode;
-    public Node rightNode;
+    Node rightNode;
     Vector2 nodePosition;
     boolean isOccupied = false; // determines if a node is obstructed or not
     String locatedIn;
