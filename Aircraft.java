@@ -1,5 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 
 public abstract class Aircraft extends Moveable implements drawable, Status {
     private final String aircraftID;
@@ -154,27 +156,52 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
     }
 
     // draws an airplane silhouette (nose, swept wings, tail wings) centred on this aircraft's
-    // position, so it reads as a plane instead of a plain shape; shared by both aircraft types
+    // position and rotated to face its current heading; shared by both aircraft types.
+    // shape points are in local space with the nose at "up" (0, -height/2), then the whole
+    // thing is translated/rotated onto the canvas via an AffineTransform
     protected void drawPlaneShape(Graphics drawer, int width, int height, Color fillColor) {
-        int cx = getXPos();
-        int cy = getYPos();
         int[] xPoints = {
-            cx,
-            cx + scale(width, 0.08), cx + scale(width, 0.5), cx + scale(width, 0.12), cx + scale(width, 0.28), cx + scale(width, 0.06),
-            cx,
-            cx - scale(width, 0.06), cx - scale(width, 0.28), cx - scale(width, 0.12), cx - scale(width, 0.5), cx - scale(width, 0.08)
+            0,
+            scale(width, 0.08), scale(width, 0.5), scale(width, 0.12), scale(width, 0.28), scale(width, 0.06),
+            0,
+            -scale(width, 0.06), -scale(width, 0.28), -scale(width, 0.12), -scale(width, 0.5), -scale(width, 0.08)
         };
         int[] yPoints = {
-            cy - scale(height, 0.5),
-            cy - scale(height, 0.15), cy + scale(height, 0.05), cy + scale(height, 0.15), cy + scale(height, 0.4), cy + scale(height, 0.3),
-            cy + scale(height, 0.5),
-            cy + scale(height, 0.3), cy + scale(height, 0.4), cy + scale(height, 0.15), cy + scale(height, 0.05), cy - scale(height, 0.15)
+            -scale(height, 0.5),
+            -scale(height, 0.15), scale(height, 0.05), scale(height, 0.15), scale(height, 0.4), scale(height, 0.3),
+            scale(height, 0.5),
+            scale(height, 0.3), scale(height, 0.4), scale(height, 0.15), scale(height, 0.05), -scale(height, 0.15)
         };
 
-        drawer.setColor(fillColor);
-        drawer.fillPolygon(xPoints, yPoints, xPoints.length);
-        drawer.setColor(Color.DARK_GRAY);
-        drawer.drawPolygon(xPoints, yPoints, xPoints.length);
+        Graphics2D canvas = (Graphics2D) drawer;
+        AffineTransform originalTransform = canvas.getTransform();
+
+        canvas.translate(getXPos(), getYPos());
+        // the shape's nose rests pointing "up" (angle -90deg), so rotate the extra amount
+        // needed to bring it to the heading angle
+        canvas.rotate(computeHeadingRadians() + Math.PI / 2);
+
+        canvas.setColor(fillColor);
+        canvas.fillPolygon(xPoints, yPoints, xPoints.length);
+        canvas.setColor(Color.DARK_GRAY);
+        canvas.drawPolygon(xPoints, yPoints, xPoints.length);
+
+        canvas.setTransform(originalTransform);
+    }
+
+    // angle (radians) from this aircraft's current position to its target, in screen-coordinate
+    // atan2 terms; falls back to pointing "up" when there's no meaningful direction yet
+    private double computeHeadingRadians() {
+        Vector2 target = getTarget();
+        if (target == null) {
+            return -Math.PI / 2;
+        }
+        int dx = target.getXPos() - getXPos();
+        int dy = target.getYPos() - getYPos();
+        if (dx == 0 && dy == 0) {
+            return -Math.PI / 2;
+        }
+        return Math.atan2(dy, dx);
     }
 
     private int scale(int dimension, double fraction) {
