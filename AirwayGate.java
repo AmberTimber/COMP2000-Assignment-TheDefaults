@@ -131,7 +131,13 @@ public class AirwayGate implements drawable {
     // for drawing elements of gate
     @Override
     public void visualRepresentation(Graphics drawer, int width, int height) {
+        int x = getGateNode().getXPos() - width/2;
+        int y = getGateNode().getYPos();
+
         drawer.setColor(Color.white);
-        drawer.fillRect(getGateNode().getXPos()-width/2, getGateNode().getYPos(), width, height);
+        drawer.fillRect(x, y, width, height);
+
+        drawer.setColor(Color.black);
+        drawer.drawString(gateID, x + 5, y + 15);
     }
 }
