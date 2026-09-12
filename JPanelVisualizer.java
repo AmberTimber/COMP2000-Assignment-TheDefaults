@@ -231,6 +231,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     }
                     if (flightPath != null && selectedAircraft.CooldownOver()) {
                         selectedAircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
+                    } else {
+                        selectedAircraft.setCountdown(100); // waits for 100 frames to see if other aircrafts will do something
                     }
                 }
             } 
