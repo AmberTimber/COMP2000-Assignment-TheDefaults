@@ -177,19 +177,29 @@ public class AirTrafficControl implements drawable, Position {
     }
 
     // detects if a aircraft is onfield
-    public void checkIfAAircraftOnAirfield(ArrayList<Node> airfieldRef, Aircraft otherAircraft) {
-        if (aircraftsInAirport != null && !aircraftsInAirport.isEmpty() && airfieldRef != null && !airfieldRef.isEmpty() && otherAircraft != null && flyingAircraft == null) {
-            for (int i = 0; i < airfieldRef.size(); i++) {
-                if (otherAircraft.getCurrentNode() == airfieldRef.get(i)) {
-                    OccupiedAirfield = true;
-                    AirfieldNodeChanger(airfieldRef);
-                    flyingAircraft = otherAircraft;
-                    flyingAircraft.setSelected(true);
-                    i = airfieldRef.size();
-                }
-            }
-        }
+    
+public void checkIfAAircraftOnAirfield(
+        ArrayList<Node> airfieldRef, Aircraft otherAircraft) {
+
+    if (aircraftsInAirport != null
+            && !aircraftsInAirport.isEmpty()
+            && airfieldRef != null
+            && !airfieldRef.isEmpty()
+            && otherAircraft != null
+            && flyingAircraft == null) {
+
+        airfieldRef.stream()
+            .filter(node -> otherAircraft.getCurrentNode() == node)
+            .findFirst()
+            .ifPresent(node -> {
+                OccupiedAirfield = true;
+                AirfieldNodeChanger(airfieldRef);
+                flyingAircraft = otherAircraft;
+                flyingAircraft.setSelected(true);
+            });
     }
+}
+
 
     // check if clear for landing
     public void clearForLanding(Aircraft selectedAircraft, ArrayList<Node> airfieldRef, ArrayList<Node> airportNav) {
