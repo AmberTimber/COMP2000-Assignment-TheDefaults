@@ -162,9 +162,8 @@ public class AirTrafficControl implements drawable, Position {
     // changes all airfield nodes to be a value
     public void AirfieldNodeChanger (ArrayList<Node> airfieldRef) {
         if (airfieldRef != null && !airfieldRef.isEmpty())
-        for (int i = 0; i < airfieldRef.size(); i++) {
-            airfieldRef.get(i).setOccupied(OccupiedAirfield);
-        }
+        airfieldRef.forEach(node -> node.setOccupied(OccupiedAirfield));
+
     }
 
     // if aircraft flew off runway, free up runway
