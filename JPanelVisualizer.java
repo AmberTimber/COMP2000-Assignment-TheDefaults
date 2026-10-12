@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 // this entire class is just used to display stuff on JPanel, pls don't delete as it is useful base 
 // for drawing stuff
@@ -18,7 +16,6 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     // important for this class
     private Timer timer;
     private int secondsPerFrame = 10; // in miliseconds
-
     private int aircraftCount = (int)(Math.random() * (10 - 1 + 1)) + 1;
     private Aircraft[] aircrafts = new Aircraft[1];
     private JFrame JframeRef;
@@ -334,11 +331,10 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 g.fillRect(JframeRef.getWidth()/5 * i, 450, JframeRef.getWidth()/5 , 150);
             }
         }
+
         // making gates
-        for (int i = 0; i < allGates.size(); i++) {
-            allGates.get(i).visualRepresentation(g, JframeRef.getWidth()/9 , 200);
-            // g.fillRect(JframeRef.getWidth()/9 * i, 600, JframeRef.getWidth()/9 , 200);
-        }
+        allGates.stream().forEach(gate -> gate.visualRepresentation(g, JframeRef.getWidth()/9 , 200));
+
         // Making terminal
         g.setColor(Color.BLUE);
         g.fillRect(0, JframeRef.getHeight()-150, JframeRef.getWidth(), 200);
@@ -351,9 +347,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         }
 
         // visualize planes
-       for (int i = 0; i < aircraftsOnSite.size(); i++) {
-        aircraftsOnSite.get(i).visualRepresentation(g, 50, 50);
-       }
+        aircraftsOnSite.stream().filter(x -> x.getFlying() == false).toList().forEach(plane -> plane.visualRepresentation(g, 50, 50));
 
         // flight board, drawn last so it sits on top of everything else
         // uses this panel's own size (not the JFrame's) so it isn't pushed past the

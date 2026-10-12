@@ -7,6 +7,9 @@ public class Node implements Position {
     Vector2 nodePosition;
     boolean isOccupied = false; // determines if a node is obstructed or not
     String locatedIn;
+    public enum locationTypes {
+        AIRFIELD, TAXIWAY, WAITINGBAY, GATEPATH, GATE
+    }
     
     // maker
     public Node (Node upperNode, Node bottomNode, Node leftNode, Node rightNode, Vector2 nodePosition, String NodeID, String Location) {
@@ -112,10 +115,6 @@ public class Node implements Position {
 
     // if in same node
     public boolean CompareNodes(Node otherNode) {
-        if (this.getPosition().compareVectors(otherNode.getPosition())) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.getPosition().compareVectors(otherNode.getPosition());
     }
 }
