@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class AirTrafficControl implements drawable, Position {
     private static ArrayList<Aircraft> aircraftsInAirport;
@@ -201,8 +202,8 @@ public void checkIfAAircraftOnAirfield(
 
 
     // check if clear for landing
-    public void clearForLanding(Aircraft selectedAircraft, ArrayList<Node> airfieldRef, ArrayList<Node> airportNav) {
-        if (airfieldRef != null && !airfieldRef.isEmpty() && selectedAircraft != null && airportNav != null && !airportNav.isEmpty()) {
+    public void clearForLanding(Aircraft selectedAircraft, ArrayList<Node> airfieldRef, ArrayList<AirwayGate> availableGates) {
+        if (airfieldRef != null && !airfieldRef.isEmpty() && selectedAircraft != null) {
             if (selectedAircraft.getFlying() && selectedAircraft.isAtLastNode()) {
                 if (OccupiedAirfield == false && flyingAircraft == null) {
                     selectedAircraft.getCurrentNode().setOccupied(false);
@@ -210,7 +211,12 @@ public void checkIfAAircraftOnAirfield(
                     ResetAircraft(flyingAircraft);
                     flyingAircraft.setSelected(true);
                     flyingAircraft.setFlying(false);
-                    flyingAircraft.setFlightPath(airportNav);
+                    // creates stream from gates available and instantly assigns first one that is free
+                    Optional<AirwayGate> selectedGate = availableGates.stream().filter(gate -> gate.getAssigned() == false).findFirst();
+                    Node airfieldNode = airfieldRef.getFirst();
+                    AirwayGate gateref = selectedGate.orElse(null);
+                    flyingAircraft.setFlightPath(calculateRoute(gateref.getGateID(), airfieldNode));
+                    gateref.setAssigned(true);
                     flyingAircraft.setStatus("GROUNDED");
                     OccupiedAirfield = true;
                     AirfieldNodeChanger(airfieldRef);

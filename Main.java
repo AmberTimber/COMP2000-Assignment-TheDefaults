@@ -1,3 +1,6 @@
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.JFrame;
 
 public class Main {
@@ -138,5 +141,12 @@ public class Main {
         statusFlight = new DelayedDecorator(statusFlight);
         statusFlight = new BoardingDecorator(statusFlight);
         System.out.println(statusFlight.getOverallStatus());
+    }
+
+    private static void planeGrouping() {
+        Aircraft DeliveryPlane = new CargoPlane("I6302", null, null, 0, 0, null, 0, 0);
+        Aircraft DeliveryPlane2 = new CargoPlane("ZO22", null, null, 0, 0, null, 0, 0);
+        Aircraft PassengerPlane = new CommercialPlane("TT05", null, null, 0, 0, null, 0, 0);
+        Map<Class<? extends Aircraft>, List<Aircraft>> sortedPlanes = List.of(DeliveryPlane, DeliveryPlane2, PassengerPlane).stream().collect(Collectors.groupingBy(Aircraft::getClass));
     }
 }

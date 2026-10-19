@@ -258,15 +258,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 // upon looping, it flies back into the airport
                 if (selectedAircraft.compareVectors(outsideLoop.get(outsideLoop.size()-1).getPosition())) {
                     // upon raching the airport, finds a gate to go to
-                    ArrayList<Node> gateNodes = new ArrayList<>();
-                    for (int c = 0; c < allGates.size(); c++) {
-                        if (allGates.get(c).isFree()) {
-                         gateNodes.add(allGates.get(c).getGateNode());
-                        }
-                    }
-                    String selectedGate = airControl.getRandomNodeID(gateNodes);
-                    flightPath = airControl.calculateRoute(selectedGate, runway.get(0));
-                    airControl.clearForLanding(selectedAircraft, runway, flightPath);
+                    airControl.clearForLanding(selectedAircraft, runway, allGates);
                 }
             }
             else { // otherwise moves towards target

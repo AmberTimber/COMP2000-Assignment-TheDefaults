@@ -8,6 +8,7 @@ public class AirwayGate implements drawable {
     private boolean status;
     private Aircraft currentPlane;
     private Node gateNode;
+    private boolean isAssigned = false;
 
     public AirwayGate(String gateID, boolean status, Node gateNode) {
         this.gateID = gateID;
@@ -68,8 +69,16 @@ public class AirwayGate implements drawable {
         return gateNode;
     }
 
+    public boolean getAssigned() {
+        return isAssigned;
+    }
+
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public void setAssigned(boolean value) {
+        isAssigned = value;
     }
 
     public void displayInfo() {
@@ -101,6 +110,7 @@ public class AirwayGate implements drawable {
                     currentPlane.setGate(null);
                     currentPlane.setDocked(false);
                     removePlane(); // removes from gate
+                    setAssigned(false);
                 }
             } catch (NullPointerException e) {
                 System.out.println("Null pointer exception happened while leaving the gate!:" + e);
