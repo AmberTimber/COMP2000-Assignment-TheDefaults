@@ -6,13 +6,13 @@ public class Node implements Position {
     Node rightNode;
     Vector2 nodePosition;
     boolean isOccupied = false; // determines if a node is obstructed or not
-    String locatedIn;
+    locationTypes locatedIn;
     public enum locationTypes {
-        AIRFIELD, TAXIWAY, WAITINGBAY, GATEPATH, GATE
+        AIRFIELD, TAXIWAY, WAITINGBAY, GATEPATH, GATE, OUTSIDE
     }
     
     // maker
-    public Node (Node upperNode, Node bottomNode, Node leftNode, Node rightNode, Vector2 nodePosition, String NodeID, String Location) {
+    public Node (Node upperNode, Node bottomNode, Node leftNode, Node rightNode, Vector2 nodePosition, String NodeID, locationTypes Location) {
         setUpperNode(upperNode);
         setBottomNode(bottomNode);
         setLeftNode(leftNode);
@@ -26,7 +26,7 @@ public class Node implements Position {
         return nodePosition;
     }
 
-    public String getNodeTileRepresentation() {
+    public locationTypes getNodeTileRepresentation() {
         return locatedIn;
     }
 

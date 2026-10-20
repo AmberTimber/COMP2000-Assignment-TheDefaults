@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import Node.locationTypes;
+
 // this entire class is just used to display stuff on JPanel, pls don't delete as it is useful base 
 // for drawing stuff
 
@@ -38,8 +40,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         Node rightTopFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 200, -200), "Outside top right", "Outside");
         Node rightFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 100, 75), "Outside right", "Outside");
         
-        Node airfieldNode1 = new Node(null, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 75), "A1", "RUNWAY");
-        Node airfieldNode2 = new Node(null, null, airfieldNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 75), "A2", "RUNWAY");
+        Node airfieldNode1 = new Node(null, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 75), "A1", Node.locationTypes.AIRFIELD);
+        Node airfieldNode2 = new Node(null, null, airfieldNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 75), "A2", Node.locationTypes.AIRFIELD);
         Node airfieldNode3 = new Node(null, null, airfieldNode2, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 75), "A3", "RUNWAY");
         Node airfieldNode4 = new Node(null, null, airfieldNode3, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 75), "A4", "RUNWAY");
 
@@ -118,6 +120,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         airportNav.add(GatePathNode3);
         airportNav.add(GatePathNode4);
 
+        airportNav.stream().distinct();
+
         // marked runway
         runway.add(airfieldNode1);
         runway.add(airfieldNode2);
@@ -189,7 +193,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 airControl.checkIfAAircraftOnAirfield(runway, selectedAircraft);
                 }
                 // checks if aircraft at gate
-                if (selectedAircraft.isAtLastNode() && selectedAircraft.getCurrentNode().getNodeTileRepresentation().equalsIgnoreCase("GATE") && selectedAircraft.getReachedTarget()) {
+                if (selectedAircraft.isAtLastNode() && selectedAircraft.getCurrentNode().getNodeTileRepresentation() == Node.locationTypes.GATE && selectedAircraft.getReachedTarget()) {
                     if (selectedAircraft.getAssignedGate() == null) {
                     for (int c = 0; c < allGates.size(); c++) {
                             allGates.get(c).PlaneAtGate(selectedAircraft);
