@@ -3,11 +3,13 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-
-import Node.locationTypes;
 
 // this entire class is just used to display stuff on JPanel, pls don't delete as it is useful base 
 // for drawing stuff
@@ -18,15 +20,15 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     // important for this class
     private Timer timer;
     private int secondsPerFrame = 10; // in miliseconds
-    private int aircraftCount = (int)(Math.random() * (10 - 1 + 1)) + 1;
-    private Aircraft[] aircrafts = new Aircraft[1];
     private JFrame JframeRef;
+    // Airport
     private ArrayList<Node> flightPath = new ArrayList<>();
     private ArrayList<Node> airportNav = new ArrayList<>();
+    // aircrafts
+    private int aircraftCount = (int)(Math.random() * (4 - 1 + 1)) + 1;
     private ArrayList<Aircraft> aircraftsOnSite = new ArrayList<>();
     private AirTrafficControl airControl = new AirTrafficControl(aircraftsOnSite,  airportNav,new Vector2(400, 600));
     private ArrayList<Node> runway = new ArrayList<>();
-    private ArrayList<Node> waitingBay = new ArrayList<>();
     private ArrayList<Node> outsideLoop = new ArrayList<>();
     private ArrayList<AirwayGate> allGates = new ArrayList<>();
     private FlightBoard flightBoard = new FlightBoard(aircraftsOnSite);
@@ -35,35 +37,35 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     public JPanelVisualizer(JFrame jframePanel) {
         JframeRef = jframePanel;
 
-        Node leftFlyOff = new Node(null, null, null, null, new Vector2(-200, 75), "Outside left", "RUNWAY");
-        Node leftTopFlyOff = new Node(null, null, null, null, new Vector2(-200, -200), "Outside top left", "Outside");
-        Node rightTopFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 200, -200), "Outside top right", "Outside");
-        Node rightFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 100, 75), "Outside right", "Outside");
+        Node leftFlyOff = new Node(null, null, null, null, new Vector2(-200, 75), "Outside left", Node.locationTypes.AIRFIELD);
+        Node leftTopFlyOff = new Node(null, null, null, null, new Vector2(-200, -200), "Outside top left", Node.locationTypes.OUTSIDE);
+        Node rightTopFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 200, -200), "Outside top right", Node.locationTypes.OUTSIDE);
+        Node rightFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 100, 75), "Outside right", Node.locationTypes.OUTSIDE);
         
         Node airfieldNode1 = new Node(null, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 75), "A1", Node.locationTypes.AIRFIELD);
         Node airfieldNode2 = new Node(null, null, airfieldNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 75), "A2", Node.locationTypes.AIRFIELD);
-        Node airfieldNode3 = new Node(null, null, airfieldNode2, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 75), "A3", "RUNWAY");
-        Node airfieldNode4 = new Node(null, null, airfieldNode3, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 75), "A4", "RUNWAY");
+        Node airfieldNode3 = new Node(null, null, airfieldNode2, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 75), "A3", Node.locationTypes.AIRFIELD);
+        Node airfieldNode4 = new Node(null, null, airfieldNode3, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 75), "A4", Node.locationTypes.AIRFIELD);
 
-        Node miniRoadNode1 = new Node(airfieldNode1, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 225), "B1", "WAITINGBAY");
-        Node miniRoadNode2 = new Node(airfieldNode2, null, null, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 225), "B2", "WAITINGBAY");
-        Node miniRoadNode3 = new Node(airfieldNode3, null, null, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 225), "B3", "WAITINGBAY");
-        Node miniRoadNode4 = new Node(airfieldNode4, null, null, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 225), "B4", "WAITINGBAY");
+        Node miniRoadNode1 = new Node(airfieldNode1, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 225), "B1", Node.locationTypes.WAITINGBAY);
+        Node miniRoadNode2 = new Node(airfieldNode2, null, null, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 225), "B2", Node.locationTypes.WAITINGBAY);
+        Node miniRoadNode3 = new Node(airfieldNode3, null, null, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 225), "B3", Node.locationTypes.WAITINGBAY);
+        Node miniRoadNode4 = new Node(airfieldNode4, null, null, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 225), "B4", Node.locationTypes.WAITINGBAY);
 
-        Node TaxiWayNode1 = new Node(miniRoadNode1, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 375), "C1", "TAXIWAY");
-        Node TaxiWayNode2 = new Node(miniRoadNode2, null, TaxiWayNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 375), "C2", "TAXIWAY");
-        Node TaxiWayNode3 = new Node(miniRoadNode3, null, TaxiWayNode2, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 375), "C3", "TAXIWAY");
-        Node TaxiWayNode4 = new Node(miniRoadNode4, null, TaxiWayNode3, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 375), "C4", "TAXIWAY");
+        Node TaxiWayNode1 = new Node(miniRoadNode1, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 375), "C1", Node.locationTypes.TAXIWAY);
+        Node TaxiWayNode2 = new Node(miniRoadNode2, null, TaxiWayNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 375), "C2", Node.locationTypes.TAXIWAY);
+        Node TaxiWayNode3 = new Node(miniRoadNode3, null, TaxiWayNode2, null, new Vector2(JframeRef.getWidth()/7 * 4 + (JframeRef.getWidth()/7)/2, 375), "C3", Node.locationTypes.TAXIWAY);
+        Node TaxiWayNode4 = new Node(miniRoadNode4, null, TaxiWayNode3, null, new Vector2(JframeRef.getWidth()/7 * 6 + (JframeRef.getWidth()/7)/2, 375), "C4", Node.locationTypes.TAXIWAY);
 
-        Node GatePathNode1 = new Node(TaxiWayNode1, null, null, null, new Vector2(JframeRef.getWidth()/9 * 1, 500), "D1", "GATEPATH");
-        Node GatePathNode2 = new Node(TaxiWayNode2, null, GatePathNode1, null, new Vector2(JframeRef.getWidth()/9 * 3, 500), "D2", "GATEPATH");
-        Node GatePathNode3 = new Node(TaxiWayNode3, null, GatePathNode2, null, new Vector2(JframeRef.getWidth()/9 * 5, 500), "D3", "GATEPATH");
-        Node GatePathNode4 = new Node(TaxiWayNode4, null, GatePathNode3, null, new Vector2(JframeRef.getWidth()/9 * 7, 500), "D4", "GATEPATH");
+        Node GatePathNode1 = new Node(TaxiWayNode1, null, null, null, new Vector2(JframeRef.getWidth()/9 * 1, 500), "D1", Node.locationTypes.GATEPATH);
+        Node GatePathNode2 = new Node(TaxiWayNode2, null, GatePathNode1, null, new Vector2(JframeRef.getWidth()/9 * 3, 500), "D2", Node.locationTypes.GATEPATH);
+        Node GatePathNode3 = new Node(TaxiWayNode3, null, GatePathNode2, null, new Vector2(JframeRef.getWidth()/9 * 5, 500), "D3", Node.locationTypes.GATEPATH);
+        Node GatePathNode4 = new Node(TaxiWayNode4, null, GatePathNode3, null, new Vector2(JframeRef.getWidth()/9 * 7, 500), "D4", Node.locationTypes.GATEPATH);
 
-        Node TestGate1 = new Node(GatePathNode1, null, null, null, new Vector2(JframeRef.getWidth()/9 * 1, 600), "E1", "GATE");
-        Node TestGate2 = new Node(GatePathNode2, null, TestGate1, null, new Vector2(JframeRef.getWidth()/9 * 3, 600), "E2", "GATE");
-        Node TestGate3 = new Node(GatePathNode3, null, TestGate2, null, new Vector2(JframeRef.getWidth()/9 * 5, 600), "E3", "GATE");
-        Node TestGate4 = new Node(GatePathNode4, null, TestGate3, null, new Vector2(JframeRef.getWidth()/9 * 7, 600), "E4", "GATE");
+        Node TestGate1 = new Node(GatePathNode1, null, null, null, new Vector2(JframeRef.getWidth()/9 * 1, 600), "E1", Node.locationTypes.GATE);
+        Node TestGate2 = new Node(GatePathNode2, null, TestGate1, null, new Vector2(JframeRef.getWidth()/9 * 3, 600), "E2", Node.locationTypes.GATE);
+        Node TestGate3 = new Node(GatePathNode3, null, TestGate2, null, new Vector2(JframeRef.getWidth()/9 * 5, 600), "E3", Node.locationTypes.GATE);
+        Node TestGate4 = new Node(GatePathNode4, null, TestGate3, null, new Vector2(JframeRef.getWidth()/9 * 7, 600), "E4", Node.locationTypes.GATE);
 
         // setting up map nodes
         airfieldNode1.setBottomNode(miniRoadNode1);
@@ -128,12 +130,6 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         runway.add(airfieldNode3);
         runway.add(airfieldNode4);
 
-        // marked waitingBay
-        waitingBay.add(miniRoadNode1);
-        waitingBay.add(miniRoadNode2);
-        waitingBay.add(miniRoadNode3);
-        waitingBay.add(miniRoadNode4);
-
         // outside loop
         outsideLoop.add(leftFlyOff);
         outsideLoop.add(leftTopFlyOff);
@@ -173,6 +169,14 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         testFlight3.setFlightPath(flightPath);
         testFlight3.setColor(Color.MAGENTA);
         aircraftsOnSite.add(testFlight3);
+
+        // future implementation of random plane generation
+        for (int i = 0; i < aircraftCount; i++) {
+            int aircraftType = (int)(Math.random() * 2) + 1; // random plane type selection
+            if (aircraftType == 1) {
+                int nameSelection = (int)(Math.random() * 2) + 1; // random plane type selection
+            }
+        }
         
 
         timer = new Timer(secondsPerFrame, this); // every secondsPerFrame time, = 1 frame
@@ -194,10 +198,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 }
                 // checks if aircraft at gate
                 if (selectedAircraft.isAtLastNode() && selectedAircraft.getCurrentNode().getNodeTileRepresentation() == Node.locationTypes.GATE && selectedAircraft.getReachedTarget()) {
-                    if (selectedAircraft.getAssignedGate() == null) {
                     for (int c = 0; c < allGates.size(); c++) {
-                            allGates.get(c).PlaneAtGate(selectedAircraft);
-                        }
+                        allGates.get(c).PlaneAtGate(selectedAircraft);
                     }
                 }
 
@@ -207,7 +209,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 if (!selectedAircraft.getFlying()) {
                 selectedAircraft.CheckIfNextPathIsBlocked(); // checks if the path is blocked or not
             if (selectedAircraft.canFly() == true) {
-                // if plane can fly, then it starts to fly
+                // if plane can fly, then it starts to warm up engines before flying
                 selectedAircraft.warmUpEngines();
                 selectedAircraft.decreaseCountdown();
                 if (selectedAircraft.CooldownOver()) {
@@ -236,9 +238,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     if (flightPath != null && selectedAircraft.CooldownOver()) {
                         selectedAircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
                     }
-                } else if (selectedAircraft.CooldownOver()) {
-                    selectedAircraft.setCountdown(100); // waits for 100 frames to see if other aircrafts will do something
                 }
+                // does nothing otherwise
             } 
             else if (selectedAircraft.isAtGate()) {
                 // if aircraft is at gate, it countsdown until 0
@@ -343,7 +344,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         }
 
         // visualize planes
-        aircraftsOnSite.stream().filter(x -> x.getFlying() == false).toList().forEach(plane -> plane.visualRepresentation(g, 50, 50));
+        aircraftsOnSite.stream().filter(x -> x.getCurrentNode().locatedIn != Node.locationTypes.OUTSIDE).toList().forEach(plane -> plane.visualRepresentation(g, 50, 50));
 
         // flight board, drawn last so it sits on top of everything else
         // uses this panel's own size (not the JFrame's) so it isn't pushed past the

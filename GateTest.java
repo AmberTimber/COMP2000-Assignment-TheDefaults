@@ -1,7 +1,8 @@
+
 public class GateTest {
     public static void main(String[] args) {
         Node gateNode = new Node(null, null, null, null,
-                new Vector2(100, 200), "N1", "Gate12");
+                new Vector2(100, 200), "N1", Node.locationTypes.GATE);
 
         AirwayGate gate = new AirwayGate("G12", true, gateNode);
 

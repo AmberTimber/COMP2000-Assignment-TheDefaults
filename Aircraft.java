@@ -132,7 +132,7 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
     public boolean canFly() {
         if (getReachedTarget() == true && getPosition().compareVectors(getFlightPath().get(getFlightPath().size()-1).getPosition()) == true) {
             Node lastNodeRef = getFlightPath().get(getFlightPath().size()-1);
-            if (lastNodeRef.getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) {
+            if (lastNodeRef.getNodeTileRepresentation() == Node.locationTypes.AIRFIELD) {
                 setStatus("Flying");
                 return true;
             }

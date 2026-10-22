@@ -163,7 +163,7 @@ public class Moveable extends Vector2  {
 
     public void MoveThroughFlightPath(int speed) { // moves through given node movement
         if (flightPath != null && !flightPath.isEmpty()) {
-            if (!currentNode.getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) {
+            if (currentNode.getNodeTileRepresentation() != Node.locationTypes.AIRFIELD) {
                 selected = false;
             }
             if (flightPath.size() > NavigationIndex) {
@@ -182,7 +182,7 @@ public class Moveable extends Vector2  {
                 } else if (getReachedTarget() == true && flightPath.size() > NavigationIndex + 1 && flightPath.get(NavigationIndex +1).getOccupied() == true && selected == false) {
                     CheckIfNextPathIsBlocked();
                 } // if the aircraft is selected to go on airfield
-                else if (getReachedTarget() == true && flightPath.size() > NavigationIndex + 1 && selected == true && flightPath.get(NavigationIndex+1).getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) {
+                else if (getReachedTarget() == true && flightPath.size() > NavigationIndex + 1 && selected == true && flightPath.get(NavigationIndex+1).getNodeTileRepresentation() == Node.locationTypes.AIRFIELD) {
                     flightPath.get(NavigationIndex).setOccupied(false);
                     NavigationIndex++;
                     setTarget(flightPath.get(NavigationIndex).getPosition());
@@ -190,7 +190,7 @@ public class Moveable extends Vector2  {
                     setReachedTarget(false);
                     flightPath.get(NavigationIndex).setOccupied(true); // ensure no other aircrafts can go to the node
                     System.out.println("Going to airfield");
-                } else if (selected == false && currentNode.getNodeTileRepresentation().equalsIgnoreCase("RUNWAY")) {
+                } else if (selected == false && currentNode.getNodeTileRepresentation() == Node.locationTypes.AIRFIELD) {
                     reverseAircraft();
                 }
             }
