@@ -3,10 +3,7 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-
+import java.util.Spliterator;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -171,10 +168,17 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         aircraftsOnSite.add(testFlight3);
 
         // future implementation of random plane generation
+        ArrayList<String> firstName = new ArrayList<>();
+        firstName.add("Joe");
+        firstName.add("Tim");
+        firstName.add("Bill");
+        firstName.add("Richard");
         for (int i = 0; i < aircraftCount; i++) {
             int aircraftType = (int)(Math.random() * 2) + 1; // random plane type selection
             if (aircraftType == 1) {
-                int nameSelection = (int)(Math.random() * 2) + 1; // random plane type selection
+                int nameSelection = (int)(Math.random() * firstName.size()) + 1; // random plane type selection
+
+                
             }
         }
         
@@ -344,8 +348,13 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         }
 
         // visualize planes
-        aircraftsOnSite.stream().filter(x -> x.getCurrentNode().locatedIn != Node.locationTypes.OUTSIDE).toList().forEach(plane -> plane.visualRepresentation(g, 50, 50));
-
+        Spliterator<Aircraft> firstHalf = aircraftsOnSite.spliterator();
+        Spliterator<Aircraft> secondHalf = firstHalf.trySplit();
+        if (secondHalf != null) {
+            secondHalf.forEachRemaining((aircraft) -> aircraft.visualRepresentation(g, 50, 50));
+        }
+        while (firstHalf.tryAdvance((aircraft) -> aircraft.visualRepresentation(g, 50, 50)))
+        
         // flight board, drawn last so it sits on top of everything else
         // uses this panel's own size (not the JFrame's) so it isn't pushed past the
         // visible area by the title bar/borders, which would clip off the bottom rows
