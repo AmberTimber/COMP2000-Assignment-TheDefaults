@@ -1,10 +1,6 @@
 
 public interface  Position {
-    int getXPos();
-    int getYPos();
-
-    void setXPos(int xPos);
-    void setYPos(int yPos);
+    void setPosition(Vector2 newVector);
 
     Vector2 getPosition();
 }

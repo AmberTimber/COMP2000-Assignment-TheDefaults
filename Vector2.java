@@ -1,8 +1,8 @@
 import java.util.Objects;
 
 public class Vector2 implements Position {
-    public int xPos;
-    public int yPos;
+    private int xPos;
+    private int yPos;
 
     public Vector2() {} // goes with just random position
 
@@ -15,9 +15,14 @@ public class Vector2 implements Position {
         return new Vector2(xPos, yPos);
     }
 
-    public void setVector2(int xPos, int yPos) {
-        setXPos(xPos);
-        setYPos(yPos);
+    public void setVector2(int newxPos, int newyPos) {
+        setXPos(newxPos);
+        setYPos(newyPos);
+    }
+
+    public void setVector2(Vector2 newPos) {
+        setXPos(newPos.getXPos());
+        setYPos(newPos.getYPos());
     }
 
     public boolean compareVectors(Vector2 otherVector) {
