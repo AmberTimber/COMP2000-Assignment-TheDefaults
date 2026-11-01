@@ -5,7 +5,7 @@ import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Aircraft extends Moveable implements drawable, Status {
+public abstract class Aircraft extends Moveable implements drawable, Status, AircraftState {
     private final String aircraftID;
     private String operator;
     private String model;
@@ -24,6 +24,7 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
     private AircraftState currentState;
     private AircraftGroundedState groundedState;
     private AircraftFlyingState flyingState;
+    private AircraftDockedState dockedState;
 
 
     public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
@@ -38,6 +39,8 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
         // states
         groundedState = new AircraftGroundedState(this);
         flyingState = new AircraftFlyingState(this);
+        dockedState = new AircraftDockedState(this);
+        setState(groundedState);
     }
 
     /**
@@ -222,14 +225,14 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
 
     //Consumes fuel
     public void influenceFuel() {
-        if (!getStatus().equalsIgnoreCase("DOCKED")) {
+        if (!getStatus().equalsIgnoreCase("DOCKED") || getState() != dockedState) {
             if (framesToConsumeFuel <= 0) {
                 fuelLevel--;
                 framesToConsumeFuel = MaxframesToConsumeFuel;
             } else {
                 framesToConsumeFuel--;
             }
-        } else if (getStatus().equalsIgnoreCase("DOCKED")) {
+        } else if (getStatus().equalsIgnoreCase("DOCKED") || getState() == dockedState) {
             if (framesToConsumeFuel <= MaxframesToConsumeFuel-10) {
                 fuelLevel++;
                 framesToConsumeFuel = MaxframesToConsumeFuel;
@@ -256,8 +259,26 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
         return flyingState;
     }
 
-    // observer for updating when aircraft can land or takeoff
+    public AircraftDockedState getDockedState() {
+        return dockedState;
+    }
+
     public void RunwayNotice(boolean value) {
         canChangeState = value;
+    }
+
+    // state stuff
+    @Override 
+    public void Move(AirTrafficControl aircontroller) {
+        currentState.Move(aircontroller);
+    }
+
+    @Override 
+    public void Dock() {
+
+    }
+
+    public void FlyNLand(AirTrafficControl aircontroller) {
+
     }
 }

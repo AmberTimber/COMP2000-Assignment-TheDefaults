@@ -122,12 +122,12 @@ public class AirwayGate implements drawable {
 
     // check if reached a gate
     public void PlaneAtGate (Aircraft selectedAircraft) {
-        if (selectedAircraft != null && selectedAircraft.isAtLastNode() && !selectedAircraft.getStatus().equalsIgnoreCase("DOCKED") && currentPlane == null) {
+        if (selectedAircraft != null && selectedAircraft.isAtLastNode() && currentPlane == null) {
                 if (selectedAircraft.getPosition().compareVectors(this.getGateNode().getPosition()) && this.getStatus() == true) {
                     try {
                     selectedAircraft.setDocked(true);
                     selectedAircraft.setStatus("DOCKED");
-                    int cooldown = (int)(Math.random() * (1000 - 500 + 1)) + 500;
+                    int cooldown = (int)(Math.random() * 1000) + 600;
                     selectedAircraft.setCountdown(cooldown); // pretend that people are getting on board + refueling
                     this.parkPlane(selectedAircraft);
                     selectedAircraft.setGate(this);

@@ -1,33 +1,40 @@
 public class AircraftFlyingState implements AircraftState {
     private Aircraft aircraft;
-    private int flightTime = (int)(Math.random() * 2001) + 1000;
+    private int flightTime;
 
     public AircraftFlyingState(Aircraft aircraft) {
         this.aircraft = aircraft;
+        flightTime = (int)(Math.random() * (int)aircraft.getFuelLevel()/0.5f) + 3000;
     }
     
-    public void Move() {
-        if (flightTime > 0)
+    // moves in air
+    public void Move(AirTrafficControl aircontroller) {
         if (aircraft.getReachedTarget() == true && aircraft.getFlightPath() != null) {
             aircraft.getCurrentNode().isOccupied = false;
-            aircraft.setFlightPath(null);
-        } else if (aircraft.getReachedTarget() == true) {
-            aircraft.changeTarget();
+             aircraft.changeTarget();
         }
         aircraft.moveTowards(1);
-        aircraft.checkIfReachTarget();
         aircraft.influenceFuel();
         flightTime -= 1;
         if (flightTime <= 0) {
-            FlyNLand();
+            FlyNLand(aircontroller);
         }
     }
 
-    void Dock();
+    public void Dock() {
+        System.out.println("Cannot dock while flying");
+    }
 
-    void FlyNLand();
+    public void FlyNLand(AirTrafficControl aircontroller) {
+        // if flighttime has finished, then it subscribes to runway observer
+        if (aircraft.getFlightPath().size() > 3) {
+            aircraft.setState(aircraft.getGroundedState());
+        } else {
+            aircontroller.GetNotifier().Subscribe(aircraft);
+        }
+    }
 
     public void RefreshTime() {
-        flightTime = (int)(Math.random() * 2001) + 1000;
+        flightTime = (int)(Math.random() * (int)aircraft.getFuelLevel()/0.5f) + 3000;
     }
 }

@@ -1,8 +1,8 @@
 public interface AircraftState {
-    void Move();
+    void Move(AirTrafficControl aircontroller);
 
     void Dock();
 
-    void FlyNLand();
+    void FlyNLand(AirTrafficControl aircontroller);
     
 }

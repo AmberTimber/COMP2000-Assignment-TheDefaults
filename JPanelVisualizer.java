@@ -34,7 +34,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     public JPanelVisualizer(JFrame jframePanel) {
         JframeRef = jframePanel;
 
-        Node leftFlyOff = new Node(null, null, null, null, new Vector2(-200, 75), "Outside left", Node.locationTypes.AIRFIELD);
+        Node leftFlyOff = new Node(null, null, null, null, new Vector2(-200, 75), "Outside left", Node.locationTypes.OUTSIDE);
         Node leftTopFlyOff = new Node(null, null, null, null, new Vector2(-200, -200), "Outside top left", Node.locationTypes.OUTSIDE);
         Node rightTopFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 200, -200), "Outside top right", Node.locationTypes.OUTSIDE);
         Node rightFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 100, 75), "Outside right", Node.locationTypes.OUTSIDE);
@@ -119,6 +119,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         airportNav.add(GatePathNode3);
         airportNav.add(GatePathNode4);
 
+        airportNav.add(leftFlyOff);
+
         airportNav.stream().distinct();
 
         // marked runway
@@ -143,6 +145,9 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         allGates.add(Gate2);
         allGates.add(Gate3);
         allGates.add(Gate4);
+
+        airControl.setExitNode(leftFlyOff);
+        airControl.setEntryNode(rightFlyOff);
 
         // establishing navigational path
         flightPath = airControl.calculateRoute("A4", TestGate1);
@@ -181,7 +186,14 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 
             }
         }
-        
+
+        for (Aircraft aircraft:aircraftsOnSite) {
+            for (AirwayGate gate:allGates) {
+                if (aircraft.getFlightPath().getLast().CompareNodes(gate.getGateNode())) {
+                    aircraft.setGate(gate);
+                }
+            }
+        }
 
         timer = new Timer(secondsPerFrame, this); // every secondsPerFrame time, = 1 frame
         timer.start(); // starts the timer
@@ -201,7 +213,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 airControl.checkIfAAircraftOnAirfield(runway, selectedAircraft);
                 }
                 // checks if aircraft at gate
-                if (selectedAircraft.isAtLastNode() && selectedAircraft.getCurrentNode().getNodeTileRepresentation() == Node.locationTypes.GATE && selectedAircraft.getReachedTarget()) {
+                /*if (selectedAircraft.isAtLastNode() && selectedAircraft.getCurrentNode().getNodeTileRepresentation() == Node.locationTypes.GATE && selectedAircraft.getReachedTarget()) {
                     for (int c = 0; c < allGates.size(); c++) {
                         allGates.get(c).PlaneAtGate(selectedAircraft);
                     }
@@ -272,7 +284,10 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             }
             else { // otherwise moves towards target
             selectedAircraft.moveTowards(1);
-            }
+            }*/
+           selectedAircraft.Move(airControl);
+           // gets any if runway is free
+           airControl.SelectAnAircraft();
 
             airControl.AirfieldNodeChanger(runway);
         }

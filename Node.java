@@ -22,7 +22,7 @@ public class Node implements Position {
         locatedIn = Location;
     }
 
-    public Vector2 getPosition () {
+    public Vector2 getPosition() {
         return nodePosition;
     }
 
@@ -64,16 +64,16 @@ public class Node implements Position {
         this.rightNode = newNode;
     }
     
-    public void setPostion(Vector2 newVector2) {
+    public void setPosition(Vector2 newVector2) {
         nodePosition = newVector2;
     }
 
     public void setXPos(int xpos) {
-        nodePosition.xPos = xpos;
+        nodePosition.setXPos(xpos);
     }
 
     public void setYPos(int ypos) {
-        nodePosition.yPos = ypos;
+        nodePosition.setYPos(ypos);
     }
 
     public void setOccupied(boolean value) {
@@ -98,11 +98,11 @@ public class Node implements Position {
     }
 
     public int getXPos() {
-        return nodePosition.xPos;
+        return nodePosition.getXPos();
     }
 
     public int getYPos() {
-        return nodePosition.yPos;
+        return nodePosition.getYPos();
     }
 
     public boolean getOccupied() {

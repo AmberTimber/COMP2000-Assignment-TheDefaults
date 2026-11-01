@@ -25,6 +25,11 @@ public class Vector2 implements Position {
         setYPos(newPos.getYPos());
     }
 
+    public void setPosition(Vector2 newPos) {
+        xPos = newPos.getXPos();
+        yPos = newPos.getYPos();
+    }
+
     public boolean compareVectors(Vector2 otherVector) {
         if (getXPos() == otherVector.getXPos() && getYPos() == otherVector.getYPos()) {
             return true;
@@ -33,23 +38,19 @@ public class Vector2 implements Position {
     }
 
     // getters
-    @Override
     public int getXPos () {
         return xPos;
     }
 
-    @Override
     public int getYPos () {
         return yPos;
     }
 
     // setters
-    @Override
     public void setXPos(int xpos) {
         this.xPos = xpos;
     }
 
-    @Override
     public void setYPos(int ypos) {
         this.yPos = ypos;
     }

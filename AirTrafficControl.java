@@ -8,43 +8,34 @@ import java.util.stream.Collectors;
 public class AirTrafficControl implements drawable, Position {
     private static ArrayList<Aircraft> aircraftsInAirport;
     private static ArrayList<Node> airportNavigation;
-    private Vector2 Location;
+    private static Vector2 Location;
     private boolean OccupiedAirfield = false;
     private static Aircraft flyingAircraft = null;
-    private final runwayNotifier notifier; // notifies planes of free runway
+    private static final runwayNotifier notifier = new runwayNotifier();; // notifies planes of free runway
     private static Node exitNode;
     private static ArrayList<Node> runway;
     private static ArrayList<AirwayGate> gateList;
-    private static final AirTrafficControl AirController = new AirTrafficControl(aircraftsInAirport, airportNavigation, new Vector2(0,0), runway, gateList);
+    private static Node entryNode;
 
     
     AirTrafficControl(ArrayList<Aircraft> aircraftCount, ArrayList<Node> airportMap, Vector2 buildingLocation, ArrayList<Node> Runway, ArrayList<AirwayGate> gates) {
         aircraftsInAirport = aircraftCount;
         airportNavigation = airportMap;
         Location = buildingLocation;
-        notifier = new runwayNotifier();
         runway = Runway;
-        gates = gateList;
-        exitNode = airportMap.stream().filter(node -> node.getNodeTileRepresentation() == Node.locationTypes.OUTSIDE).findFirst().orElse(null);
-        AirController.AddToMap(airportMap);
-        AirController.AssignedAircrafts(aircraftCount);
-        AirController.setPosition(buildingLocation);
-        AirController.AssignRunway(Runway);
-        if (exitNode != null) {
-            AirController.setExitNode(exitNode);
-        } else {
-            System.out.println("No exitnode set");
-        }
-        AirController.AssignGates(gateList);
+        gateList = gates;
     }
 
-    // only 1 air control can exist on a airport (like a real airport)
-    public static final AirTrafficControl getControlTower() {
-        return  AirController;
+    public runwayNotifier GetNotifier() {
+        return notifier;
     }
 
-    private void setExitNode(Node ExitNode) {
+    public void setExitNode(Node ExitNode) {
         exitNode = ExitNode;
+    }
+
+    public void setEntryNode(Node EntryNode) {
+        entryNode = EntryNode;
     }
 
    public Vector2 getPosition() {
@@ -212,47 +203,9 @@ public class AirTrafficControl implements drawable, Position {
             AirfieldNodeChanger(airfieldRef);
             flyingAircraft.setSelected(false);
             flyingAircraft = null;
-        }
-    }
-
-    // adds items to airtrafficcontrol
-    private void AddToMap(ArrayList<Node> airportNavMap) {
-        if (airportNavMap != null && airportNavMap.isEmpty()) {
-            for (Node selectedNode:airportNavMap) {
-                if (selectedNode != null) {
-                    airportNavigation.add(selectedNode);
-                }
-            }
-        }
-    }
-    
-    private void AssignedAircrafts(ArrayList<Aircraft> aircrafts) {
-        if (aircrafts != null && aircrafts.isEmpty()) {
-            for (Aircraft selectedPlane:aircrafts) {
-                if (selectedPlane != null) {
-                    aircraftsInAirport.add(selectedPlane);
-                }
-            }
-        }
-    }
-
-    private void AssignRunway(ArrayList<Node> runwayNav) {
-        if (runwayNav != null && runwayNav.isEmpty()) {
-            for (Node selectedNode:runwayNav) {
-                if (selectedNode != null) {
-                    runway.add(selectedNode);
-                }
-            }
-        }
-    }
-
-    private void AssignGates(ArrayList<AirwayGate> availableGates) {
-        if (availableGates != null && availableGates.isEmpty()) {
-            for (AirwayGate selectedGate:availableGates) {
-                if (selectedGate != null) {
-                    gateList.add(selectedGate);
-                }
-            }
+            notifier.Notify(false);
+        } else {
+            notifier.Notify(true);
         }
     }
 
@@ -276,6 +229,7 @@ public void checkIfAAircraftOnAirfield(
                 AirfieldNodeChanger(airfieldRef);
                 flyingAircraft = otherAircraft;
                 flyingAircraft.setSelected(true);
+                notifier.Notify(false);
             });
     }
 }
@@ -320,14 +274,28 @@ public void checkIfAAircraftOnAirfield(
                     Optional<AirwayGate> selectedGate = gateList.stream().filter(gate -> gate.getAssigned() == false).findFirst();
                     Node airfieldNode = runway.get(0);
                     AirwayGate gateref = selectedGate.orElse(null);
-                    flyingAircraft.setFlightPath(calculateRoute(gateref.getGateNode().getNodeID(), airfieldNode));
+                    ArrayList<Node> flightPath = calculateRoute(gateref.getGateNode().getNodeID(), airfieldNode);
+                    flightPath.add(0, entryNode);
+                    flyingAircraft.setFlightPath(flightPath);
                     flyingAircraft.setGate(gateref);
                     gateref.setAssigned(true);
                     flyingAircraft.setStatus("GROUNDED");
                     OccupiedAirfield = true;
                     AirfieldNodeChanger(runway);
                     System.out.println("attempting to land!");
+                    flyingAircraft.setState(flyingAircraft.getGroundedState());
+                    notifier.unSubscribe(flyingAircraft);
                 }
+            }
+        }
+    }
+
+    public void SelectAnAircraft() {
+        Aircraft selectedPlane = notifier.getRandomAircraft();
+        if (selectedPlane != null && flyingAircraft == null && OccupiedAirfield == false) {
+            // gets a random plane from the observer which holds planes that want to land or fly
+            if (selectedPlane.getState() == selectedPlane.getFlyingState()) {
+                clearForLanding(selectedPlane);
             }
         }
     }
@@ -345,6 +313,18 @@ public void checkIfAAircraftOnAirfield(
         if (nodeSet != null && !nodeSet.isEmpty()) {
             int numberSelected = (int)(Math.random() * nodeSet.size());
             Node selectedNode = nodeSet.get(numberSelected);
+            return selectedNode.getNodeID();
+        } else {
+            System.out.println("Cannot get a random node ID. Array is null or is empty");
+            return null;
+        }
+    }
+
+    // used for getting a random location on runway and gate
+    public String getRandomNodeID() {
+        if (runway != null && !runway.isEmpty()) {
+            int numberSelected = (int)(Math.random() * runway.size());
+            Node selectedNode = runway.get(numberSelected);
             return selectedNode.getNodeID();
         } else {
             System.out.println("Cannot get a random node ID. Array is null or is empty");
