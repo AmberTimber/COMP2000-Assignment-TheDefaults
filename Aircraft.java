@@ -2,6 +2,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Aircraft extends Moveable implements drawable, Status {
     private final String aircraftID;
@@ -16,6 +18,12 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
     private int MaxframesToConsumeFuel = framesToConsumeFuel;
     private AirwayGate gateAssigned = null;
     private Color color = null; // lets each aircraft be told apart visually; null = subclass picks its own default
+    private boolean canChangeState = false;
+
+    // states
+    private AircraftState currentState;
+    private AircraftGroundedState groundedState;
+    private AircraftFlyingState flyingState;
 
 
     public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
@@ -26,6 +34,10 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
         setFuelLevel(fuelLevel);
         this.capacity = capacity;
         this.status = status;
+
+        // states
+        groundedState = new AircraftGroundedState(this);
+        flyingState = new AircraftFlyingState(this);
     }
 
     /**
@@ -225,5 +237,27 @@ public abstract class Aircraft extends Moveable implements drawable, Status {
                 framesToConsumeFuel--;
             }
         }
+    }
+
+    // state works
+    public void setState(AircraftState newState) {
+        currentState = newState;
+    }
+
+    public AircraftState getState() {
+        return currentState;
+    }
+
+    public AircraftGroundedState getGroundedState() {
+        return groundedState;
+    }
+
+    public AircraftFlyingState getFlyingState() {
+        return flyingState;
+    }
+
+    // observer for updating when aircraft can land or takeoff
+    public void RunwayNotice(boolean value) {
+        canChangeState = value;
     }
 }

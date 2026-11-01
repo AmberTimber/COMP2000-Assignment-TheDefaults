@@ -24,10 +24,10 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     // aircrafts
     private int aircraftCount = (int)(Math.random() * (4 - 1 + 1)) + 1;
     private ArrayList<Aircraft> aircraftsOnSite = new ArrayList<>();
-    private AirTrafficControl airControl = new AirTrafficControl(aircraftsOnSite,  airportNav,new Vector2(400, 600));
     private ArrayList<Node> runway = new ArrayList<>();
-    private ArrayList<Node> outsideLoop = new ArrayList<>();
     private ArrayList<AirwayGate> allGates = new ArrayList<>();
+    private AirTrafficControl airControl = new AirTrafficControl(aircraftsOnSite, airportNav,new Vector2(400, 600), runway, allGates);
+    private ArrayList<Node> outsideLoop = new ArrayList<>();
     private FlightBoard flightBoard = new FlightBoard(aircraftsOnSite);
 
     // intializes time

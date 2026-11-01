@@ -3,6 +3,6 @@ public interface AircraftState {
 
     void Dock();
 
-    void Fly();
+    void FlyNLand();
     
 }

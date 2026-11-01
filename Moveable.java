@@ -15,8 +15,8 @@ public class Moveable extends Vector2  {
     public Moveable(){}
 
     public Moveable(Vector2 position) {
-        setXPos(position.xPos);
-        setYPos(position.yPos);
+        setXPos(position.getXPos());
+        setYPos(position.getYPos());
     } 
 
     public Moveable (int xpos, int ypos) {
@@ -155,8 +155,8 @@ public class Moveable extends Vector2  {
     }
 
     public void changeTarget() {
-        int newXpos = (int)(Math.random() * (1000 - 1 + 1)) + 1;
-        int newYpos = (int)(Math.random() * (800 - 1 + 1)) + 1;
+        int newXpos = (int)(Math.random() * 1201) - 200;
+        int newYpos = (int)(Math.random() * 1201) - 200;
         target = new Vector2(newXpos, newYpos);
         reachTarget = false;
     }
