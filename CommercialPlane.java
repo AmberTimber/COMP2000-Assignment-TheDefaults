@@ -71,7 +71,7 @@ public class CommercialPlane extends Aircraft implements flyable {
         drawer.drawString("Operator: " + this.getOperator(), getXPos() + 5, getYPos() - 5);
         drawer.drawString("Model: " + this.getModel(), getXPos() + 5, getYPos() + 10);
         drawer.drawString("Fuel Level: " + this.getFuelLevel() + "L", getXPos() + 5, getYPos() + 25);
-        drawer.drawString("Capacity: " + this.getCapacity(), getXPos() + 5, getYPos() + 40);
+        drawer.drawString("No. Passengers: " + currentPassengers, getXPos() + 5, getYPos() + 40);
         drawer.drawString("Current status: " + this.getStatus(), getXPos() + 5, getYPos() + 55);
         drawer.drawString("Current target is: " + getCurrentNode().getNodeID(), getXPos() + 5, getYPos() + 70);
         drawer.drawString("Final destination is: " + getFlightPath().get(getFlightPath().size()-1).getNodeID(), getXPos() + 5, getYPos() + 85);

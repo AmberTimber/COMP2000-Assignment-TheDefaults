@@ -28,4 +28,12 @@ public class runwayNotifier {
     public Aircraft getRandomAircraft() {
         return aircrafts.stream().findAny().orElse(null);
     }
+
+    public boolean checkIfAircraftIsSubscribed(Aircraft aircraft) {
+        if (aircrafts.contains(aircraft)) {
+            return  true;
+        } else {
+            return  false;
+        }
+    }
 }

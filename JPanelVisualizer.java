@@ -1,9 +1,15 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Spliterator;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -178,10 +184,13 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         firstName.add("Tim");
         firstName.add("Bill");
         firstName.add("Richard");
+        List<Integer> randomID = Stream.generate(Math::random).map(num -> (int)Math.round(num)).limit(aircraftCount).collect(Collectors.toList());
         for (int i = 0; i < aircraftCount; i++) {
             int aircraftType = (int)(Math.random() * 2) + 1; // random plane type selection
+            int nameSelection = (int)(Math.random() * firstName.size()); // random plane type selection
+            int IDselected = (int)(Math.random() * randomID.size());
             if (aircraftType == 1) {
-                int nameSelection = (int)(Math.random() * firstName.size()) + 1; // random plane type selection
+                //CargoPlane newCargoPlane = new CargoPlane((randomID.get(IDselected)).toString(), firstName.get(nameSelection), 100, 100, TOOL_TIP_TEXT_KEY, i, i)
 
                 
             }
@@ -342,10 +351,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         g.drawLine(0, 440, JframeRef.getWidth(), 440);
         // making road to gate
         g.setColor(Color.GRAY);
-        for (int i = 0; i < 5; i++) {
-            if (i%2 == 0) {
-                g.fillRect(JframeRef.getWidth()/5 * i, 450, JframeRef.getWidth()/5 , 150);
-            }
+        for (int i = 0; i < allGates.size(); i++) {
+            g.fillRect(allGates.get(i).getGateNode().getXPos() - 100, 450, JframeRef.getWidth()/allGates.size() , 150);
         }
 
         // making gates

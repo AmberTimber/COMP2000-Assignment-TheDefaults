@@ -197,14 +197,13 @@ public class AirTrafficControl implements drawable, Position {
     }
 
     // if aircraft flew off runway, free up runway
-    public void checkIfAirfieldIsFree(int width, ArrayList<Node> airfieldRef) {
-        if (flyingAircraft != null && flyingAircraft.getXPos() < 0 || flyingAircraft != null && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.AIRFIELD) {
+    public void checkIfAirfieldIsFree(int flyoffDist, ArrayList<Node> airfieldRef) {
+        if (flyingAircraft != null && flyingAircraft.getXPos() < 0
+         || flyingAircraft != null && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.AIRFIELD && flyingAircraft.getCurrentNode() != exitNode) {
             OccupiedAirfield = false;
             AirfieldNodeChanger(airfieldRef);
             flyingAircraft.setSelected(false);
             flyingAircraft = null;
-            notifier.Notify(false);
-        } else {
             notifier.Notify(true);
         }
     }
@@ -236,31 +235,6 @@ public void checkIfAAircraftOnAirfield(
 
 
     // check if clear for landing
-    public void clearForLanding(Aircraft selectedAircraft, ArrayList<Node> airfieldRef, ArrayList<AirwayGate> availableGates) {
-        if (airfieldRef != null && !airfieldRef.isEmpty() && selectedAircraft != null) {
-            if (selectedAircraft.getFlying() && selectedAircraft.isAtLastNode()) {
-                if (OccupiedAirfield == false && flyingAircraft == null) {
-                    selectedAircraft.getCurrentNode().setOccupied(false);
-                    flyingAircraft = selectedAircraft;
-                    ResetAircraft(flyingAircraft);
-                    flyingAircraft.setSelected(true);
-                    flyingAircraft.setFlying(false);
-                    // creates stream from gates available and instantly assigns first one that is free
-                    Optional<AirwayGate> selectedGate = availableGates.stream().filter(gate -> gate.getAssigned() == false).findFirst();
-                    Node airfieldNode = airfieldRef.get(0);
-                    AirwayGate gateref = selectedGate.orElse(null);
-                    flyingAircraft.setFlightPath(calculateRoute(gateref.getGateNode().getNodeID(), airfieldNode));
-                    flyingAircraft.setGate(gateref);
-                    gateref.setAssigned(true);
-                    flyingAircraft.setStatus("GROUNDED");
-                    OccupiedAirfield = true;
-                    AirfieldNodeChanger(airfieldRef);
-                    System.out.println("attempting to land!");
-                }
-            }
-        }
-    }
-
     public void clearForLanding(Aircraft selectedAircraft) {
         if (selectedAircraft != null) {
             if (selectedAircraft.getFlying() && selectedAircraft.isAtLastNode()) {

@@ -263,6 +263,7 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
         return dockedState;
     }
 
+    // listens for runway changes
     public void RunwayNotice(boolean value) {
         canChangeState = value;
     }

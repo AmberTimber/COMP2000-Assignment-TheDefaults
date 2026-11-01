@@ -11,7 +11,7 @@ public class AircraftFlyingState implements AircraftState {
     public void Move(AirTrafficControl aircontroller) {
         if (aircraft.getReachedTarget() == true && aircraft.getFlightPath() != null) {
             aircraft.getCurrentNode().isOccupied = false;
-             aircraft.changeTarget();
+            aircraft.changeTarget();
         }
         aircraft.moveTowards(1);
         aircraft.influenceFuel();
@@ -27,9 +27,10 @@ public class AircraftFlyingState implements AircraftState {
 
     public void FlyNLand(AirTrafficControl aircontroller) {
         // if flighttime has finished, then it subscribes to runway observer
-        if (aircraft.getFlightPath().size() > 3) {
+        if (aircraft.getChosenToFly()) {
             aircraft.setState(aircraft.getGroundedState());
-        } else {
+        } 
+        if (aircontroller.GetNotifier().checkIfAircraftIsSubscribed(aircraft) == false) {
             aircontroller.GetNotifier().Subscribe(aircraft);
         }
     }
