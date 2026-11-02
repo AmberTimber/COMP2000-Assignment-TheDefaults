@@ -11,6 +11,7 @@ public class AircraftDockedState implements AircraftState {
     public void Move(AirTrafficControl aircontroller) {
         aircraft.influenceFuel();
         aircraft.decreaseCountdown();
+        aircraft.PlaneStatus = new BoardingDecorator(aircraft.PlaneStatus);
         if (aircraft.CooldownOver()) {
             AirwayGate currentGate = aircraft.getAssignedGate();
             // if plane can depart

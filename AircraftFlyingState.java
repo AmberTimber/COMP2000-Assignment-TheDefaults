@@ -12,6 +12,7 @@ public class AircraftFlyingState implements AircraftState {
         if (aircraft.getReachedTarget() == true && aircraft.getFlightPath() != null) {
             aircraft.getCurrentNode().isOccupied = false;
             aircraft.changeTarget();
+            aircraft.setFlying(true);
         }
         aircraft.moveTowards(1);
         aircraft.influenceFuel();

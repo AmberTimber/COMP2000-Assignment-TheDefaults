@@ -74,6 +74,26 @@ public class AirTrafficControl implements drawable, Position {
         return path;
     }
 
+    // done on start
+    public ArrayList<Node> initialCalculateRoute(String NodeID, Node StartingNode) {
+        ArrayList<Node> path = new ArrayList<>();
+        if (NodeID != null && StartingNode != null) {
+            try {
+                StartingNode.setOccupied(false);
+                path = findNodeStart(NodeID, path, StartingNode);
+                StartingNode.setOccupied(true);
+                path = shortestPathNode(path);
+            } catch (NullPointerException e) {
+                System.out.println("NULL ERROR IN PATH: " + e);
+                return null;
+            }
+        } else {
+            throw new NullPointerException("Route calculations NodeID or startingNode is null or a incorrect data type!");
+        }
+
+        return path;
+    }
+
     // find shortest path
     private ArrayList<Node> shortestPathNode(ArrayList<Node> givenArray) {
         ArrayList<Node> copy = new ArrayList<>(givenArray);
@@ -147,6 +167,46 @@ public class AirTrafficControl implements drawable, Position {
         System.out.println("Returned null in path!");
         return null; // after checking that all other slots are null, meaning this branch isn't it
     }
+
+    // used to create a navigational arraylist of points on the airport on start to prevent null errors
+        private ArrayList<Node> findNodeStart(String TargetedNode, ArrayList<Node> givenArray, Node startingNode) {
+        if (startingNode == null || givenArray.contains(startingNode)) { // ensure that a node can only be gone on once
+            return null;
+        }
+
+        givenArray.add(startingNode); // adds
+
+        // if correct node
+        if (startingNode.getNodeID() != null && startingNode.getNodeID().equals(TargetedNode)) {
+            return givenArray;
+        }
+
+        ArrayList<Node> finalPath; // used to hold all pathways and check if reached
+        
+        finalPath = findNodeStart(TargetedNode, givenArray, startingNode.upperNode);
+        if (finalPath != null) {
+            return finalPath;
+        }
+
+        finalPath = findNodeStart(TargetedNode, givenArray, startingNode.bottomNode);
+        if (finalPath != null) {
+            return finalPath;
+        }
+
+        finalPath = findNodeStart(TargetedNode, givenArray, startingNode.leftNode);
+        if (finalPath != null) {
+            return finalPath;
+        }
+
+        finalPath = findNodeStart(TargetedNode, givenArray, startingNode.rightNode);
+        if (finalPath != null) {
+            return finalPath;
+        }
+
+       givenArray.remove(givenArray.size()-1);
+        System.out.println("Returned null in path!");
+        return null; // after checking that all other slots are null, meaning this branch isn't it
+    }
     
     // for drawing elements of airtraffic control
     @Override
@@ -158,20 +218,6 @@ public class AirTrafficControl implements drawable, Position {
     }
 
     // allows air traffic control to decide whether a plane can takeoff or not
-    public void ClearAircraftForTakeOff(Aircraft selectedAircraft, ArrayList<Node> flightOutside, ArrayList<Node> airfieldRef) {
-        if (airfieldRef != null && !airfieldRef.isEmpty() && selectedAircraft != null && flightOutside != null && !flightOutside.isEmpty()) {
-            if (selectedAircraft.canFly() == true && selectedAircraft.getChosenToFly()) {
-                System.out.println("Go for takeoff!!!");
-                ResetAircraft(flyingAircraft);
-                OccupiedAirfield = true;
-                AirfieldNodeChanger(airfieldRef);
-                flyingAircraft = selectedAircraft;
-                flyingAircraft.setFlying(true);
-                flyingAircraft.setFlightPath(flightOutside);
-            }
-        }
-    }
-
     public void ClearAircraftForTakeOff(Aircraft selectedAircraft) {
         if (runway != null && !runway.isEmpty() && selectedAircraft != null) {
             if (selectedAircraft.canFly() == true && selectedAircraft.getChosenToFly()) {
@@ -191,15 +237,15 @@ public class AirTrafficControl implements drawable, Position {
 
     // changes all airfield nodes to be a value
     public void AirfieldNodeChanger (ArrayList<Node> airfieldRef) {
-        if (airfieldRef != null && !airfieldRef.isEmpty())
-        airfieldRef.forEach(node -> node.setOccupied(OccupiedAirfield));
-
+        if (airfieldRef != null && !airfieldRef.isEmpty()) {
+            airfieldRef.forEach(node -> node.setOccupied(OccupiedAirfield));
+        }
     }
 
     // if aircraft flew off runway, free up runway
     public void checkIfAirfieldIsFree(int flyoffDist, ArrayList<Node> airfieldRef) {
         if (flyingAircraft != null && flyingAircraft.getXPos() < 0
-         || flyingAircraft != null && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.AIRFIELD && flyingAircraft.getCurrentNode() != exitNode) {
+         || flyingAircraft != null && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.AIRFIELD && !flyingAircraft.compareVectors(exitNode.getPosition())) {
             OccupiedAirfield = false;
             AirfieldNodeChanger(airfieldRef);
             flyingAircraft.setSelected(false);
@@ -209,23 +255,18 @@ public class AirTrafficControl implements drawable, Position {
     }
 
     // detects if a aircraft is onfield
-    
-public void checkIfAAircraftOnAirfield(
-        ArrayList<Node> airfieldRef, Aircraft otherAircraft) {
+public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
 
-    if (aircraftsInAirport != null
-            && !aircraftsInAirport.isEmpty()
-            && airfieldRef != null
-            && !airfieldRef.isEmpty()
+    if (aircraftsInAirport != null && !aircraftsInAirport.isEmpty() && runway != null && !runway.isEmpty()
             && otherAircraft != null
             && flyingAircraft == null) {
 
-        airfieldRef.stream()
+        runway.stream()
             .filter(node -> otherAircraft.getCurrentNode() == node)
             .findFirst()
             .ifPresent(node -> {
                 OccupiedAirfield = true;
-                AirfieldNodeChanger(airfieldRef);
+                AirfieldNodeChanger(runway);
                 flyingAircraft = otherAircraft;
                 flyingAircraft.setSelected(true);
                 notifier.Notify(false);
@@ -237,7 +278,7 @@ public void checkIfAAircraftOnAirfield(
     // check if clear for landing
     public void clearForLanding(Aircraft selectedAircraft) {
         if (selectedAircraft != null) {
-             Optional<AirwayGate> selectedGate = gateList.stream().filter(gate -> gate.getAssigned() == false).findFirst();
+            AirwayGate selectedGate = gateList.stream().filter(gate -> gate.getAssigned() == false).findFirst().orElse(null);
             if (selectedAircraft.getFlying() && selectedAircraft.isAtLastNode()) {
                 if (OccupiedAirfield == false && flyingAircraft == null && selectedGate != null) {
                     selectedAircraft.getCurrentNode().setOccupied(false);
@@ -247,12 +288,11 @@ public void checkIfAAircraftOnAirfield(
                     flyingAircraft.setFlying(false);
                     // creates stream from gates available and instantly assigns first one that is free
                     Node airfieldNode = runway.get(0);
-                    AirwayGate gateref = selectedGate.orElse(null);
-                    ArrayList<Node> flightPath = calculateRoute(gateref.getGateNode().getNodeID(), airfieldNode);
+                    ArrayList<Node> flightPath = initialCalculateRoute(selectedGate.getGateNode().getNodeID(), airfieldNode);
                     flightPath.add(0, entryNode);
                     flyingAircraft.setFlightPath(flightPath);
-                    flyingAircraft.setGate(gateref);
-                    gateref.setAssigned(true);
+                    flyingAircraft.setGate(selectedGate);
+                    selectedGate.setAssigned(true);
                     OccupiedAirfield = true;
                     AirfieldNodeChanger(runway);
                     System.out.println("attempting to land!");
@@ -267,7 +307,7 @@ public void checkIfAAircraftOnAirfield(
 
     public void SelectAnAircraft() {
         Aircraft selectedPlane = notifier.getRandomAircraft();
-        if (selectedPlane != null && flyingAircraft == null && OccupiedAirfield == false) {
+        if (selectedPlane != null && flyingAircraft == null && OccupiedAirfield == false && !exitNode.isOccupied) {
             // gets a random plane from the observer which holds planes that want to land or fly
             if (selectedPlane.getState() == selectedPlane.getFlyingState()) {
                 clearForLanding(selectedPlane);

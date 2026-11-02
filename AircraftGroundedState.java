@@ -48,8 +48,10 @@ public class AircraftGroundedState implements AircraftState {
     @Override
     public void Dock() {
         // docks aircraft to gate
-        aircraft.getAssignedGate().PlaneAtGate(aircraft);
-        aircraft.setState(aircraft.getDockedState());
+        if (aircraft.getAssignedGate() != null) {
+            aircraft.getAssignedGate().PlaneAtGate(aircraft);
+            aircraft.setState(aircraft.getDockedState());
+        }
     }
 
     @Override 

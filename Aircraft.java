@@ -140,12 +140,17 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
 
     // allows you to built up the status for future board
     public List<String> breakDownStatus(Status allstatus) {
+        if (allstatus != null) {
         String text = allstatus.getOverallStatus();
         List<String> actualstatus = Arrays.stream(text.split(", ")).collect(Collectors.toList());
         return actualstatus;
+        } else {
+            System.out.println("error getting status because null");
+            return null;
+        }
     }
 
-    // allows you to built up the status for future board
+    // allows you to built up the status for plane text display
     @Override 
     public String getOverallStatus() {
         String message = getAircraftType() + ": " + getAircraftID();
@@ -153,10 +158,13 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
         message += ", Model: " + getModel();
         message += ", Fuel Level: " + getFuelLevel() + "L";
         message += ", Current status: " + getStatus();
-        if (getCurrentNode() != null) {
-            message += ", Current target is: " + getCurrentNode().getNodeID();
-        } else {
-            message += ", Current target is: No Target";
+        if (getState() == getGroundedState() || getState() == getDockedState()) {
+            if (getCurrentNode() != null && getFlightPath() != null) {
+                message += ", Current target is: " + getCurrentNode().getNodeID();
+                message += ", Final destination is: " + getFlightPath().get(getFlightPath().size()-1).getNodeID();
+            } else {
+                message += ", Current target is: No Target";
+            }
         }
         return message;
     }
@@ -262,7 +270,7 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
     // atan2 terms; falls back to pointing "up" when there's no meaningful direction yet
     private double computeHeadingRadians() {
         Vector2 target = getTarget();
-        if (target == null || getReachedTarget() && getCurrentNode().getNodeTileRepresentation() == Node.locationTypes.AIRFIELD || getState() == getDockedState()) {
+        if (target == null || getCurrentNode() != null && getReachedTarget() && getCurrentNode().getNodeTileRepresentation() == Node.locationTypes.AIRFIELD || getState() == getDockedState()) {
             return Math.PI;
         }
         int dx = target.getXPos() - getXPos();
