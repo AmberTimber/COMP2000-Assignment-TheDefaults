@@ -3,7 +3,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class Aircraft extends Moveable implements drawable, Status, AircraftState {
     private final String aircraftID;
@@ -11,7 +13,6 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
     private String model;
     private double fuelLevel;
     private final int capacity;
-    private String status;
     private boolean flying = false;
     private int countdown = 0;
     private int framesToConsumeFuel = 200;
@@ -26,15 +27,17 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
     private AircraftFlyingState flyingState;
     private AircraftDockedState dockedState;
 
+    // decorator
+    public Status PlaneStatus;
 
-    public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status) {
+
+    public Aircraft(String aircraftID, String operator, String model, double fuelLevel, int capacity) {
         
         this.aircraftID = aircraftID;
         setOperator(operator);
         setModel(model);
         setFuelLevel(fuelLevel);
         this.capacity = capacity;
-        this.status = status;
 
         // states
         groundedState = new AircraftGroundedState(this);
@@ -68,10 +71,6 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
             throw new InvalidAircraftParameterException("Fuel level cannot be negative (was " + fuelLevel + ")");
         }
         this.fuelLevel = fuelLevel;
-    }
-
-    public void setStatus(String newStatus) {
-        status = newStatus;
     }
 
     public void setFlying(boolean value) {
@@ -130,9 +129,65 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
             return false;
         }
     }
-
+    
     public String getStatus() {
-        return status;
+        return currentState.getStatus();
+    }
+
+    public String getAircraftType() {
+        return "Generic aircraft";
+    }
+
+    // allows you to built up the status for future board
+    public List<String> breakDownStatus(Status allstatus) {
+        String text = allstatus.getOverallStatus();
+        List<String> actualstatus = Arrays.stream(text.split(", ")).collect(Collectors.toList());
+        return actualstatus;
+    }
+
+    // allows you to built up the status for future board
+    @Override 
+    public String getOverallStatus() {
+        String message = getAircraftType() + ": " + getAircraftID();
+        message += ", Operator: " + getOperator();
+        message += ", Model: " + getModel();
+        message += ", Fuel Level: " + getFuelLevel() + "L";
+        message += ", Current status: " + getStatus();
+        if (getCurrentNode() != null) {
+            message += ", Current target is: " + getCurrentNode().getNodeID();
+        } else {
+            message += ", Current target is: No Target";
+        }
+        return message;
+    }
+
+    /*@Override
+    public void visualRepresentation(Graphics drawer, int width, int height) {
+        drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.YELLOW);
+        drawer.setColor(Color.black);
+        drawer.drawString(getOverallStatus(), getXPos() + 5, getYPos() - 20);
+        drawer.drawString("Operator: " + this.getOperator(), getXPos() + 5, getYPos() - 5);
+        drawer.drawString("Model: " + this.getModel(), getXPos() + 5, getYPos() + 10);
+        drawer.drawString("Fuel Level: " + this.getFuelLevel() + "L", getXPos() + 5, getYPos() + 25);
+        drawer.drawString("No. Passengers: " + capacity, getXPos() + 5, getYPos() + 40);
+        drawer.drawString("Current status: " + this.getStatus(), getXPos() + 5, getYPos() + 55);
+        drawer.drawString("Current target is: " + getCurrentNode().getNodeID(), getXPos() + 5, getYPos() + 70);
+        drawer.drawString("Final destination is: " + getFlightPath().get(getFlightPath().size()-1).getNodeID(), getXPos() + 5, getYPos() + 85);
+    }*/
+
+    public void UpdateStats() {
+        Status newStatus = this;
+        PlaneStatus = newStatus;
+    }
+
+    @Override
+    public void visualRepresentation(Graphics drawer, int width, int height) {
+        drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.YELLOW);
+        drawer.setColor(Color.black);
+        List<String> text = breakDownStatus(PlaneStatus);
+        for (int i = 0; i < text.size(); i++) {
+            drawer.drawString(text.get(i), getXPos() + 5, (getYPos() - 20) + (i * 15));
+        }
     }
 
     public void displayInfo() {
@@ -148,7 +203,6 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
         if (getReachedTarget() == true && getPosition().compareVectors(getFlightPath().get(getFlightPath().size()-1).getPosition()) == true) {
             Node lastNodeRef = getFlightPath().get(getFlightPath().size()-1);
             if (lastNodeRef.getNodeTileRepresentation() == Node.locationTypes.AIRFIELD) {
-                setStatus("Flying");
                 return true;
             }
         }
@@ -208,8 +262,8 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
     // atan2 terms; falls back to pointing "up" when there's no meaningful direction yet
     private double computeHeadingRadians() {
         Vector2 target = getTarget();
-        if (target == null) {
-            return -Math.PI / 2;
+        if (target == null || getReachedTarget() && getCurrentNode().getNodeTileRepresentation() == Node.locationTypes.AIRFIELD || getState() == getDockedState()) {
+            return Math.PI;
         }
         int dx = target.getXPos() - getXPos();
         int dy = target.getYPos() - getYPos();
@@ -271,6 +325,7 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
     // state stuff
     @Override 
     public void Move(AirTrafficControl aircontroller) {
+        UpdateStats();
         currentState.Move(aircontroller);
     }
 

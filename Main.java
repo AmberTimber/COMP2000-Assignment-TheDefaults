@@ -93,10 +93,10 @@ public class Main {
      */
     private static void demoTaxiway() {
         CommercialPlane passengerPlane = new CommercialPlane(
-                "QF101", "Qantas", "Airbus A320", 82.5, 180, "GROUNDED", 180, 145);
+                "QF101", "Qantas", "Airbus A320", 82.5, 180, 180, 145);
 
         CargoPlane cargoPlane = new CargoPlane(
-                "FX220", "FedEx", "Boeing 767F", 74.0, 3, "GROUNDED", 52000.0, 31000.0);
+                "FX220", "FedEx", "Boeing 767F", 74.0, 3, 52000.0, 31000.0);
 
         // Capacity of 1, so the second aircraft to enter should be rejected.
         Taxiway taxiway = new Taxiway("T1", 900.0, 1, 20.0);
@@ -136,7 +136,7 @@ public class Main {
 
     // used to test plane status for future development
     private static void PlaneStatusDemo() {
-        Status statusFlight = new CargoPlane("113972", null, null, 0, 0, null, 0, 0);
+        Status statusFlight = new CargoPlane("113972", null, null, 0, 0, 0, 0);
         System.out.println(statusFlight.getOverallStatus());
         statusFlight = new DelayedDecorator(statusFlight);
         statusFlight = new BoardingDecorator(statusFlight);
@@ -144,9 +144,9 @@ public class Main {
     }
 
     private static void planeGrouping() {
-        Aircraft DeliveryPlane = new CargoPlane("I6302", null, null, 0, 0, null, 0, 0);
-        Aircraft DeliveryPlane2 = new CargoPlane("ZO22", null, null, 0, 0, null, 0, 0);
-        Aircraft PassengerPlane = new CommercialPlane("TT05", null, null, 0, 0, null, 0, 0);
+        Aircraft DeliveryPlane = new CargoPlane("I6302", null, null, 0, 0, 0, 0);
+        Aircraft DeliveryPlane2 = new CargoPlane("ZO22", null, null, 0, 0, 0, 0);
+        Aircraft PassengerPlane = new CommercialPlane("TT05", null, null, 0, 0,  0, 0);
         Map<Class<? extends Aircraft>, List<Aircraft>> sortedPlanes = List.of(DeliveryPlane, DeliveryPlane2, PassengerPlane).stream().collect(Collectors.groupingBy(Aircraft::getClass));
     }
 }

@@ -24,11 +24,16 @@ public class AircraftDockedState implements AircraftState {
 
     @Override 
     public void Dock() {
-        
+        System.out.println("Aircraft is already docked");
     }
 
     @Override 
     public void FlyNLand(AirTrafficControl aircontroller) {
         System.out.println("Cannot fly while docked");
+    }
+
+    @Override 
+    public String getStatus() {
+        return "Docked";
     }
 }

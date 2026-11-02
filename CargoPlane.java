@@ -1,12 +1,16 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CargoPlane extends Aircraft implements flyable {
     private final double maxWeight; // in KG
     private double currentWeight;
 
-    public CargoPlane(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status, double maxWeight, double currentWeight) {
-        super(aircraftID, operator, model, fuelLevel, capacity, status);
+    public CargoPlane(String aircraftID, String operator, String model, double fuelLevel, int capacity, double maxWeight, double currentWeight) {
+        super(aircraftID, operator, model, fuelLevel, capacity);
         this.maxWeight = maxWeight;
         setCurrentWeight(currentWeight); //call setter from constructor so it would check setter first 
     }
@@ -37,6 +41,11 @@ public class CargoPlane extends Aircraft implements flyable {
         System.out.println("Current Weight: " + currentWeight);
     }
 
+    @Override 
+    public String getAircraftType() {
+        return "CargoPlane";
+    }
+
     // for flyable implement
     @Override
     public boolean flying() {
@@ -65,7 +74,7 @@ public class CargoPlane extends Aircraft implements flyable {
         return !flying() && getFuelLevel() > 0 && currentWeight <= maxWeight;
     }
 
-    @Override
+    /*@Override
     public void visualRepresentation(Graphics drawer, int width, int height) {
         drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.RED);
         drawer.setColor(Color.black);
@@ -77,12 +86,6 @@ public class CargoPlane extends Aircraft implements flyable {
         drawer.drawString("Current status: " + this.getStatus(), getXPos() + 5, getYPos() + 55);
         drawer.drawString("Current target is: " + getCurrentNode().getNodeID(), getXPos() + 5, getYPos() + 70);
         drawer.drawString("Final destination is: " + getFlightPath().get(getFlightPath().size()-1).getNodeID(), getXPos() + 5, getYPos() + 85);
-    }
+    }*/
 
-    // allows you to built up the status for future board
-    @Override 
-    public String getOverallStatus() {
-        String status = "Flight number " + getAircraftID();
-        return status;
-    }
 }

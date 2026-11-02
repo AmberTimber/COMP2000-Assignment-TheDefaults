@@ -15,7 +15,7 @@ public class AircraftGroundedState implements AircraftState {
             // moves through the airport
             aircraft.MoveThroughFlightPath(1); 
         } // if blocked while moving 
-        else if(aircraft.isBlocked() == true && aircraft.canFly() == false) { 
+        else if(aircraft.isBlocked() == true) { 
             // if a aircraft path is being blocked, it regenerates a new path or goes back 1 node
             int chosenAction = (int)(Math.random() * 3);
             aircraft.decreaseCountdown();
@@ -33,6 +33,8 @@ public class AircraftGroundedState implements AircraftState {
             }
             aircraft.CheckIfNextPathIsBlocked();
         }
+
+        aircraft.CheckIfNextPathIsBlocked();
         if (aircraft.getReachedTarget() == true && 
         aircraft.getCurrentNode().getNodeTileRepresentation() == Node.locationTypes.AIRFIELD &&
          aircraft.getChosenToFly() && aircraft.isAtLastNode()) {
@@ -63,5 +65,10 @@ public class AircraftGroundedState implements AircraftState {
                 aircraft.setState(aircraft.getFlyingState());
             }
         }
+    }
+
+    @Override 
+    public String getStatus() {
+        return "Grounded";
     }
 }

@@ -5,8 +5,8 @@ public class CommercialPlane extends Aircraft implements flyable {
     private final int numSeats;
     private int currentPassengers;
 
-    public CommercialPlane(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status, int numSeats, int currentPassengers) {
-        super(aircraftID, operator, model, fuelLevel, capacity, status);
+    public CommercialPlane(String aircraftID, String operator, String model, double fuelLevel, int capacity, int numSeats, int currentPassengers) {
+        super(aircraftID, operator, model, fuelLevel, capacity);
         this.numSeats = numSeats;
         this.currentPassengers = currentPassengers;
     }
@@ -63,7 +63,7 @@ public class CommercialPlane extends Aircraft implements flyable {
         return !flying() && getFuelLevel() > 0 && currentPassengers <= numSeats;
     }
 
-    @Override
+    /*@Override
     public void visualRepresentation(Graphics drawer, int width, int height) {
         drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.YELLOW);
         drawer.setColor(Color.black);
@@ -75,11 +75,5 @@ public class CommercialPlane extends Aircraft implements flyable {
         drawer.drawString("Current status: " + this.getStatus(), getXPos() + 5, getYPos() + 55);
         drawer.drawString("Current target is: " + getCurrentNode().getNodeID(), getXPos() + 5, getYPos() + 70);
         drawer.drawString("Final destination is: " + getFlightPath().get(getFlightPath().size()-1).getNodeID(), getXPos() + 5, getYPos() + 85);
-    }
-
-    // allows you to built up the status for future board
-    @Override 
-    public String getOverallStatus() {
-        return "Flight number " + getAircraftID();
-    }
+    }*/
 }

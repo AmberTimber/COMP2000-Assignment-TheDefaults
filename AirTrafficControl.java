@@ -237,15 +237,15 @@ public void checkIfAAircraftOnAirfield(
     // check if clear for landing
     public void clearForLanding(Aircraft selectedAircraft) {
         if (selectedAircraft != null) {
+             Optional<AirwayGate> selectedGate = gateList.stream().filter(gate -> gate.getAssigned() == false).findFirst();
             if (selectedAircraft.getFlying() && selectedAircraft.isAtLastNode()) {
-                if (OccupiedAirfield == false && flyingAircraft == null) {
+                if (OccupiedAirfield == false && flyingAircraft == null && selectedGate != null) {
                     selectedAircraft.getCurrentNode().setOccupied(false);
                     flyingAircraft = selectedAircraft;
                     ResetAircraft(flyingAircraft);
                     flyingAircraft.setSelected(true);
                     flyingAircraft.setFlying(false);
                     // creates stream from gates available and instantly assigns first one that is free
-                    Optional<AirwayGate> selectedGate = gateList.stream().filter(gate -> gate.getAssigned() == false).findFirst();
                     Node airfieldNode = runway.get(0);
                     AirwayGate gateref = selectedGate.orElse(null);
                     ArrayList<Node> flightPath = calculateRoute(gateref.getGateNode().getNodeID(), airfieldNode);
@@ -253,13 +253,14 @@ public void checkIfAAircraftOnAirfield(
                     flyingAircraft.setFlightPath(flightPath);
                     flyingAircraft.setGate(gateref);
                     gateref.setAssigned(true);
-                    flyingAircraft.setStatus("GROUNDED");
                     OccupiedAirfield = true;
                     AirfieldNodeChanger(runway);
                     System.out.println("attempting to land!");
                     flyingAircraft.setState(flyingAircraft.getGroundedState());
                     notifier.unSubscribe(flyingAircraft);
                 }
+            } else {
+                System.out.println("No gates are free or are found!");
             }
         }
     }
@@ -271,6 +272,8 @@ public void checkIfAAircraftOnAirfield(
             if (selectedPlane.getState() == selectedPlane.getFlyingState()) {
                 clearForLanding(selectedPlane);
             }
+        } else if (selectedPlane != null) {
+            System.out.println("Airfield is currently occupied, cannot land!");
         }
     }
 

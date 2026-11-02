@@ -106,7 +106,6 @@ public class AirwayGate implements drawable {
                 }
                 if (path != null && currentPlane.CooldownOver()) { // ensure path no null, maybe because its blocked, and tries later
                     currentPlane.setFlightPath(path); // creates new path so it doesn't collide with other aircrafts
-                    currentPlane.setStatus("GROUNDED");
                     currentPlane.setGate(null);
                     currentPlane.setDocked(false);
                     removePlane(); // removes from gate
@@ -126,7 +125,6 @@ public class AirwayGate implements drawable {
                 if (selectedAircraft.getPosition().compareVectors(this.getGateNode().getPosition()) && this.getStatus() == true) {
                     try {
                     selectedAircraft.setDocked(true);
-                    selectedAircraft.setStatus("DOCKED");
                     int cooldown = (int)(Math.random() * 1000) + 600;
                     selectedAircraft.setCountdown(cooldown); // pretend that people are getting on board + refueling
                     this.parkPlane(selectedAircraft);

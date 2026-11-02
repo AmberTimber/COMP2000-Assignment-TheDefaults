@@ -18,6 +18,7 @@ public class AircraftFlyingState implements AircraftState {
         flightTime -= 1;
         if (flightTime <= 0) {
             FlyNLand(aircontroller);
+            aircraft.PlaneStatus = new DelayedDecorator(aircraft.PlaneStatus);
         }
     }
 
@@ -37,5 +38,10 @@ public class AircraftFlyingState implements AircraftState {
 
     public void RefreshTime() {
         flightTime = (int)(Math.random() * (int)aircraft.getFuelLevel()/0.5f) + 3000;
+    }
+
+    @Override 
+    public String getStatus() {
+        return "Flying";
     }
 }
