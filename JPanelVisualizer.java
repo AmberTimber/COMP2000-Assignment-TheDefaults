@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.List;
+import java.util.Map;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -152,8 +153,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         airControl.setExitNode(leftFlyOff);
         airControl.setEntryNode(rightFlyOff);
 
-        // establishing navigational path
-
+        // pre made plane tests
         /*Aircraft testFlight = new CargoPlane("Test aircraft", "Thyme the geat", "Hawking404", 1500.00, 50, 500.00, 250.00);
         testFlight.setVector2(200, 400);
         testFlight.setFlightPath(flightPath);
@@ -174,7 +174,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         testFlight3.setColor(Color.MAGENTA);
         aircraftsOnSite.add(testFlight3);*/
 
-        // future implementation of random plane generation
+        // implementation of random plane generation
         ArrayList<String> firstName = new ArrayList<>();
         firstName.add("Joe");
         firstName.add("Tim");
@@ -193,97 +193,67 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         randomModel.add("Airbus A220");
         randomModel.add("Cessna 172 Skyhawk");
         for (int i = 0; i < aircraftCount; i++) {
-            int aircraftType = 1; //(int)(Math.random() * 2) + 1; // random plane type selection
+            int aircraftType = (int)(Math.random() * 2) + 1; // random plane type selection
             int nameSelection = (int)(Math.random() * firstName.size()); // random plane type selection
             int IDselected = (int)(Math.random() * randomID.size());
             int Modelselected = (int)(Math.random() * randomModel.size());
-            if (aircraftType == 1) {
-                for (int c = 0; c < aircraftsOnSite.size(); c++) {
-                    while ((randomID.get(IDselected)).toString() == aircraftsOnSite.get(c).getAircraftID()) {
-                        int newInteger = (int)((Math.random() * 9999) + 1000);
-                        randomID.set(IDselected, newInteger);
-                        c = 0;
-                    }
+            Aircraft newAircaft;
+            for (int c = 0; c < aircraftsOnSite.size(); c++) {
+                while ((randomID.get(IDselected)).toString() == aircraftsOnSite.get(c).getAircraftID()) {
+                    // ensure all ID's are unique
+                    int newInteger = (int)((Math.random() * 9999) + 1000);
+                    randomID.set(IDselected, newInteger);
+                    c = 0;
                 }
-                
-                CargoPlane newCargoPlane = new CargoPlane((randomID.get(IDselected)).toString(), firstName.get(nameSelection), randomModel.get(Modelselected), 5000.0, 2, 600.0, 500.0);
-                Node spawningNode = airportNav.stream().filter(node -> node.isOccupied == false)
+            }
+            // selecting type of aircraft
+            if (aircraftType == 1) {
+                newAircaft = new CargoPlane((randomID.get(IDselected)).toString(), firstName.get(nameSelection), randomModel.get(Modelselected), 5000.0, 2, 600.0, 500.0);
+            } else {
+                newAircaft = new CommercialPlane((randomID.get(IDselected)).toString(), firstName.get(nameSelection), randomModel.get(Modelselected), 5000, 2, 100, 100);
+            }
+            
+            // setting random spawn on Node, and making it move through the navigation from there
+            Node spawningNode = airportNav.stream().filter(node -> node.isOccupied == false)
                 .filter(node -> node.getNodeTileRepresentation() != Node.locationTypes.AIRFIELD).
                 collect(Collectors.collectingAndThen(Collectors.toList(), collectedList -> {
-                int randomIndex = ThreadLocalRandom.current().nextInt(collectedList.size());
-                return collectedList.get(randomIndex);
-            }));
+                    int randomIndex = ThreadLocalRandom.current().nextInt(collectedList.size());
+                    return collectedList.get(randomIndex);
+                }));
+
+                // choose between going to gate, going to airfield or already flying
                 int chosenBehaviour = (int)(Math.random() * 3) + 1; // random plane to airfield or gate
                 AirwayGate selectedGate = allGates.stream().filter(gate -> gate.getAssigned() == false).findFirst().orElse(null);
                 Node selectedRunwayNode = runway.stream().findAny().orElse(null);
                 if (spawningNode != null && selectedGate != null && chosenBehaviour == 1) {
                     flightPath = airControl.initialCalculateRoute(selectedGate.getGateNode().getNodeID(), spawningNode);
-                    newCargoPlane.setVector2(spawningNode.getXPos(), spawningNode.getYPos());
-                    newCargoPlane.setFlightPath(flightPath);
-                    newCargoPlane.setColor(getRandomColorRGB());
-                    newCargoPlane.setGate(selectedGate);
+                    newAircaft.setVector2(spawningNode.getXPos(), spawningNode.getYPos());
+                    newAircaft.setFlightPath(flightPath);
+                    newAircaft.setColor(getRandomColorRGB());
+                    newAircaft.setGate(selectedGate);
                     selectedGate.setAssigned(true);
-                    aircraftsOnSite.add(newCargoPlane);
+                    aircraftsOnSite.add(newAircaft);
                 } else if (spawningNode != null && selectedRunwayNode != null && chosenBehaviour == 2) { // becomes airfied goer
                     flightPath = airControl.initialCalculateRoute(selectedRunwayNode.getNodeID(), spawningNode);
-                    newCargoPlane.setVector2(spawningNode.getXPos(), spawningNode.getYPos());
-                    newCargoPlane.setFlightPath(flightPath);
-                    newCargoPlane.setColor(getRandomColorRGB());
-                    aircraftsOnSite.add(newCargoPlane);
+                    newAircaft.setVector2(spawningNode.getXPos(), spawningNode.getYPos());
+                    newAircaft.setFlightPath(flightPath);
+                    newAircaft.setColor(getRandomColorRGB());
+                    aircraftsOnSite.add(newAircaft);
                 } else {
-                    newCargoPlane.changeTarget();
-                    newCargoPlane.setVector2(newCargoPlane.getTarget().getPosition());
-                    newCargoPlane.setState(newCargoPlane.getFlyingState());
+                    newAircaft.changeTarget();
+                    newAircaft.setVector2(newAircaft.getTarget().getPosition());
+                    newAircaft.setState(newAircaft.getFlyingState());
                     flightPath = new ArrayList<Node>();
                     flightPath.add(leftFlyOff);
-                    newCargoPlane.setFlightPath(flightPath);
-                    airControl.GetNotifier().Subscribe(newCargoPlane);
-                    newCargoPlane.setReachedTarget(true);
-                    newCargoPlane.getFlyingState().RefreshTime();
-                    aircraftsOnSite.add(newCargoPlane);
-                }
+                    newAircaft.setFlightPath(flightPath);
+                    airControl.GetNotifier().Subscribe(newAircaft);
+                    newAircaft.setReachedTarget(true);
+                    newAircaft.getFlyingState().RefreshTime();
+                    aircraftsOnSite.add(newAircaft);
             }
-                
-            /*} else { // otherwise make a commercial plane
-                CommercialPlane newCommercialPlane = new CommercialPlane((randomID.get(IDselected)).toString(), firstName.get(nameSelection), randomModel.get(Modelselected), 5000, 2, 100, 100);
-                Node spawningNode = airportNav.stream().filter(node -> node.isOccupied == false)
-                .filter(node -> node.getNodeTileRepresentation() != Node.locationTypes.AIRFIELD).
-                collect(Collectors.collectingAndThen(Collectors.toList(), collectedList -> {
-                int randomIndex = ThreadLocalRandom.current().nextInt(collectedList.size());
-                return collectedList.get(randomIndex);
-            }));
-                int chosenBehaviour = (int)(Math.random() * 2) + 1; // random plane to airfield or gate
-                AirwayGate selectedGate = allGates.stream().filter(gate -> gate.getAssigned() == false).findFirst().orElse(null);
-                Node selectedRunwayNode = runway.stream().findAny().orElse(null);
-                if (spawningNode != null && selectedGate != null && chosenBehaviour == 1) {
-                    flightPath = airControl.calculateRoute(selectedGate.getGateNode().getNodeID(), spawningNode);
-                    newCommercialPlane.setVector2(spawningNode.getXPos(), spawningNode.getYPos());
-                    newCommercialPlane.setFlightPath(flightPath);
-                    newCommercialPlane.setColor(getRandomColorRGB());
-                    newCommercialPlane.setGate(selectedGate);
-                    selectedGate.setAssigned(true);
-                    spawningNode.isOccupied = true;
-                    aircraftsOnSite.add(newCommercialPlane);
-                } else if (spawningNode != null && selectedRunwayNode != null) { // becomes airfied goer
-                    flightPath = airControl.calculateRoute(selectedRunwayNode.getNodeID(), spawningNode);
-                    newCommercialPlane.setVector2(spawningNode.getXPos(), spawningNode.getYPos());
-                    newCommercialPlane.setFlightPath(flightPath);
-                    newCommercialPlane.setColor(getRandomColorRGB());
-                    spawningNode.isOccupied = true;
-                    aircraftsOnSite.add(newCommercialPlane);
-                } else {
-                    newCommercialPlane.changeTarget();
-                    newCommercialPlane.setVector2(newCommercialPlane.getTarget().getPosition());
-                    newCommercialPlane.setState(newCommercialPlane.getFlyingState());
-                    flightPath = new ArrayList<Node>();
-                    flightPath.add(leftFlyOff);
-                    newCommercialPlane.setFlightPath(flightPath);
-                    aircraftsOnSite.add(newCommercialPlane);
-                }
-                newCommercialPlane.setColor(getRandomColorRGB());
-            }*/
         }
 
+        // no duplicate planes
         aircraftsOnSite.stream().distinct();
 
         /*for (Aircraft aircraft:aircraftsOnSite) {
@@ -303,90 +273,17 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         // this entire function is used to update this element every frame
         // key note: increase in xPos = more to right, increase in Y makes it go down
 
-            for (int i = 0; i < aircraftsOnSite.size(); i++) {
-                Aircraft selectedAircraft = aircraftsOnSite.get(i);
-                // checks if the airfield is clear
-                if (airControl.getOccupiedAirfield() == true) {
+        for (int i = 0; i < aircraftsOnSite.size(); i++) {
+            Aircraft selectedAircraft = aircraftsOnSite.get(i);
+            // checks if the airfield is clear
+            if (airControl.getOccupiedAirfield() == true) {
                     airControl.checkIfAirfieldIsFree(0, runway);
-                } else {
-                    airControl.checkIfAAircraftOnAirfield(selectedAircraft);
-                }
-                // checks if aircraft at gate
-                /*if (selectedAircraft.isAtLastNode() && selectedAircraft.getCurrentNode().getNodeTileRepresentation() == Node.locationTypes.GATE && selectedAircraft.getReachedTarget()) {
-                    for (int c = 0; c < allGates.size(); c++) {
-                        allGates.get(c).PlaneAtGate(selectedAircraft);
-                    }
-                }
-
-                selectedAircraft.influenceFuel(); // either gain fuel or spend fuel
-                
-                // checks if plane is flying
-                if (!selectedAircraft.getFlying()) {
-                selectedAircraft.CheckIfNextPathIsBlocked(); // checks if the path is blocked or not
-            if (selectedAircraft.canFly() == true) {
-                // if plane can fly, then it starts to warm up engines before flying
-                selectedAircraft.warmUpEngines();
-                selectedAircraft.decreaseCountdown();
-                if (selectedAircraft.CooldownOver()) {
-                    selectedAircraft.getFlightPath().get(selectedAircraft.getFlightPath().size()-1).setOccupied(false);
-                    airControl.ClearAircraftForTakeOff(selectedAircraft, outsideLoop, runway); // changes path to outside route
-                }
-            } // if on ground
-            else if (selectedAircraft.canFly() == false && selectedAircraft.getStatus().equalsIgnoreCase("GROUNDED") && selectedAircraft.isBlocked() == false) {
-                // moves through the airport
-                selectedAircraft.MoveThroughFlightPath(1); 
-            } // if blocked while moving 
-            else if(selectedAircraft.isBlocked() == true && !selectedAircraft.getFlying()) { 
-                // if a aircraft path is being blocked, it regenerates a new path or goes back 1 node
-                int chosenAction = (int)(Math.random() * 3);
-                selectedAircraft.decreaseCountdown();
-                if (chosenAction == 0) {
-                    selectedAircraft.reverseAircraft();
-                } else if (chosenAction == 1) { // generates new path
-                    String NodeID = selectedAircraft.getFlightPath().get(selectedAircraft.getFlightPath().size()-1).getNodeID();
-                    Node currentNode = selectedAircraft.getCurrentNode();
-                    flightPath = airControl.calculateRoute(NodeID, currentNode);
-                    selectedAircraft.decreaseCountdown();
-                    if (flightPath == null && selectedAircraft.CooldownOver()) { // if path is null, it waits until it can find node or unoccupied
-                        selectedAircraft.setCountdown(100);
-                    }
-                    if (flightPath != null && selectedAircraft.CooldownOver()) {
-                        selectedAircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
-                    }
-                }
-                // does nothing otherwise
-            } 
-            else if (selectedAircraft.isAtGate()) {
-                // if aircraft is at gate, it countsdown until 0
-                selectedAircraft.decreaseCountdown();
-                if (selectedAircraft.CooldownOver()) {
-                    AirwayGate currentGate = selectedAircraft.getAssignedGate();
-                    // if plane can depart
-                    if (selectedAircraft.getAssignedGate() != null && selectedAircraft.getCurrentNode().getPosition().compareVectors(currentGate.getGateNode().getPosition()) && currentGate.getStatus() == true) {
-                        String selectedNodeID = airControl.getRandomNodeID(runway);
-                        currentGate.departingPlane(airControl, selectedNodeID);
-                    }
-                }
+            } else {
+                airControl.checkIfAAircraftOnAirfield(selectedAircraft);
             }
-             else {
-                selectedAircraft.moveTowards(1); // once in flight, moves to target
-            }
-
-            // if aircraft is flying
-        } else if (selectedAircraft.getFlying()) {
-                selectedAircraft.MoveThroughFlightPath(1); 
-                // upon looping, it flies back into the airport
-                if (selectedAircraft.compareVectors(outsideLoop.get(outsideLoop.size()-1).getPosition())) {
-                    // upon raching the airport, finds a gate to go to
-                    airControl.clearForLanding(selectedAircraft, runway, allGates);
-                }
-            }
-            else { // otherwise moves towards target
-            selectedAircraft.moveTowards(1);
-            }*/
-           // moves aircraft
-           selectedAircraft.Move(airControl);
-           // gets any if runway is free
+                // moves aircraft
+            selectedAircraft.Move(airControl);
+            // gets any if runway is free
             airControl.SelectAnAircraft();
 
             airControl.AirfieldNodeChanger(runway);
@@ -461,6 +358,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         }
 
         // visualize planes
+        Map<AircraftState, ArrayList<Aircraft>> seperatedAircrafts = aircraftsOnSite.stream().collect(Collectors.groupingBy(Aircraft::getState, Collectors.toCollection(ArrayList::new)));
+        AircraftDockedState dockKey = new AircraftDockedState(null);
         Spliterator<Aircraft> firstHalf = aircraftsOnSite.spliterator();
         Spliterator<Aircraft> secondHalf = firstHalf.trySplit();
         if (secondHalf != null) {

@@ -194,7 +194,7 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
         drawer.setColor(Color.black);
         List<String> text = breakDownStatus(PlaneStatus);
         for (int i = 0; i < text.size(); i++) {
-            drawer.drawString(text.get(i), getXPos() + 5, (getYPos() - 20) + (i * 15));
+            drawer.drawString(text.get(i), getXPos() + 10, (getYPos() - 20) + (i * 15));
         }
     }
 

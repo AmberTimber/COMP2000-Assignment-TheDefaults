@@ -245,7 +245,8 @@ public class AirTrafficControl implements drawable, Position {
     // if aircraft flew off runway, free up runway
     public void checkIfAirfieldIsFree(int flyoffDist, ArrayList<Node> airfieldRef) {
         if (flyingAircraft != null && flyingAircraft.getXPos() < 0
-         || flyingAircraft != null && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.AIRFIELD && !flyingAircraft.compareVectors(exitNode.getPosition())) {
+         || flyingAircraft != null && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.AIRFIELD 
+         && !flyingAircraft.compareVectors(exitNode.getPosition()) && flyingAircraft.getReachedTarget()) {
             OccupiedAirfield = false;
             AirfieldNodeChanger(airfieldRef);
             flyingAircraft.setSelected(false);
@@ -263,7 +264,7 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
 
         runway.stream()
             .filter(node -> otherAircraft.getCurrentNode() == node)
-            .findFirst()
+            .findAny()
             .ifPresent(node -> {
                 OccupiedAirfield = true;
                 AirfieldNodeChanger(runway);
@@ -307,7 +308,8 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
 
     public void SelectAnAircraft() {
         Aircraft selectedPlane = notifier.getRandomAircraft();
-        if (selectedPlane != null && flyingAircraft == null && OccupiedAirfield == false && !exitNode.isOccupied) {
+        checkIfAirfieldIsFree(0, runway);
+        if (selectedPlane != null && flyingAircraft == null && OccupiedAirfield == false) {
             // gets a random plane from the observer which holds planes that want to land or fly
             if (selectedPlane.getState() == selectedPlane.getFlyingState()) {
                 clearForLanding(selectedPlane);

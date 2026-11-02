@@ -101,7 +101,7 @@ public class AirwayGate implements drawable {
                 gateNode.isOccupied = false;
                 ArrayList<Node> path = airController.calculateRoute(locationNode, gateNode);
                 if (path == null && currentPlane.CooldownOver()) {
-                    currentPlane.setCountdown(100);
+                    currentPlane.setCountdown(1000);
                     gateNode.isOccupied = true;
                 }
                 if (path != null && currentPlane.CooldownOver()) { // ensure path no null, maybe because its blocked, and tries later
