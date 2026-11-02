@@ -1,17 +1,14 @@
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.List;
-import java.util.Map;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Spliterator;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -43,7 +40,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         JframeRef = jframePanel;
 
         Node leftFlyOff = new Node(null, null, null, null, new Vector2(-200, 75), "Outside left", Node.locationTypes.OUTSIDE);
-        Node rightFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 100, 75), "Outside right", Node.locationTypes.OUTSIDE);
+        Node rightFlyOff = new Node(null, null, null, null, new Vector2(JframeRef.getWidth() + 100, 75), "Outside right", Node.locationTypes.AIRFIELD);
         
         Node airfieldNode1 = new Node(null, null, null, null, new Vector2(JframeRef.getWidth()/7 * 0 + (JframeRef.getWidth()/7)/2, 75), "A1", Node.locationTypes.AIRFIELD);
         Node airfieldNode2 = new Node(null, null, airfieldNode1, null, new Vector2(JframeRef.getWidth()/7 * 2 + (JframeRef.getWidth()/7)/2, 75), "A2", Node.locationTypes.AIRFIELD);
@@ -127,6 +124,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
 
         airportNav.add(leftFlyOff);
 
+        // making airport map distinct
         airportNav.stream().distinct();
 
         // marked runway
@@ -246,7 +244,6 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     flightPath = new ArrayList<Node>();
                     flightPath.add(leftFlyOff);
                     newAircaft.setFlightPath(flightPath);
-                    airControl.GetNotifier().Subscribe(newAircaft);
                     newAircaft.setReachedTarget(true);
                     newAircaft.getFlyingState().RefreshTime();
                     aircraftsOnSite.add(newAircaft);
@@ -344,7 +341,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         }
 
         // making gates
-        allGates.stream().forEach(gate -> gate.visualRepresentation(g, JframeRef.getWidth()/9 , 200));
+        allGates.stream().parallel().forEach(gate -> gate.visualRepresentation(g, JframeRef.getWidth()/9 , 200));
 
         // Making terminal
         g.setColor(Color.BLUE);
@@ -358,15 +355,19 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         }
 
         // visualize planes
-        Map<AircraftState, ArrayList<Aircraft>> seperatedAircrafts = aircraftsOnSite.stream().collect(Collectors.groupingBy(Aircraft::getState, Collectors.toCollection(ArrayList::new)));
-        AircraftDockedState dockKey = new AircraftDockedState(null);
-        Spliterator<Aircraft> firstHalf = aircraftsOnSite.spliterator();
-        Spliterator<Aircraft> secondHalf = firstHalf.trySplit();
-        if (secondHalf != null) {
-            secondHalf.forEachRemaining((aircraft) -> aircraft.visualRepresentation(g, 50, 50));
-        }
-        while (firstHalf.tryAdvance((aircraft) -> aircraft.visualRepresentation(g, 50, 50)))
-        
+        Map<Boolean, List<Aircraft>> seperatedAircrafts = aircraftsOnSite.stream().collect(Collectors.partitioningBy(a -> a.getState() == a.getFlyingState()));
+        if (seperatedAircrafts.get(false) != null && !seperatedAircrafts.get(false).isEmpty()) {
+            Spliterator<Aircraft> firstHalf = seperatedAircrafts.get(false).spliterator();
+            Spliterator<Aircraft> secondHalf = firstHalf.trySplit();
+            if (secondHalf != null) {
+                secondHalf.forEachRemaining((aircraft) -> aircraft.visualRepresentation(g, 50, 50));
+            }
+            while (firstHalf.tryAdvance((aircraft) -> aircraft.visualRepresentation(g, 50, 50))) {}
+            }
+
+        if (seperatedAircrafts.get(true) != null && !seperatedAircrafts.get(true).isEmpty()) {
+            seperatedAircrafts.get(true).stream().forEach((aircraft) -> aircraft.visualRepresentation(g, 50, 50));
+        } 
         // flight board, drawn last so it sits on top of everything else
         // uses this panel's own size (not the JFrame's) so it isn't pushed past the
         // visible area by the title bar/borders, which would clip off the bottom rows
