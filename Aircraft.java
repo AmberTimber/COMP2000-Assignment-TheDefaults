@@ -330,6 +330,10 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
         canChangeState = value;
     }
 
+    public Boolean canChangeStates() {
+        return canChangeState;
+    }
+
     // state stuff
     @Override 
     public void Move(AirTrafficControl aircontroller) {

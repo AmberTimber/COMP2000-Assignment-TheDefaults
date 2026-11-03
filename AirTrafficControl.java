@@ -211,8 +211,6 @@ public class AirTrafficControl implements drawable, Position {
     // for drawing elements of airtraffic control
     @Override
     public void visualRepresentation(Graphics drawer, int width, int height) {
-        drawer.setColor(Color.GRAY);
-        drawer.fillRect(Location.getXPos()-width/2, Location.getYPos()-height/2, width, height);
         drawer.setColor(Color.CYAN);
         drawer.fillRect(Location.getXPos(), Location.getYPos(), width, height);
     }
@@ -246,13 +244,13 @@ public class AirTrafficControl implements drawable, Position {
     public void checkIfAirfieldIsFree(int flyoffDist, ArrayList<Node> airfieldRef) {
         if (flyingAircraft != null && flyingAircraft.getXPos() < 0
          || flyingAircraft != null && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.AIRFIELD 
-         && !flyingAircraft.compareVectors(exitNode.getPosition()) && flyingAircraft.getReachedTarget()) {
+         && flyingAircraft.getCurrentNode() != exitNode) {
             OccupiedAirfield = false;
             AirfieldNodeChanger(airfieldRef);
             flyingAircraft.setSelected(false);
             flyingAircraft = null;
-            notifier.Notify(true);
         }
+        notifier.Notify(OccupiedAirfield);
     }
 
     // detects if a aircraft is onfield
@@ -262,7 +260,7 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
             && otherAircraft != null
             && flyingAircraft == null) {
 
-        runway.stream()
+        runway.stream().parallel()
             .filter(node -> otherAircraft.getCurrentNode() == node)
             .findAny()
             .ifPresent(node -> {
@@ -270,7 +268,6 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
                 AirfieldNodeChanger(runway);
                 flyingAircraft = otherAircraft;
                 flyingAircraft.setSelected(true);
-                notifier.Notify(false);
             });
     }
 }
@@ -281,7 +278,7 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
         if (selectedAircraft != null) {
             AirwayGate selectedGate = gateList.stream().filter(gate -> gate.getAssigned() == false).findFirst().orElse(null);
             if (selectedAircraft.getFlying() && selectedAircraft.isAtLastNode()) {
-                if (OccupiedAirfield == false && flyingAircraft == null && selectedGate != null) {
+                if (OccupiedAirfield == false && flyingAircraft == null && selectedGate != null && !exitNode.getOccupied()) {
                     selectedAircraft.getCurrentNode().setOccupied(false);
                     flyingAircraft = selectedAircraft;
                     ResetAircraft(flyingAircraft);
@@ -309,9 +306,9 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
     public void SelectAnAircraft() {
         Aircraft selectedPlane = notifier.getRandomAircraft();
         checkIfAirfieldIsFree(0, runway);
-        if (selectedPlane != null && flyingAircraft == null && OccupiedAirfield == false) {
+        if (selectedPlane != null && flyingAircraft == null && OccupiedAirfield == false ) {
             // gets a random plane from the observer which holds planes that want to land or fly
-            if (selectedPlane.getState() == selectedPlane.getFlyingState()) {
+            if (selectedPlane.getState() == selectedPlane.getFlyingState() && selectedPlane.canChangeStates()) {
                 clearForLanding(selectedPlane);
             }
         } else if (selectedPlane != null) {

@@ -10,18 +10,18 @@ public class runwayNotifier {
         aircrafts = new ArrayList<>();
     }
 
-    public void Subscribe(Aircraft selectedAircraft) {
+    // takes any aircraft
+    public <T extends Aircraft> void Subscribe(T selectedAircraft) {
         aircrafts.add(selectedAircraft);
-        aircrafts.stream().distinct();
     }
 
-    public void unSubscribe(Aircraft selectedAircraft) {
+    public <T extends Aircraft> void unSubscribe(T selectedAircraft) {
         aircrafts.remove(selectedAircraft);
     }
 
     public void Notify(boolean value) {
         // notifies any aircraft the runway is free
-        aircrafts.forEach(plane -> plane.RunwayNotice(value));
+        aircrafts.forEach(plane -> plane.RunwayNotice(!value));
     }
 
     // returns a random aircraft
@@ -29,7 +29,8 @@ public class runwayNotifier {
         return aircrafts.stream().findAny().orElse(null);
     }
 
-    public boolean checkIfAircraftIsSubscribed(Aircraft aircraft) {
+    // prevents duplication and also ensures that planes aren't constantly subscribed
+    public <T extends Aircraft> boolean checkIfAircraftIsSubscribed(T aircraft) {
         if (aircrafts.contains(aircraft)) {
             return  true;
         } else {
