@@ -220,11 +220,7 @@ public class AirTrafficControl implements drawable, Position {
         if (runway != null && !runway.isEmpty() && selectedAircraft != null) {
             if (selectedAircraft.canFly() == true && selectedAircraft.getChosenToFly()) {
                 System.out.println("Go for takeoff!!!");
-                ResetAircraft(flyingAircraft);
-                OccupiedAirfield = true;
-                AirfieldNodeChanger(runway);
-                flyingAircraft = selectedAircraft;
-                flyingAircraft.setFlying(true);
+                SelectAircraft(selectedAircraft);
                 ArrayList<Node> flightOutside = airportNavigation.stream()
                 .filter(node -> node.getNodeTileRepresentation() == Node.locationTypes.OUTSIDE)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -234,28 +230,24 @@ public class AirTrafficControl implements drawable, Position {
     }
 
     // changes all airfield nodes to be a value
-    public void AirfieldNodeChanger (ArrayList<Node> airfieldRef) {
-        if (airfieldRef != null && !airfieldRef.isEmpty()) {
-            airfieldRef.forEach(node -> node.setOccupied(OccupiedAirfield));
+    public void AirfieldNodeChanger () {
+        if (runway != null && !runway.isEmpty()) {
+            runway.forEach(node -> node.setOccupied(OccupiedAirfield));
         }
     }
 
     // if aircraft flew off runway, free up runway
-    public void checkIfAirfieldIsFree(int flyoffDist, ArrayList<Node> airfieldRef) {
+    public void checkIfAirfieldIsFree() {
         if (flyingAircraft != null && flyingAircraft.getXPos() < 0
          || flyingAircraft != null && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.AIRFIELD 
-         && flyingAircraft.getCurrentNode() != exitNode) {
-            OccupiedAirfield = false;
-            AirfieldNodeChanger(airfieldRef);
-            flyingAircraft.setSelected(false);
-            flyingAircraft = null;
+         && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.OUTSIDE) {
+            DeselectAircraft();
         }
-        notifier.Notify(OccupiedAirfield);
     }
 
     // detects if a aircraft is onfield
 public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
-
+    checkIfAirfieldIsFree();
     if (aircraftsInAirport != null && !aircraftsInAirport.isEmpty() && runway != null && !runway.isEmpty()
             && otherAircraft != null
             && flyingAircraft == null) {
@@ -264,12 +256,10 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
             .filter(node -> otherAircraft.getCurrentNode() == node)
             .findAny()
             .ifPresent(node -> {
-                OccupiedAirfield = true;
-                AirfieldNodeChanger(runway);
-                flyingAircraft = otherAircraft;
-                flyingAircraft.setSelected(true);
+                SelectAircraft(otherAircraft);
             });
     }
+    notifier.Notify(OccupiedAirfield);
 }
 
 
@@ -277,13 +267,9 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
     public void clearForLanding(Aircraft selectedAircraft) {
         if (selectedAircraft != null) {
             AirwayGate selectedGate = gateList.stream().filter(gate -> gate.getAssigned() == false).findFirst().orElse(null);
-            if (selectedAircraft.getFlying() && selectedAircraft.isAtLastNode()) {
+            if (selectedAircraft.getState() == selectedAircraft.getFlyingState() && selectedAircraft.isAtLastNode()) {
                 if (OccupiedAirfield == false && flyingAircraft == null && selectedGate != null && !exitNode.getOccupied()) {
-                    selectedAircraft.getCurrentNode().setOccupied(false);
-                    flyingAircraft = selectedAircraft;
-                    ResetAircraft(flyingAircraft);
-                    flyingAircraft.setSelected(true);
-                    flyingAircraft.setFlying(false);
+                    SelectAircraft(selectedAircraft);
                     // creates stream from gates available and instantly assigns first one that is free
                     Node airfieldNode = runway.get(0);
                     ArrayList<Node> flightPath = initialCalculateRoute(selectedGate.getGateNode().getNodeID(), airfieldNode);
@@ -291,8 +277,6 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
                     flyingAircraft.setFlightPath(flightPath);
                     flyingAircraft.setGate(selectedGate);
                     selectedGate.setAssigned(true);
-                    OccupiedAirfield = true;
-                    AirfieldNodeChanger(runway);
                     System.out.println("attempting to land!");
                     flyingAircraft.setState(flyingAircraft.getGroundedState());
                     notifier.unSubscribe(flyingAircraft);
@@ -303,9 +287,9 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
         }
     }
 
-    public void SelectAnAircraft() {
+    public void GetRandomAircraft() {
         Aircraft selectedPlane = notifier.getRandomAircraft();
-        checkIfAirfieldIsFree(0, runway);
+        checkIfAirfieldIsFree();
         if (selectedPlane != null && flyingAircraft == null && OccupiedAirfield == false ) {
             // gets a random plane from the observer which holds planes that want to land or fly
             if (selectedPlane.getState() == selectedPlane.getFlyingState() && selectedPlane.canChangeStates()) {
@@ -313,6 +297,29 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
             }
         } else if (selectedPlane != null) {
             System.out.println("Airfield is currently occupied, cannot land!");
+        }
+    }
+
+    private void SelectAircraft(Aircraft selection) {
+        if (selection != null && flyingAircraft == null) {
+            flyingAircraft = selection;
+            flyingAircraft.setSelected(true);
+            OccupiedAirfield = true;
+            AirfieldNodeChanger();
+            ResetAircraft(flyingAircraft);
+        } else {
+            System.out.println("Cannot add null aircraft!");
+        }
+    }
+
+    private void DeselectAircraft() {
+        if (flyingAircraft != null) {
+            OccupiedAirfield = false;
+            AirfieldNodeChanger();
+            flyingAircraft.setSelected(false);
+            flyingAircraft = null;
+        } else {
+            System.out.println("Cannot remove no aircraft!");
         }
     }
 

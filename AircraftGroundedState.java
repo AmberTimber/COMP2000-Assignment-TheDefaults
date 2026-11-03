@@ -11,6 +11,7 @@ public class AircraftGroundedState implements AircraftState {
     @Override 
     public void Move(AirTrafficControl aircontroller) {
         aircraft.influenceFuel();
+        aircraft.CheckIfNextPathIsBlocked();
         if (aircraft.canFly() == false && aircraft.isBlocked() == false) {
             // moves through the airport
             aircraft.MoveThroughFlightPath(1); 
@@ -31,7 +32,6 @@ public class AircraftGroundedState implements AircraftState {
                     aircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
                 }
             }
-            aircraft.CheckIfNextPathIsBlocked();
         }
 
         aircraft.CheckIfNextPathIsBlocked();

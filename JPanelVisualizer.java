@@ -27,7 +27,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     private ArrayList<Node> flightPath = new ArrayList<>();
     private ArrayList<Node> airportNav = new ArrayList<>();
     // aircrafts
-    private int aircraftCount = (int)(Math.random() * 8) + 1;
+    private int aircraftCount = 10; //(int)(Math.random() * 8) + 1;
     private ArrayList<Aircraft> aircraftsOnSite = new ArrayList<>();
     private ArrayList<Node> runway = new ArrayList<>();
     private ArrayList<AirwayGate> allGates = new ArrayList<>();
@@ -151,27 +151,6 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
 
         airControl.setExitNode(leftFlyOff);
         airControl.setEntryNode(rightFlyOff);
-
-        // pre made plane tests
-        /*Aircraft testFlight = new CargoPlane("Test aircraft", "Thyme the geat", "Hawking404", 1500.00, 50, 500.00, 250.00);
-        testFlight.setVector2(200, 400);
-        testFlight.setFlightPath(flightPath);
-        testFlight.setColor(Color.ORANGE);
-        aircraftsOnSite.add(testFlight);
-
-        Aircraft testFlight2 = new CommercialPlane("Tester103", "Albert Minestein", "Blimper64", 1300.00, 50, 500, 250);
-        testFlight2.setVector2(TaxiWayNode4.getXPos()-100, TaxiWayNode4.getYPos());
-        flightPath = airControl.calculateRoute("A1", TestGate2);
-        testFlight2.setFlightPath(flightPath);
-        testFlight2.setColor(Color.CYAN);
-        aircraftsOnSite.add(testFlight2);
-
-        Aircraft testFlight3 = new CommercialPlane("12345", "Mr Joel", "AirDuck302",1400.00, 100, 1000, 779);
-        flightPath = airControl.calculateRoute("E3", miniRoadNode1);
-        testFlight3.setVector2(miniRoadNode1.getXPos(), miniRoadNode1.getYPos()-50);
-        testFlight3.setFlightPath(flightPath);
-        testFlight3.setColor(Color.MAGENTA);
-        aircraftsOnSite.add(testFlight3);*/
 
         // implementation of random plane generation
         ArrayList<String> firstName = new ArrayList<>();
@@ -300,20 +279,16 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         for (int i = 0; i < aircraftsOnSite.size(); i++) {
             Aircraft selectedAircraft = aircraftsOnSite.get(i);
             // checks if the airfield is clear
-            if (airControl.getOccupiedAirfield() == true) {
-                    airControl.checkIfAirfieldIsFree(0, runway);
-            } else {
-                airControl.checkIfAAircraftOnAirfield(selectedAircraft);
-            }
+            airControl.checkIfAAircraftOnAirfield(selectedAircraft);
             // moves aircraft
-            for (int c = 0; c <= movementSpeed; c++) {
+            for (int c = 0; c < movementSpeed; c++) {
                 selectedAircraft.Move(airControl);
             }
             // gets any if runway is free
-            airControl.SelectAnAircraft();
+            airControl.GetRandomAircraft();
             
 
-            airControl.AirfieldNodeChanger(runway);
+            airControl.AirfieldNodeChanger();
         }
         
         // updates the panel

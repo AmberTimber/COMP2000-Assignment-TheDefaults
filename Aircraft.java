@@ -13,7 +13,6 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
     private String model;
     private double fuelLevel;
     private final int capacity;
-    private boolean flying = false;
     private int countdown = 0;
     private int framesToConsumeFuel = 200;
     private int MaxframesToConsumeFuel = framesToConsumeFuel;
@@ -73,10 +72,6 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
         this.fuelLevel = fuelLevel;
     }
 
-    public void setFlying(boolean value) {
-        flying = value;
-    }
-
     public void setCountdown (int value) {
         countdown = value;
     }
@@ -108,10 +103,6 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
 
     public int getCapacity() {
         return capacity;
-    }
-
-    public boolean getFlying() {
-        return flying;
     }
 
     public AirwayGate getAssignedGate() {
