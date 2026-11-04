@@ -211,8 +211,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     newAircaft.changeTarget();
                     newAircaft.setVector2(newAircaft.getTarget().getPosition());
                     newAircaft.setState(newAircaft.getFlyingState());
-                    flightPath = new ArrayList<Node>();
-                    flightPath.add(leftFlyOff);
+                    flightPath = new ArrayList<>(List.of(leftFlyOff));
                     newAircaft.setFlightPath(flightPath);
                     newAircaft.setReachedTarget(true);
                     newAircaft.getFlyingState().RefreshTime();
@@ -276,13 +275,13 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         // this entire function is used to update this element every frame
         // key note: increase in xPos = more to right, increase in Y makes it go down
 
-        for (int i = 0; i < aircraftsOnSite.size(); i++) {
-            Aircraft selectedAircraft = aircraftsOnSite.get(i);
+        for (Aircraft selectedAircraft:aircraftsOnSite) {
             // checks if the airfield is clear
             airControl.checkIfAAircraftOnAirfield(selectedAircraft);
             // moves aircraft
             for (int c = 0; c < movementSpeed; c++) {
                 selectedAircraft.Move(airControl);
+                airControl.checkIfAAircraftOnAirfield(selectedAircraft);
             }
             // gets any if runway is free
             airControl.GetRandomAircraft();
@@ -359,8 +358,11 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             g.fillOval(airportNav.get(i).getXPos(), airportNav.get(i).getYPos(), 10, 10);
         }
 
-        // visualize planes
+        /* visualize planes by splitting them into groups of flying or not flying
+        not flying planes get visualized first then the flying ones, to better help simulate
+        the overhead planes being on top*/
         Map<Boolean, List<Aircraft>> seperatedAircrafts = aircraftsOnSite.stream().collect(Collectors.partitioningBy(a -> a.getState() == a.getFlyingState()));
+        // createes non-flying aircrafts first
         if (seperatedAircrafts.get(false) != null && !seperatedAircrafts.get(false).isEmpty()) {
             Spliterator<Aircraft> firstHalf = seperatedAircrafts.get(false).spliterator();
             Spliterator<Aircraft> secondHalf = firstHalf.trySplit();
@@ -368,8 +370,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 secondHalf.forEachRemaining((aircraft) -> aircraft.visualRepresentation(g, 50, 50));
             }
             while (firstHalf.tryAdvance((aircraft) -> aircraft.visualRepresentation(g, 50, 50))) {}
-            }
-
+        }
+            // creates the flying aircrafts
         if (seperatedAircrafts.get(true) != null && !seperatedAircrafts.get(true).isEmpty()) {
             seperatedAircrafts.get(true).stream().forEach((aircraft) -> aircraft.visualRepresentation(g, 50, 50));
         } 
@@ -386,5 +388,5 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     int b = rand.nextInt(256);
     
     return new Color(r, g, b);
-}
+    }
 }

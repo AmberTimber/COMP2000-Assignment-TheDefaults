@@ -148,5 +148,6 @@ public class Main {
         Aircraft DeliveryPlane2 = new CargoPlane("ZO22", null, null, 0, 0, 0, 0);
         Aircraft PassengerPlane = new CommercialPlane("TT05", null, null, 0, 0,  0, 0);
         Map<Class<? extends Aircraft>, List<Aircraft>> sortedPlanes = List.of(DeliveryPlane, DeliveryPlane2, PassengerPlane).stream().collect(Collectors.groupingBy(Aircraft::getClass));
+        System.out.println(sortedPlanes);
     }
 }
