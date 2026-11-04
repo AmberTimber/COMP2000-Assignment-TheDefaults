@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -290,7 +292,7 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
     public void GetRandomAircraft() {
         Aircraft selectedPlane = notifier.getRandomAircraft();
         checkIfAirfieldIsFree();
-        if (selectedPlane != null && flyingAircraft == null && OccupiedAirfield == false ) {
+        if (selectedPlane != null && flyingAircraft == null && OccupiedAirfield == false && !FilledAirport()) {
             // gets a random plane from the observer which holds planes that want to land or fly
             if (selectedPlane.getState() == selectedPlane.getFlyingState() && selectedPlane.canChangeStates()) {
                 clearForLanding(selectedPlane);
@@ -307,6 +309,7 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
             OccupiedAirfield = true;
             AirfieldNodeChanger();
             ResetAircraft(flyingAircraft);
+            notifier.Notify(OccupiedAirfield);
         } else {
             System.out.println("Cannot add null aircraft!");
         }
@@ -318,6 +321,7 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
             AirfieldNodeChanger();
             flyingAircraft.setSelected(false);
             flyingAircraft = null;
+            notifier.Notify(OccupiedAirfield);
         } else {
             System.out.println("Cannot remove no aircraft!");
         }
@@ -361,6 +365,22 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
         Node currentNode = plane.getCurrentNode();
         ArrayList<Node> flightPath = calculateRoute(NodeID, currentNode);
         return  flightPath;
+    }
+
+    // determiens population of airport
+    public boolean FilledAirport() {
+        if (runway == null || aircraftsInAirport == null || aircraftsInAirport.isEmpty() || gateList == null || gateList.isEmpty()) {
+            return false;
+        }
+
+        long groundedCount = aircraftsInAirport.stream().filter(a -> a.getState() != a.getFlyingState()).count();
+        int totalGrounded = Math.toIntExact(groundedCount);
+        // if airport is full, stops more aircrafts from landing
+        if (totalGrounded > gateList.size()) {
+            return  true;
+        } else {
+            return  false;
+        }
     }
 }
 

@@ -208,6 +208,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
 
             // sets aircraft to flying immediately if no node is found
             if (spawningNode == null) {
+                try {
                     newAircaft.changeTarget();
                     newAircaft.setVector2(newAircaft.getTarget().getPosition());
                     newAircaft.setState(newAircaft.getFlyingState());
@@ -215,6 +216,10 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     newAircaft.setFlightPath(flightPath);
                     newAircaft.setReachedTarget(true);
                     newAircaft.getFlyingState().RefreshTime();
+                } catch (NullPointerException e) {
+                    System.out.println("Error occured while making newAircraft become flying state: " + e);
+                    newAircaft = null;
+                }
             } else {
                 // choose between going to gate, going to airfield or already flying
                 int chosenBehaviour = (int)(Math.random() * 3) + 1; // random plane to airfield or gate
@@ -248,8 +253,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     newAircaft.changeTarget();
                     newAircaft.setVector2(newAircaft.getTarget().getPosition());
                     newAircaft.setState(newAircaft.getFlyingState());
-                    flightPath = new ArrayList<Node>();
-                    flightPath.add(leftFlyOff);
+                    flightPath = new ArrayList<>(List.of(leftFlyOff));
                     newAircaft.setFlightPath(flightPath);
                     newAircaft.setReachedTarget(true);
                     newAircaft.getFlyingState().RefreshTime();
@@ -278,14 +282,13 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         for (Aircraft selectedAircraft:aircraftsOnSite) {
             // checks if the airfield is clear
             airControl.checkIfAAircraftOnAirfield(selectedAircraft);
+            for (int i = 0; i < 2; i++) {
             // moves aircraft
-            for (int c = 0; c < movementSpeed; c++) {
-                selectedAircraft.Move(airControl);
-                airControl.checkIfAAircraftOnAirfield(selectedAircraft);
+            selectedAircraft.Move(airControl);
+            airControl.checkIfAAircraftOnAirfield(selectedAircraft);
             }
-            // gets any if runway is free
+            // gets any if runway and airport is free
             airControl.GetRandomAircraft();
-            
 
             airControl.AirfieldNodeChanger();
         }

@@ -16,7 +16,7 @@ public class AircraftGroundedState implements AircraftState {
             // moves through the airport
             aircraft.MoveThroughFlightPath(1); 
         } // if blocked while moving 
-        else if(aircraft.isBlocked() == true) { 
+        else if(aircraft.isBlocked() == true && !aircraft.getChosenToFly()) { 
             // if a aircraft path is being blocked, it regenerates a new path or goes back 1 node
             int chosenAction = (int)(Math.random() * 3);
             aircraft.decreaseCountdown();
@@ -32,7 +32,13 @@ public class AircraftGroundedState implements AircraftState {
                     aircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
                 }
             }
-        }
+            // if blocked on runay
+        } else if (aircraft.isBlocked() == true && aircraft.getChosenToFly()) {
+            ArrayList<Node> flightPath = aircontroller.SendFlightPath(aircraft);
+            if (flightPath != null) {
+                aircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
+            }
+    }
 
         aircraft.CheckIfNextPathIsBlocked();
         if (aircraft.getReachedTarget() == true && 
