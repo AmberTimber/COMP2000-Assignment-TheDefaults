@@ -72,9 +72,7 @@ public class Moveable extends Vector2  {
         if (givenPath != null && !givenPath.isEmpty()) {
             if (flightPath != null && !flightPath.isEmpty()) {
                 currentNode.setOccupied(false);
-                for (int i = 0; i < flightPath.size(); i++) {
-                    flightPath.get(i).setOccupied(false);
-                }
+                flightPath.forEach(node -> node.setOccupied(false));
                 reachTarget = false;
             }
         resetIndex();
