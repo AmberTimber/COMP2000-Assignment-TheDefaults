@@ -344,9 +344,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         g.drawLine(0, 440, JframeRef.getWidth(), 440);
         // making road to gate
         g.setColor(Color.LIGHT_GRAY);
-        for (int i = 0; i < allGates.size(); i++) {
-            g.fillRect(allGates.get(i).getGateNode().getXPos() - 100, 450, JframeRef.getWidth()/allGates.size(), 150);
-        }
+        allGates.forEach(gate -> g.fillRect(gate.getGateNode().getXPos() - 100, 450, JframeRef.getWidth()/allGates.size(), 150));
 
         // making gates
         allGates.stream().forEach(gate -> gate.visualRepresentation(g, JframeRef.getWidth()/9, 200));
