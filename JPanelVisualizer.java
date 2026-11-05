@@ -355,10 +355,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         // air traffic control
         airControl.visualRepresentation(g, 50,50);
         // visualize noeds
-        for (int i = 0; i < airportNav.size(); i++) {
-            g.setColor(Color.GREEN);
-            g.fillOval(airportNav.get(i).getXPos(), airportNav.get(i).getYPos(), 10, 10);
-        }
+        g.setColor(Color.GREEN);
+        airportNav.forEach(node -> g.fillOval(node.getXPos(), node.getYPos(), 10, 10));
 
         /* visualize planes by splitting them into groups of flying or not flying
         not flying planes get visualized first then the flying ones, to better help simulate
