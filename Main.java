@@ -66,8 +66,9 @@ public class Main {
         System.out.println("========== STATUS SIMULATION ==========");
         PlaneStatusDemo();
         System.out.println("========== STATUS SIMULATION COMPLETE ==========\n");
-       /* Aircraft tester = new Aircraft();
-        tester.setAircraft("89797", "Billy", "SuperBus", 50.00, 20, "Grounded");*/
+        System.out.println("========== GROUPING SIMULATION ==========");
+        planeGrouping();
+        System.out.println("========== GROUPING SIMULATION COMPLETE ==========\n");
         
         //tests by Tim, pls do not move, I need to test JPanel !!!!!!
         JFrame mainPanel = new JFrame();

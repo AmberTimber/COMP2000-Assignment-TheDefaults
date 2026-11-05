@@ -163,14 +163,20 @@ public class Moveable extends Vector2  {
 
     public void MoveThroughFlightPath(int speed) { // moves through given node movement
         if (flightPath != null && !flightPath.isEmpty()) {
-            if (currentNode.getNodeTileRepresentation() != Node.locationTypes.AIRFIELD) {
+            // ensure that aircraft is deselected while not on airfield
+            if (currentNode.getNodeTileRepresentation() != Node.locationTypes.AIRFIELD && currentNode.getNodeTileRepresentation() != Node.locationTypes.OUTSIDE) {
                 selected = false;
             }
+            // moves towards the target
             if (flightPath.size() > NavigationIndex) {
                 moveTowards(speed);
                 checkIfReachTarget();
                 flightPath.get(NavigationIndex).setOccupied(true);
-    
+            }
+            
+            // if not at last node
+            if (!isAtLastNode())
+                // if not blocked and not selected for airfield, moves to next point
                 if (getReachedTarget() == true && flightPath.size() > NavigationIndex + 1 && flightPath.get(NavigationIndex +1).getOccupied() == false) {
                     flightPath.get(NavigationIndex).setOccupied(false); // frees up node for other aircrafts to go to
                     NavigationIndex++;
@@ -194,7 +200,6 @@ public class Moveable extends Vector2  {
                     reverseAircraft();
                 }
             }
-        }
     }
 
     public void CheckIfNextPathIsBlocked() {
@@ -207,7 +212,9 @@ public class Moveable extends Vector2  {
     }
 
     public boolean isAtLastNode() { // detects whether at last node
-        if (flightPath != null && !flightPath.isEmpty() && NavigationIndex >= flightPath.size()-1 || flightPath != null && !flightPath.isEmpty() && flightPath.get(flightPath.size()-1).CompareNodes(currentNode)) {
+        if (flightPath != null && !flightPath.isEmpty() && NavigationIndex >= flightPath.size()-1 
+        || flightPath != null && !flightPath.isEmpty() && flightPath.get(flightPath.size()-1).CompareNodes(currentNode)
+    || flightPath.get(flightPath.size()-1) == currentNode) {
             return true;
         } else {
             return false;

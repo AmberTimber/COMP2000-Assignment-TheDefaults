@@ -27,8 +27,7 @@ public class AircraftGroundedState implements AircraftState {
                 if (flightPath == null) { 
                 // if path is null, it waits until it can find node or unoccupied
                     aircraft.setCountdown(100);
-                }
-                if (flightPath != null) {
+                } else {
                     aircraft.setFlightPath(flightPath); // creates new path so it doesn't collide with other aircrafts
                 }
             }

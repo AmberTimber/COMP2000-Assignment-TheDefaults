@@ -1,9 +1,3 @@
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CargoPlane extends Aircraft implements flyable {
     private final double maxWeight; // in KG
@@ -24,12 +18,9 @@ public class CargoPlane extends Aircraft implements flyable {
     /* No setter for maxWeight because it is fixed when the plane is created */
 
     //getters
-    public double getCurrentWeight(){
-        return currentWeight;
-    }
-
-    public double getMaxWeight(){
-        return maxWeight;
+    @Override 
+    public int getCurrentCapacity() {
+        return (int)currentWeight;
     }
 
     @Override
@@ -42,7 +33,7 @@ public class CargoPlane extends Aircraft implements flyable {
     }
 
     @Override 
-    public String getAircraftType() {
+    public String getVehicleType() {
         return "CargoPlane";
     }
 
@@ -74,18 +65,31 @@ public class CargoPlane extends Aircraft implements flyable {
         return !flying() && getFuelLevel() > 0 && currentWeight <= maxWeight;
     }
 
-    /*@Override
-    public void visualRepresentation(Graphics drawer, int width, int height) {
-        drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.RED);
-        drawer.setColor(Color.black);
-        drawer.drawString("CargoPlane: " + this.getAircraftID(), getXPos() + 5, getYPos() - 20);
-        drawer.drawString("Operator: " + this.getOperator(), getXPos() + 5, getYPos() - 5);
-        drawer.drawString("Model: " + this.getModel(), getXPos() + 5, getYPos() + 10);
-        drawer.drawString("Fuel Level: " + this.getFuelLevel() + "L", getXPos() + 5, getYPos() + 25);
-        drawer.drawString("Capacity: " + this.getCapacity(), getXPos() + 5, getYPos() + 40);
-        drawer.drawString("Current status: " + this.getStatus(), getXPos() + 5, getYPos() + 55);
-        drawer.drawString("Current target is: " + getCurrentNode().getNodeID(), getXPos() + 5, getYPos() + 70);
-        drawer.drawString("Final destination is: " + getFlightPath().get(getFlightPath().size()-1).getNodeID(), getXPos() + 5, getYPos() + 85);
-    }*/
+    @Override 
+    public void influenceCargo(boolean reStocking) {
+        int randomValueChange = (int)(Math.random() * 31) + 1;
+        if (reStocking == false) {
+            currentWeight -= randomValueChange;
+        } else {
+            if (currentWeight < maxWeight) {
+                currentWeight += randomValueChange;
+            } else {
+                System.out.println("Overcapacity, cannot load anymore");
+            }
+        }
+        // ensure cannot be negative number
+        if (currentWeight <= 0) {
+            currentWeight = 0;
+        }
+    }
 
+    @Override 
+    public int getMaxCapacity() {
+        return (int)maxWeight;
+    }
+
+    @Override 
+    public String getCargoSummary() {
+        return ", Cargo capacity: " + getCurrentCapacity() + "KG";
+    }
 }

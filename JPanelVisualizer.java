@@ -157,6 +157,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         firstName.add("Joe");
         firstName.add("Tim");
         firstName.add("Bill");
+        firstName.add("Billy");
         firstName.add("Richard");
         firstName.add("Megan");
         firstName.add("Bob");
@@ -385,10 +386,9 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     }
 
     private Color getRandomColorRGB() {
-    ThreadLocalRandom rand = ThreadLocalRandom.current();
-    int r = rand.nextInt(256); // 0 to 255
-    int g = rand.nextInt(256);
-    int b = rand.nextInt(256);
+    int r = (int)(Math.random() * 256); // 0 to 255
+    int g = (int)(Math.random() * 256);
+    int b = (int)(Math.random() * 256);
     
     return new Color(r, g, b);
     }

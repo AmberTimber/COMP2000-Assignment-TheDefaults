@@ -9,7 +9,7 @@ public class AircraftFlyingState implements AircraftState {
     
     // moves in air
     public void Move(AirTrafficControl aircontroller) {
-        if (aircraft.getReachedTarget() == true && aircraft.getFlightPath() != null) {
+        if (aircraft.getReachedTarget() == true && aircraft.getFlightPath() != null || aircraft.getTarget() == null) {
             aircraft.getCurrentNode().isOccupied = false;
             aircraft.changeTarget();
         }

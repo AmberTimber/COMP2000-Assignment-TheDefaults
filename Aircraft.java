@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class Aircraft extends Moveable implements drawable, Status, AircraftState {
+public abstract class Aircraft extends Moveable implements drawable, Status, AircraftState, vehicle {
     private final String aircraftID;
     private String operator;
     private String model;
@@ -101,10 +101,6 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
         return fuelLevel;
     }
 
-    public int getCapacity() {
-        return capacity;
-    }
-
     public AirwayGate getAssignedGate() {
         return gateAssigned;
     }
@@ -125,10 +121,6 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
         return currentState.getStatus();
     }
 
-    public String getAircraftType() {
-        return "Generic aircraft";
-    }
-
     // allows you to built up the status for future board
     public List<String> breakDownStatus(Status allstatus) {
         if (allstatus != null) {
@@ -144,11 +136,12 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
     // allows you to built up the status for plane text display
     @Override 
     public String getOverallStatus() {
-        String message = getAircraftType() + ": " + getAircraftID();
+        String message = getVehicleType() + ": " + getAircraftID();
         message += ", Operator: " + getOperator();
         message += ", Model: " + getModel();
         message += ", Fuel Level: " + getFuelLevel() + "L";
         message += ", Current status: " + getStatus();
+        message += getCargoSummary();
         if (getState() == getGroundedState() || getState() == getDockedState()) {
             if (getCurrentNode() != null && getFlightPath() != null) {
                 message += ", Current target is: " + getCurrentNode().getNodeID();
@@ -157,23 +150,13 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
                 message += ", Current target is: No Target";
             }
         }
+        if (isBlocked() == true) {
+            message += ", Currently being blocked";
+        }
         return message;
     }
 
-    /*@Override
-    public void visualRepresentation(Graphics drawer, int width, int height) {
-        drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.YELLOW);
-        drawer.setColor(Color.black);
-        drawer.drawString(getOverallStatus(), getXPos() + 5, getYPos() - 20);
-        drawer.drawString("Operator: " + this.getOperator(), getXPos() + 5, getYPos() - 5);
-        drawer.drawString("Model: " + this.getModel(), getXPos() + 5, getYPos() + 10);
-        drawer.drawString("Fuel Level: " + this.getFuelLevel() + "L", getXPos() + 5, getYPos() + 25);
-        drawer.drawString("No. Passengers: " + capacity, getXPos() + 5, getYPos() + 40);
-        drawer.drawString("Current status: " + this.getStatus(), getXPos() + 5, getYPos() + 55);
-        drawer.drawString("Current target is: " + getCurrentNode().getNodeID(), getXPos() + 5, getYPos() + 70);
-        drawer.drawString("Final destination is: " + getFlightPath().get(getFlightPath().size()-1).getNodeID(), getXPos() + 5, getYPos() + 85);
-    }*/
-
+    // Updates decorator pattern text with new status
     public void UpdateStats() {
         Status newStatus = this;
         PlaneStatus = newStatus;
@@ -277,6 +260,7 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
     }
 
     //Consumes fuel
+    @Override 
     public void influenceFuel() {
         if (!getStatus().equalsIgnoreCase("DOCKED") || getState() != dockedState) {
             if (framesToConsumeFuel <= 0) {
@@ -293,6 +277,11 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
                 framesToConsumeFuel--;
             }
         }
+    }
+
+    @Override 
+    public void swapOperators(String newOp) {
+
     }
 
     // state works

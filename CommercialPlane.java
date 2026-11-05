@@ -1,5 +1,4 @@
-import java.awt.Color;
-import java.awt.Graphics;
+
 
 public class CommercialPlane extends Aircraft implements flyable {
     private final int numSeats;
@@ -22,7 +21,8 @@ public class CommercialPlane extends Aircraft implements flyable {
         return numSeats;
     }
 
-    public int getCurrentPassengers(){
+    @Override 
+    public int getCurrentCapacity() {
         return currentPassengers;
     }
 
@@ -63,22 +63,35 @@ public class CommercialPlane extends Aircraft implements flyable {
         return !flying() && getFuelLevel() > 0 && currentPassengers <= numSeats;
     }
 
-    /*@Override
-    public void visualRepresentation(Graphics drawer, int width, int height) {
-        drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.YELLOW);
-        drawer.setColor(Color.black);
-        drawer.drawString("Commercial plane: " + this.getAircraftID(), getXPos() + 5, getYPos() - 20);
-        drawer.drawString("Operator: " + this.getOperator(), getXPos() + 5, getYPos() - 5);
-        drawer.drawString("Model: " + this.getModel(), getXPos() + 5, getYPos() + 10);
-        drawer.drawString("Fuel Level: " + this.getFuelLevel() + "L", getXPos() + 5, getYPos() + 25);
-        drawer.drawString("No. Passengers: " + currentPassengers, getXPos() + 5, getYPos() + 40);
-        drawer.drawString("Current status: " + this.getStatus(), getXPos() + 5, getYPos() + 55);
-        drawer.drawString("Current target is: " + getCurrentNode().getNodeID(), getXPos() + 5, getYPos() + 70);
-        drawer.drawString("Final destination is: " + getFlightPath().get(getFlightPath().size()-1).getNodeID(), getXPos() + 5, getYPos() + 85);
-    }*/
+    @Override 
+    public void influenceCargo(boolean boarding) {
+        if (boarding == false) {
+            currentPassengers--;
+        } else {
+            if (numSeats > currentPassengers) {
+                currentPassengers++;
+            } else {
+                System.out.println("Overcapacity, cannot load anymore");
+            }
+        }
+        // cannot have negative passengers
+        if (currentPassengers <= 0) {
+            currentPassengers = 0;
+        }
+    }
 
     @Override 
-    public String getAircraftType() {
+    public int getMaxCapacity() {
+        return numSeats;
+    }
+
+    @Override 
+    public String getCargoSummary() {
+        return ", No. Passengers: " + getCurrentCapacity();
+    }
+
+    @Override 
+    public String getVehicleType() {
         return "Commercial Plane";
     }
 }

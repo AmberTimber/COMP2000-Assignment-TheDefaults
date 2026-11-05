@@ -242,7 +242,7 @@ public class AirTrafficControl implements drawable, Position {
     public void checkIfAirfieldIsFree() {
         if (flyingAircraft != null && flyingAircraft.getXPos() < 0
          || flyingAircraft != null && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.AIRFIELD 
-         && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.OUTSIDE) {
+        && flyingAircraft.getCurrentNode().getNodeTileRepresentation() != Node.locationTypes.OUTSIDE) {
             DeselectAircraft();
         }
     }
@@ -253,13 +253,17 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
     if (aircraftsInAirport != null && !aircraftsInAirport.isEmpty() && runway != null && !runway.isEmpty()
             && otherAircraft != null
             && flyingAircraft == null) {
-
-        runway.stream().parallel()
-            .filter(node -> otherAircraft.getCurrentNode() == node)
-            .findAny()
-            .ifPresent(node -> {
-                SelectAircraft(otherAircraft);
+                // detects if aircraft on airfield
+            boolean isOnAirfield = aircraftsInAirport.stream().parallel().map(Aircraft::getCurrentNode).filter(a -> runway.contains(a)).findFirst().isPresent();
+            // if there is a aircraft on runway, selects them    
+            if (isOnAirfield) {
+                runway.stream().parallel()
+                .filter(node -> otherAircraft.getCurrentNode() == node)
+                .findAny()
+                .ifPresent(node -> {
+                    SelectAircraft(otherAircraft);
             });
+        }
     }
     notifier.Notify(OccupiedAirfield);
 }
@@ -376,7 +380,7 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
         long groundedCount = aircraftsInAirport.stream().filter(a -> a.getState() != a.getFlyingState()).count();
         int totalGrounded = Math.toIntExact(groundedCount);
         // if airport is full, stops more aircrafts from landing
-        if (totalGrounded > gateList.size()) {
+        if (totalGrounded > gateList.size()-1) {
             return  true;
         } else {
             return  false;
