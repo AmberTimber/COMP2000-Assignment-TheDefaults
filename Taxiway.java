@@ -39,8 +39,13 @@ public class Taxiway extends AirportPath {
     if (aircraft == null) {
       return false;
     }
-    if (aircraftOnTaxiway.contains(aircraft)) {
-      return false;
+    // Compare with == so only the same aircraft object counts as a duplicate.
+    // contains() uses Vector2.equals(), which treats two different aircraft
+    // of the same type at the same position as equal.
+    for (Aircraft onTaxiway : aircraftOnTaxiway) {
+      if (onTaxiway == aircraft) {
+        return false;
+      }
     }
     return getCurrentOccupancy() < capacity;
   }
@@ -55,7 +60,7 @@ public class Taxiway extends AirportPath {
     if (!canAcceptAircraft(aircraft)) {
       throw new OccupancyException(
           "Taxiway " + getPathID() + " is at full capacity ("
-          + capacity + "/" + capacity + "). Cannot accept aircraft "
+          + getCurrentOccupancy() + "/" + capacity + "). Cannot accept aircraft "
           + (aircraft != null ? aircraft.getAircraftID() : "null") + ".");
     }
     aircraftOnTaxiway.add(aircraft);
