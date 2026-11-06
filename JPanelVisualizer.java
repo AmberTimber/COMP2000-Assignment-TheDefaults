@@ -34,7 +34,6 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     private AirTrafficControl airControl = new AirTrafficControl(aircraftsOnSite, airportNav,new Vector2(400, 600), runway, allGates);
     private ArrayList<Node> outsideLoop = new ArrayList<>();
     private FlightBoard flightBoard = new FlightBoard(aircraftsOnSite);
-    private int movementSpeed = 2;
 
     // intializes time
     public JPanelVisualizer(JFrame jframePanel) {
@@ -265,7 +264,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 }
             }
                 // adds aircrafts to existing list of aircrafts
-                if (newAircaft != null && !aircraftsOnSite.contains(newAircaft)) {
+                if (newAircaft != null && !aircraftsOnSite.contains(newAircaft) && newAircaft.getTarget() != null) {
                     aircraftsOnSite.add(newAircaft);
                 }
                 
@@ -281,6 +280,11 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         // key note: increase in xPos = more to right, increase in Y makes it go down
 
         for (Aircraft selectedAircraft:aircraftsOnSite) {
+            if (selectedAircraft.getFuelLevel() <= 0 && selectedAircraft.getState() == selectedAircraft.getFlyingState()) {
+                aircraftsOnSite.remove(selectedAircraft);
+                System.err.println("A aircraft has crashed after having no more fuel");
+            }
+
             // checks if the airfield is clear
             airControl.checkIfAAircraftOnAirfield(selectedAircraft);
             for (int i = 0; i < 2; i++) {
@@ -294,6 +298,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
             airControl.AirfieldNodeChanger();
         }
         
+        airControl.freeNodes();
         // updates the panel
         repaint();
     }

@@ -386,5 +386,13 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
             return  false;
         }
     }
+
+    public void freeNodes() { // free up any unoccupied nodes which are occupied
+        if (aircraftsInAirport != null && !aircraftsInAirport.isEmpty()) {
+           airportNavigation.stream().filter(a -> a.getNodeTileRepresentation() != Node.locationTypes.AIRFIELD)
+           .filter(a -> aircraftsInAirport.stream().parallel().map(b -> b.getCurrentNode()) != a)
+           .forEach(a -> a.setOccupied(false));
+        }
+    }
 }
 
