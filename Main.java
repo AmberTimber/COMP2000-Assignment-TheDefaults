@@ -1,3 +1,6 @@
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.JFrame;
 
 public class Main {
@@ -63,14 +66,15 @@ public class Main {
         System.out.println("========== STATUS SIMULATION ==========");
         PlaneStatusDemo();
         System.out.println("========== STATUS SIMULATION COMPLETE ==========\n");
-       /* Aircraft tester = new Aircraft();
-        tester.setAircraft("89797", "Billy", "SuperBus", 50.00, 20, "Grounded");*/
+        System.out.println("========== GROUPING SIMULATION ==========");
+        planeGrouping();
+        System.out.println("========== GROUPING SIMULATION COMPLETE ==========\n");
         
         //tests by Tim, pls do not move, I need to test JPanel !!!!!!
         JFrame mainPanel = new JFrame();
         mainPanel.setName("This is the simulation"); // ID
         mainPanel.setTitle("Airport Simulation"); // title of tab
-        mainPanel.setSize(1000, 1000); // size, duh
+        mainPanel.setSize(1000, 800); // size, duh
         mainPanel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // ensure jpanel tab can close
         JPanelVisualizer plaeTemp = new JPanelVisualizer(mainPanel); // creates objects
         // adding the elements
@@ -90,10 +94,10 @@ public class Main {
      */
     private static void demoTaxiway() {
         CommercialPlane passengerPlane = new CommercialPlane(
-                "QF101", "Qantas", "Airbus A320", 82.5, 180, "GROUNDED", 180, 145);
+                "QF101", "Qantas", "Airbus A320", 82.5, 180, 180, 145);
 
         CargoPlane cargoPlane = new CargoPlane(
-                "FX220", "FedEx", "Boeing 767F", 74.0, 3, "GROUNDED", 52000.0, 31000.0);
+                "FX220", "FedEx", "Boeing 767F", 74.0, 3, 52000.0, 31000.0);
 
         // Capacity of 1, so the second aircraft to enter should be rejected.
         Taxiway taxiway = new Taxiway("T1", 900.0, 1, 20.0);
@@ -133,10 +137,18 @@ public class Main {
 
     // used to test plane status for future development
     private static void PlaneStatusDemo() {
-        Status statusFlight = new CargoPlane("113972", null, null, 0, 0, null, 0, 0);
+        Status statusFlight = new CargoPlane("113972", null, null, 0, 0, 0, 0);
         System.out.println(statusFlight.getOverallStatus());
         statusFlight = new DelayedDecorator(statusFlight);
         statusFlight = new BoardingDecorator(statusFlight);
         System.out.println(statusFlight.getOverallStatus());
+    }
+
+    private static void planeGrouping() {
+        Aircraft DeliveryPlane = new CargoPlane("I6302", null, null, 0, 0, 0, 0);
+        Aircraft DeliveryPlane2 = new CargoPlane("ZO22", null, null, 0, 0, 0, 0);
+        Aircraft PassengerPlane = new CommercialPlane("TT05", null, null, 0, 0,  0, 0);
+        Map<Class<? extends Aircraft>, List<Aircraft>> sortedPlanes = List.of(DeliveryPlane, DeliveryPlane2, PassengerPlane).stream().collect(Collectors.groupingBy(Aircraft::getClass));
+        System.out.println(sortedPlanes);
     }
 }

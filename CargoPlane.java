@@ -1,12 +1,10 @@
-import java.awt.Color;
-import java.awt.Graphics;
 
 public class CargoPlane extends Aircraft implements flyable {
     private final double maxWeight; // in KG
     private double currentWeight;
 
-    public CargoPlane(String aircraftID, String operator, String model, double fuelLevel, int capacity, String status, double maxWeight, double currentWeight) {
-        super(aircraftID, operator, model, fuelLevel, capacity, status);
+    public CargoPlane(String aircraftID, String operator, String model, double fuelLevel, int capacity, double maxWeight, double currentWeight) {
+        super(aircraftID, operator, model, fuelLevel, capacity);
         this.maxWeight = maxWeight;
         setCurrentWeight(currentWeight); //call setter from constructor so it would check setter first 
     }
@@ -20,12 +18,9 @@ public class CargoPlane extends Aircraft implements flyable {
     /* No setter for maxWeight because it is fixed when the plane is created */
 
     //getters
-    public double getCurrentWeight(){
-        return currentWeight;
-    }
-
-    public double getMaxWeight(){
-        return maxWeight;
+    @Override 
+    public int getCurrentCapacity() {
+        return (int)currentWeight;
     }
 
     @Override
@@ -35,6 +30,11 @@ public class CargoPlane extends Aircraft implements flyable {
         System.out.println("This is a Cargo Plane.");
         System.out.println("Max Weight: " + maxWeight);
         System.out.println("Current Weight: " + currentWeight);
+    }
+
+    @Override 
+    public String getVehicleType() {
+        return "CargoPlane";
     }
 
     // for flyable implement
@@ -65,23 +65,31 @@ public class CargoPlane extends Aircraft implements flyable {
         return !flying() && getFuelLevel() > 0 && currentWeight <= maxWeight;
     }
 
-    @Override
-    public void visualRepresentation(Graphics drawer, int width, int height) {
-        drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.RED);
-        drawer.setColor(Color.black);
-        drawer.drawString("CargoPlane: " + this.getAircraftID(), xPos + 5, yPos - 20);
-        drawer.drawString("Operator: " + this.getOperator(), xPos + 5, yPos - 5);
-        drawer.drawString("Model: " + this.getModel(), xPos + 5, yPos + 10);
-        drawer.drawString("Fuel Level: " + this.getFuelLevel() + "L", xPos + 5, yPos + 25);
-        drawer.drawString("Capacity: " + this.getCapacity(), xPos + 5, yPos + 40);
-        drawer.drawString("Current status: " + this.getStatus(), xPos + 5, yPos + 55);
-        drawer.drawString("Current target is: " + getCurrentNode().getNodeID(), xPos + 5, yPos + 70);
+    @Override 
+    public void influenceCargo(boolean reStocking) {
+        int randomValueChange = (int)(Math.random() * 31) + 1;
+        if (reStocking == false) {
+            currentWeight -= randomValueChange;
+        } else {
+            if (currentWeight < maxWeight) {
+                currentWeight += randomValueChange;
+            } else {
+                System.out.println("Overcapacity, cannot load anymore");
+            }
+        }
+        // ensure cannot be negative number
+        if (currentWeight <= 0) {
+            currentWeight = 0;
+        }
     }
 
-    // allows you to built up the status for future board
     @Override 
-    public String getOverallStatus() {
-        String status = "Flight number " + getAircraftID();
-        return status;
+    public int getMaxCapacity() {
+        return (int)maxWeight;
+    }
+
+    @Override 
+    public String getCargoSummary() {
+        return ", Cargo capacity: " + getCurrentCapacity() + "KG";
     }
 }

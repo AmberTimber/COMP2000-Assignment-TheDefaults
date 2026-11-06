@@ -6,10 +6,13 @@ public class Node implements Position {
     Node rightNode;
     Vector2 nodePosition;
     boolean isOccupied = false; // determines if a node is obstructed or not
-    String locatedIn;
+    locationTypes locatedIn;
+    public enum locationTypes {
+        AIRFIELD, TAXIWAY, WAITINGBAY, GATEPATH, GATE, OUTSIDE
+    }
     
     // maker
-    public Node (Node upperNode, Node bottomNode, Node leftNode, Node rightNode, Vector2 nodePosition, String NodeID, String Location) {
+    public Node (Node upperNode, Node bottomNode, Node leftNode, Node rightNode, Vector2 nodePosition, String NodeID, locationTypes Location) {
         setUpperNode(upperNode);
         setBottomNode(bottomNode);
         setLeftNode(leftNode);
@@ -19,11 +22,11 @@ public class Node implements Position {
         locatedIn = Location;
     }
 
-    public Vector2 getPosition () {
+    public Vector2 getPosition() {
         return nodePosition;
     }
 
-    public String getNodeTileRepresentation() {
+    public locationTypes getNodeTileRepresentation() {
         return locatedIn;
     }
 
@@ -61,16 +64,16 @@ public class Node implements Position {
         this.rightNode = newNode;
     }
     
-    public void setPostion(Vector2 newVector2) {
+    public void setPosition(Vector2 newVector2) {
         nodePosition = newVector2;
     }
 
     public void setXPos(int xpos) {
-        nodePosition.xPos = xpos;
+        nodePosition.setXPos(xpos);
     }
 
     public void setYPos(int ypos) {
-        nodePosition.yPos = ypos;
+        nodePosition.setYPos(ypos);
     }
 
     public void setOccupied(boolean value) {
@@ -95,11 +98,11 @@ public class Node implements Position {
     }
 
     public int getXPos() {
-        return nodePosition.xPos;
+        return nodePosition.getXPos();
     }
 
     public int getYPos() {
-        return nodePosition.yPos;
+        return nodePosition.getYPos();
     }
 
     public boolean getOccupied() {
@@ -112,10 +115,6 @@ public class Node implements Position {
 
     // if in same node
     public boolean CompareNodes(Node otherNode) {
-        if (this.getPosition().compareVectors(otherNode.getPosition())) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.getPosition().compareVectors(otherNode.getPosition());
     }
 }

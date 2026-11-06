@@ -1,14 +1,15 @@
+
 public class GateTest {
     public static void main(String[] args) {
         Node gateNode = new Node(null, null, null, null,
-                new Vector2(100, 200), "N1", "Gate12");
+                new Vector2(100, 200), "N1", Node.locationTypes.GATE);
 
         AirwayGate gate = new AirwayGate("G12", true, gateNode);
 
         CommercialPlane plane = new CommercialPlane(
-                "QF101", "Qantas", "Airbus A320", 82.5, 180, "Grounded", 180, 145);
+                "QF101", "Qantas", "Airbus A320", 82.5, 180, 180, 145);
         CommercialPlane plane2 = new CommercialPlane(
-                "QF202", "Qantas", "Airbus A321", 75.0, 200, "Grounded", 200, 150);
+                "QF202", "Qantas", "Airbus A321", 75.0, 200, 200, 150);
 
         System.out.println("Gate free before parking: " + gate.isFree());
 

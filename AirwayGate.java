@@ -8,6 +8,7 @@ public class AirwayGate implements drawable {
     private boolean status;
     private Aircraft currentPlane;
     private Node gateNode;
+    private boolean isAssigned = false;
 
     public AirwayGate(String gateID, boolean status, Node gateNode) {
         this.gateID = gateID;
@@ -16,10 +17,11 @@ public class AirwayGate implements drawable {
         this.currentPlane = null;
     }
 
-    /*
- * Parks an aircraft at this gate if the gate is open and currently free.
- * Throws OccupancyException if the gate is closed or already occupied.
+    /**
+ * Parks an aircraft at this gate if the gate is open and free.
+ * Throws OccupancyException if the gate is unavailable.
  */
+
     public void parkPlane(Aircraft plane) throws OccupancyException {
 
         if (!status) {
@@ -67,8 +69,16 @@ public class AirwayGate implements drawable {
         return gateNode;
     }
 
+    public boolean getAssigned() {
+        return isAssigned;
+    }
+
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public void setAssigned(boolean value) {
+        isAssigned = value;
     }
 
     public void displayInfo() {
@@ -91,15 +101,16 @@ public class AirwayGate implements drawable {
                 gateNode.isOccupied = false;
                 ArrayList<Node> path = airController.calculateRoute(locationNode, gateNode);
                 if (path == null && currentPlane.CooldownOver()) {
-                    currentPlane.setCountdown(100);
+                    int waitingTime = (int)(Math.random() * 2001) + 1000;
+                    currentPlane.setCountdown(waitingTime);
                     gateNode.isOccupied = true;
                 }
                 if (path != null && currentPlane.CooldownOver()) { // ensure path no null, maybe because its blocked, and tries later
                     currentPlane.setFlightPath(path); // creates new path so it doesn't collide with other aircrafts
-                    currentPlane.setStatus("GROUNDED");
                     currentPlane.setGate(null);
                     currentPlane.setDocked(false);
                     removePlane(); // removes from gate
+                    setAssigned(false);
                 }
             } catch (NullPointerException e) {
                 System.out.println("Null pointer exception happened while leaving the gate!:" + e);
@@ -111,12 +122,11 @@ public class AirwayGate implements drawable {
 
     // check if reached a gate
     public void PlaneAtGate (Aircraft selectedAircraft) {
-        if (selectedAircraft != null && selectedAircraft.isAtLastNode() && !selectedAircraft.getStatus().equalsIgnoreCase("DOCKED") && currentPlane == null) {
+        if (selectedAircraft != null && selectedAircraft.isAtLastNode() && currentPlane == null) {
                 if (selectedAircraft.getPosition().compareVectors(this.getGateNode().getPosition()) && this.getStatus() == true) {
                     try {
                     selectedAircraft.setDocked(true);
-                    selectedAircraft.setStatus("DOCKED");
-                    int cooldown = (int)(Math.random() * (1000 - 500 + 1)) + 500;
+                    int cooldown = (int)(Math.random() * 1000) + 600;
                     selectedAircraft.setCountdown(cooldown); // pretend that people are getting on board + refueling
                     this.parkPlane(selectedAircraft);
                     selectedAircraft.setGate(this);
