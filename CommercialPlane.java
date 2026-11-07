@@ -1,4 +1,7 @@
-
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 
 public class CommercialPlane extends Aircraft implements flyable {
     private final int numSeats;
@@ -90,8 +93,21 @@ public class CommercialPlane extends Aircraft implements flyable {
         return ", No. Passengers: " + getCurrentCapacity();
     }
 
-    @Override 
+    @Override
     public String getVehicleType() {
         return "Commercial Plane";
+    }
+
+    // passenger windows down both sides of the cabin plus an airline stripe on the tail
+    @Override
+    protected void drawTypeDetails(Graphics2D canvas, int width, int height) {
+        double windowSize = Math.max(1.5, width * 0.025);
+        canvas.setColor(new Color(200, 230, 255));
+        for (double y = -height * 0.3; y < height * 0.28; y += height * 0.06) {
+            canvas.fill(new Ellipse2D.Double(-width * 0.045, y, windowSize, windowSize));
+            canvas.fill(new Ellipse2D.Double(width * 0.045 - windowSize, y, windowSize, windowSize));
+        }
+        canvas.setColor(new Color(200, 30, 30));
+        canvas.fill(new Rectangle2D.Double(-width * 0.07, height * 0.36, width * 0.14, height * 0.04));
     }
 }
