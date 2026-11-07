@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -303,6 +304,49 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         repaint();
     }
 
+    // runway strip across the top of the screen (y 0-150): tarmac, edge lines, threshold bars,
+    // runway numbers, touchdown markings, dashed centre line and edge lights
+    private void drawRunway(Graphics g, int width) {
+        // darker tarmac than the taxiways so the runway stands out
+        g.setColor(new Color(70, 70, 75));
+        g.fillRect(0, 0, width, 150);
+
+        g.setColor(Color.WHITE);
+        // edge lines
+        g.fillRect(0, 9, width, 2);
+        g.fillRect(0, 139, width, 2);
+        // threshold bars at both ends
+        for (int i = 10; i < 120; i += 20) {
+            g.fillRect(10, i + 10, 100, 10);
+            g.fillRect(width - 130, i + 10, 100, 10);
+        }
+
+        // runway numbers just inside each threshold
+        Font originalFont = g.getFont();
+        g.setFont(new Font("SansSerif", Font.BOLD, 28));
+        g.drawString("09", 122, 85);
+        g.drawString("27", width - 166, 85);
+        g.setFont(originalFont); // so plane labels and the flight board keep their normal font
+
+        // touchdown zone markings: pairs of bars either side of the centre line
+        for (int x : new int[] {175, 235, width - 215, width - 275}) {
+            g.fillRect(x, 40, 40, 8);
+            g.fillRect(x, 102, 40, 8);
+        }
+
+        // dashed centre line, thicker than before
+        for (int i = 175; i + 45 < width - 175; i += 80) {
+            g.fillRect(i, 73, 45, 4);
+        }
+
+        // edge lights along both sides
+        g.setColor(new Color(255, 230, 150));
+        for (int i = 20; i < width; i += 50) {
+            g.fillOval(i - 2, 2, 5, 5);
+            g.fillOval(i - 2, 143, 5, 5);
+        }
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         // put anything you want to redraw, like images or shapes here, otherwise they won't be redrawn
@@ -311,18 +355,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         g.setColor(new Color(0,100,0));
         g.fillRect(0, 0, JframeRef.getWidth(), JframeRef.getHeight());
         // draw airfield
-        g.setColor(Color.GRAY);
-        g.fillRect(0, 0, JframeRef.getWidth(), 150);
-        g.setColor(Color.white);
-        for (int i = 120; i < JframeRef.getWidth() - 130; i+=100) {
-            g.drawLine(i, 75, i+50, 75);
-        }
-        for (int i = 10; i < 120; i+=20) {
-            g.fillRect(10, i+10, 100, 10);
-            g.fillRect(JframeRef.getWidth() - 130, i+10, 100, 10);
-        }
-        g.drawLine(0, 10, JframeRef.getWidth(), 10);
-        g.drawLine(0, 140, JframeRef.getWidth(), 140);
+        drawRunway(g, JframeRef.getWidth());
         // making road to airfield
         g.setColor(Color.GRAY);
         for (int i = 0; i < 8; i++) {
