@@ -240,6 +240,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                         System.out.println("Error occured while making newAircraft go to gate: " + e);
                         selectedGate.setAssigned(false);
                         selectedGate.getGateNode().isOccupied = false;
+                        flightPath = new ArrayList<>(List.of(leftFlyOff));
+                        newAircaft.setFlightPath(flightPath);
                         newAircaft = null;
                     }
                 } else if (selectedRunwayNode != null && chosenBehaviour == 2) { // becomes airfied goer

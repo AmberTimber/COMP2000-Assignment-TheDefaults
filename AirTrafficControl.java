@@ -82,7 +82,7 @@ public class AirTrafficControl implements drawable, Position {
             for (int i = 0; i < givenArray.size(); i++) { // starting node to check if future nodes are neighbors
                 int furtherProgression = 0; // used to compare which node is further down
                 for (int c = i; c < givenArray.size(); c++) {
-                    if (copy.get(i).checkIfNeighboring(givenArray.get(c)) && givenArray.get(c).getOccupied() == false) { // detects whether a neighboring node has a vector2
+                    if (copy.get(i).checkIfNeighboring(givenArray.get(c))) { // detects whether a neighboring node has a vector2
                         if (furtherProgression <= c && (i+1) < givenArray.size()) {
                             copy.set(i + 1, givenArray.get(c));
                             furtherProgression = c;
