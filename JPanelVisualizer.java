@@ -1,5 +1,6 @@
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -304,47 +305,163 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         repaint();
     }
 
-    // runway strip across the top of the screen (y 0-150): tarmac, edge lines, threshold bars,
-    // runway numbers, touchdown markings, dashed centre line and edge lights
+    // ---------- pixel-art runway (strip across the top of the screen, y 0-150) ----------
+    // everything is drawn on a coarse grid of PX x PX "pixels" with a small palette so it
+    // reads as 2D pixel art. the static parts (tarmac, paint, skid marks) are rendered once
+    // into an image and reused every frame; only the edge lights are redrawn so they can animate
+    private static final int PX = 5;
+    private static final int RUNWAY_ROWS = 150 / PX; // 30 rows tall
+
+    private static final Color TARMAC = new Color(58, 58, 66);
+    private static final Color TARMAC_LIGHT = new Color(68, 68, 77);
+    private static final Color TARMAC_DARK = new Color(49, 49, 56);
+    private static final Color SKID = new Color(30, 30, 34);
+    private static final Color CONCRETE = new Color(104, 104, 98);
+    private static final Color CONCRETE_DARK = new Color(88, 88, 83);
+    private static final Color PAINT = new Color(236, 236, 226);
+    private static final Color PAINT_WORN = new Color(190, 190, 182);
+    private static final Color LIGHT_DIM = new Color(200, 150, 50);
+    private static final Color LIGHT_BRIGHT = new Color(255, 236, 140);
+    private static final Color LIGHT_GLOW = new Color(255, 210, 90, 170);
+
+    // 3x5 pixel font for the runway numbers, one string per digit read row by row
+    private static final String[] PIXEL_DIGITS = {
+        "111101101101111", "010110010010111", "111001111100111", "111001111001111", "101101111001001",
+        "111100111001111", "111100111101111", "111001010010010", "111101111101111", "111101111001111"
+    };
+
+    private BufferedImage runwayCache = null;
+    private int runwayCacheWidth = -1;
+
     private void drawRunway(Graphics g, int width) {
-        // darker tarmac than the taxiways so the runway stands out
-        g.setColor(new Color(70, 70, 75));
-        g.fillRect(0, 0, width, 150);
+        if (runwayCache == null || runwayCacheWidth != width) { // rebuild only if the window was resized
+            runwayCache = buildRunwayImage(width);
+            runwayCacheWidth = width;
+        }
+        g.drawImage(runwayCache, 0, 0, null);
+        drawRunwayLights(g, width);
+    }
 
-        g.setColor(Color.WHITE);
+    private BufferedImage buildRunwayImage(int width) {
+        int cols = (width + PX - 1) / PX;
+        BufferedImage image = new BufferedImage(cols * PX, RUNWAY_ROWS * PX, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+
+        // speckled tarmac, with a concrete shoulder along the top and bottom rows
+        for (int col = 0; col < cols; col++) {
+            for (int row = 0; row < RUNWAY_ROWS; row++) {
+                int h = pixelHash(col, row);
+                Color c;
+                if (row == 0 || row == RUNWAY_ROWS - 1) {
+                    c = h % 5 == 0 ? CONCRETE_DARK : CONCRETE;
+                } else {
+                    c = h % 9 == 0 ? TARMAC_LIGHT : h % 11 == 0 ? TARMAC_DARK : TARMAC;
+                }
+                setPixel(g, col, row, c);
+            }
+        }
+
+        // a few short diagonal cracks scattered along the runway
+        for (int col = 30; col < cols - 30; col += 19) {
+            int h = pixelHash(col, 99);
+            if (h % 3 != 0) continue;
+            int row = 4 + h % 21;
+            for (int i = 0; i < 3; i++) {
+                setPixel(g, col + i, row + (h % 2 == 0 ? i : -i), TARMAC_DARK);
+            }
+        }
+
+        // tyre skid marks where planes touch down at each end
+        for (int start : new int[] {36, cols - 51}) {
+            for (int row : new int[] {12, 13, 17, 18}) {
+                for (int col = start; col < start + 15; col++) {
+                    if (pixelHash(col, row) % 4 != 0) setPixel(g, col, row, SKID);
+                }
+            }
+        }
+
         // edge lines
-        g.fillRect(0, 9, width, 2);
-        g.fillRect(0, 139, width, 2);
-        // threshold bars at both ends
-        for (int i = 10; i < 120; i += 20) {
-            g.fillRect(10, i + 10, 100, 10);
-            g.fillRect(width - 130, i + 10, 100, 10);
+        paintCells(g, 0, 2, cols, 1);
+        paintCells(g, 0, RUNWAY_ROWS - 3, cols, 1);
+
+        // threshold "piano keys" at both ends
+        for (int bar = 0; bar < 6; bar++) {
+            int row = 4 + bar * 4;
+            paintCells(g, 2, row, 20, 2);
+            paintCells(g, cols - 22, row, 20, 2);
         }
 
-        // runway numbers just inside each threshold
-        Font originalFont = g.getFont();
-        g.setFont(new Font("SansSerif", Font.BOLD, 28));
-        g.drawString("09", 122, 85);
-        g.drawString("27", width - 166, 85);
-        g.setFont(originalFont); // so plane labels and the flight board keep their normal font
+        // runway numbers in the pixel font
+        drawPixelNumber(g, "09", 24, 13);
+        drawPixelNumber(g, "27", cols - 31, 13);
 
-        // touchdown zone markings: pairs of bars either side of the centre line
-        for (int x : new int[] {175, 235, width - 215, width - 275}) {
-            g.fillRect(x, 40, 40, 8);
-            g.fillRect(x, 102, 40, 8);
+        // touchdown zone markings either side of the centre line
+        for (int col : new int[] {35, 47, cols - 43, cols - 55}) {
+            paintCells(g, col, 8, 8, 2);
+            paintCells(g, col, 20, 8, 2);
         }
 
-        // dashed centre line, thicker than before
-        for (int i = 175; i + 45 < width - 175; i += 80) {
-            g.fillRect(i, 73, 45, 4);
+        // dashed centre line
+        for (int col = 35; col + 9 <= cols - 35; col += 16) {
+            paintCells(g, col, 14, 9, 2);
         }
 
-        // edge lights along both sides
-        g.setColor(new Color(255, 230, 150));
-        for (int i = 20; i < width; i += 50) {
-            g.fillOval(i - 2, 2, 5, 5);
-            g.fillOval(i - 2, 143, 5, 5);
+        g.dispose();
+        return image;
+    }
+
+    // edge lights along both shoulders; a brighter light "chases" along them from left to right
+    private void drawRunwayLights(Graphics g, int width) {
+        int cols = (width + PX - 1) / PX;
+        int lightCount = (cols - 4) / 10 + 1;
+        int chase = (int) ((System.currentTimeMillis() / 90) % lightCount);
+        for (int i = 0; i < lightCount; i++) {
+            int col = 4 + i * 10;
+            boolean lit = i == chase || i == (chase + lightCount - 1) % lightCount;
+            for (int row : new int[] {0, RUNWAY_ROWS - 1}) {
+                if (lit) {
+                    // small plus-shaped glow around the bright light
+                    setPixel(g, col - 1, row, LIGHT_GLOW);
+                    setPixel(g, col + 1, row, LIGHT_GLOW);
+                    setPixel(g, col, row == 0 ? 1 : row - 1, LIGHT_GLOW);
+                }
+                setPixel(g, col, row, lit ? LIGHT_BRIGHT : LIGHT_DIM);
+            }
         }
+    }
+
+    private void drawPixelNumber(Graphics g, String number, int col, int row) {
+        for (int d = 0; d < number.length(); d++) {
+            String glyph = PIXEL_DIGITS[number.charAt(d) - '0'];
+            for (int i = 0; i < glyph.length(); i++) {
+                if (glyph.charAt(i) == '1') {
+                    paintCells(g, col + d * 4 + i % 3, row + i / 3, 1, 1);
+                }
+            }
+        }
+    }
+
+    // white runway paint, with the odd worn-looking pixel
+    private void paintCells(Graphics g, int col, int row, int w, int h) {
+        for (int x = col; x < col + w; x++) {
+            for (int y = row; y < row + h; y++) {
+                setPixel(g, x, y, pixelHash(x, y) % 7 == 0 ? PAINT_WORN : PAINT);
+            }
+        }
+    }
+
+    private void setPixel(Graphics g, int col, int row, Color color) {
+        g.setColor(color);
+        g.fillRect(col * PX, row * PX, PX, PX);
+    }
+
+    // cheap deterministic noise so the texture looks random but is identical every frame
+    private static int pixelHash(int x, int y) {
+        int h = x * 73856093 ^ y * 19349663;
+        h ^= h >>> 13;
+        h *= 0x5bd1e995;
+        h ^= h >>> 15;
+        return h & 0x7fffffff;
     }
 
     @Override
