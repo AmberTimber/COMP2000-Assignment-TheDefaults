@@ -211,10 +211,33 @@ public class AirTrafficControl implements drawable, Position {
     }
     
     // for drawing elements of airtraffic control
+    // control tower seen from above as a 10x10 pixel sprite: octagonal glass cab around a roof
+    // with a beacon in the middle that blinks red
+    private static final String[] TOWER_SPRITE = {
+        "..oooooo..",
+        ".oGggggGo.",
+        "oGgrrrrgGo",
+        "ogrrRRrrgo",
+        "ogrRaarrgo",
+        "ogrRaarrgo",
+        "ogrrrrrrgo",
+        "oGgrrrrgGo",
+        ".oGggggGo.",
+        "..oooooo..",
+    };
+
     @Override
     public void visualRepresentation(Graphics drawer, int width, int height) {
-        drawer.setColor(Color.CYAN);
-        drawer.fillRect(Location.getXPos(), Location.getYPos(), width, height);
+        boolean beaconOn = (System.currentTimeMillis() / 500) % 2 == 0;
+        Map<Character, Color> palette = Map.of(
+            'o', new Color(34, 38, 52),     // outline
+            'g', new Color(110, 180, 220),  // cab glass
+            'G', new Color(190, 230, 250),  // glass glint
+            'r', new Color(150, 152, 160),  // roof
+            'R', new Color(176, 178, 186),  // roof highlight
+            'a', beaconOn ? new Color(255, 60, 50) : new Color(110, 30, 30)); // beacon
+        int cell = Math.max(1, Math.min(width, height) / TOWER_SPRITE.length);
+        PixelArt.sprite(drawer, TOWER_SPRITE, Location.getXPos(), Location.getYPos(), cell, palette);
     }
 
     // allows air traffic control to decide whether a plane can takeoff or not

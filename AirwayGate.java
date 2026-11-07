@@ -144,14 +144,47 @@ public class AirwayGate implements drawable {
 
     // for drawing elements of gate
     @Override
+    // pixel-art gate house: a short jet bridge reaching up to the parked plane, the building
+    // itself with a dark sign showing the gate ID, and a status light
+    // (green = free, amber = assigned to an incoming plane, red = closed/occupied)
     public void visualRepresentation(Graphics drawer, int width, int height) {
-        int x = getGateNode().getXPos() - width/2;
-        int y = getGateNode().getYPos();
+        int p = PixelArt.PX;
+        // snap to the world pixel grid so the gate lines up with the ground art
+        int x = Math.floorDiv(getGateNode().getXPos() - width / 2, p) * p;
+        int y = Math.floorDiv(getGateNode().getYPos(), p) * p;
+        int w = width / p * p;
+        int cx = Math.floorDiv(getGateNode().getXPos(), p) * p;
 
-        drawer.setColor(Color.white);
-        drawer.fillRect(x, y, width, height);
+        // jet bridge: a grey walkway with a darker outline, ending just under the plane's door
+        drawer.setColor(new Color(60, 62, 70));
+        drawer.fillRect(cx - 20, y + 5, 15, height / 2);
+        drawer.setColor(new Color(160, 162, 170));
+        drawer.fillRect(cx - 15, y + 5, 5, height / 2 - 5);
 
-        drawer.setColor(Color.black);
-        drawer.drawString(gateID, x + 5, y + 15);
+        // gate house building
+        int top = y + height / 2 - p;
+        PixelArt.bevelBox(drawer, x, top, w, y + height - top, p,
+                new Color(196, 196, 190), new Color(222, 222, 216), new Color(128, 128, 124));
+
+        // sign with the gate ID in the pixel font
+        String label = gateID.toUpperCase();
+        int signW = PixelArt.textWidth(label, 2) + 8;
+        drawer.setColor(new Color(28, 30, 40));
+        drawer.fillRect(x + p * 2, top + p, signW, 14);
+        PixelArt.text(drawer, label, x + p * 2 + 4, top + p + 2, 2, new Color(255, 190, 60));
+
+        // status light with a dark rim
+        Color light;
+        if (!status || currentPlane != null) {
+            light = new Color(230, 60, 50);
+        } else if (isAssigned) {
+            light = new Color(250, 180, 40);
+        } else {
+            light = new Color(70, 220, 100);
+        }
+        drawer.setColor(new Color(30, 30, 34));
+        drawer.fillRect(x + w - p * 4, top + p, p * 2, p * 2);
+        drawer.setColor(light);
+        drawer.fillRect(x + w - p * 4 + 2, top + p + 2, p * 2 - 4, p * 2 - 4);
     }
 }

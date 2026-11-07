@@ -1,5 +1,4 @@
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
@@ -34,7 +33,9 @@ public class FlightBoard implements drawable {
     }
 
     // panelWidth/panelHeight are the size of the area the board should be anchored within,
-    // the board itself is drawn pinned to the bottom right corner of that area
+    // the board itself is drawn pinned to the bottom right corner of that area.
+    // drawn in the pixel-art style: chunky bevelled frame, dark LED-style screen with
+    // scanline stripes, and all text in the 3x5 pixel font
     @Override
     public void visualRepresentation(Graphics drawer, int panelWidth, int panelHeight) {
         int rowCount = aircraftsOnSite == null ? 0 : aircraftsOnSite.size();
@@ -42,23 +43,32 @@ public class FlightBoard implements drawable {
         int x = panelWidth - BOARD_WIDTH - PADDING;
         int y = panelHeight - boardHeight - PADDING;
 
-        drawer.setColor(new Color(20, 20, 20, 230));
+        // frame and screen
+        PixelArt.bevelBox(drawer, x - 4, y - 4, BOARD_WIDTH + 8, boardHeight + 8, 4,
+                new Color(70, 74, 86), new Color(120, 124, 138), new Color(30, 32, 40));
+        drawer.setColor(new Color(14, 16, 22));
         drawer.fillRect(x, y, BOARD_WIDTH, boardHeight);
-        drawer.setColor(Color.WHITE);
-        drawer.drawRect(x, y, BOARD_WIDTH, boardHeight);
+        // faint stripe on every other row, like an old dot-matrix board
+        drawer.setColor(new Color(24, 28, 36));
+        for (int i = 0; i < Math.max(rowCount, 1); i += 2) {
+            drawer.fillRect(x, y + HEADER_HEIGHT - 4 + i * ROW_HEIGHT, BOARD_WIDTH, ROW_HEIGHT);
+        }
 
-        drawer.setFont(new Font("Monospaced", Font.BOLD, 14));
-        drawer.drawString("FLIGHT BOARD", x + PADDING, y + 18);
+        Color shadow = new Color(0, 0, 0);
+        PixelArt.shadowText(drawer, "FLIGHT BOARD", x + PADDING, y + 6, 2, new Color(255, 200, 70), shadow);
+        // blinking "live" dot in the corner
+        if ((System.currentTimeMillis() / 600) % 2 == 0) {
+            drawer.setColor(new Color(230, 60, 50));
+            drawer.fillRect(x + BOARD_WIDTH - PADDING - 6, y + 8, 6, 6);
+        }
 
-        drawer.setFont(new Font("Monospaced", Font.BOLD, 11));
-        int headerY = y + 34;
-        drawer.setColor(Color.YELLOW);
-        drawer.drawString(String.format("%-10s%-8s%-13s%s", "FLIGHT", "TYPE", "STATUS", "GATE"), x + PADDING, headerY);
+        int headerY = y + 24;
+        PixelArt.text(drawer, String.format("%-10s%-8s%-13s%s", "FLIGHT", "TYPE", "STATUS", "GATE"),
+                x + PADDING, headerY, 2, new Color(240, 220, 90));
 
-        drawer.setFont(new Font("Monospaced", Font.PLAIN, 11));
-        drawer.setColor(Color.GREEN);
+        Color rowColor = new Color(110, 235, 130);
         if (rowCount == 0) {
-            drawer.drawString("No active flights", x + PADDING, headerY + ROW_HEIGHT);
+            PixelArt.text(drawer, "NO ACTIVE FLIGHTS", x + PADDING, headerY + ROW_HEIGHT, 2, rowColor);
         } else {
             for (int i = 0; i < rowCount; i++) {
                 Aircraft aircraft = aircraftsOnSite.get(i);
@@ -66,9 +76,9 @@ public class FlightBoard implements drawable {
                 String row = String.format("%-10s%-8s%-13s%s",
                         trim(aircraft.getAircraftID(), 9),
                         type,
-                        resolveStatus(aircraft),
+                        trim(resolveStatus(aircraft), 12),
                         resolveGate(aircraft));
-                drawer.drawString(row, x + PADDING, headerY + ROW_HEIGHT * (i + 1));
+                PixelArt.text(drawer, row, x + PADDING, headerY + ROW_HEIGHT * (i + 1), 2, rowColor);
             }
         }
     }

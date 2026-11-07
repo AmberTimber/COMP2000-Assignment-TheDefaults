@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.RoundRectangle2D;
@@ -171,10 +171,11 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
     @Override
     public void visualRepresentation(Graphics drawer, int width, int height) {
         drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.YELLOW);
-        drawer.setColor(Color.black);
+        // status lines in the pixel font, light text with a dark shadow so it reads on any ground
         List<String> text = breakDownStatus(PlaneStatus);
         for (int i = 0; i < text.size(); i++) {
-            drawer.drawString(text.get(i), getXPos() + 10, (getYPos() - 20) + (i * 15));
+            PixelArt.shadowText(drawer, text.get(i).toUpperCase(), getXPos() + 10, (getYPos() - 30) + (i * 15), 2,
+                    new Color(245, 245, 235), new Color(20, 20, 26));
         }
     }
 
@@ -215,14 +216,21 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
     // draws a detailed airplane (wings, tailplane, engines, fuselage, cockpit, lights) centred on
     // this aircraft's position and rotated to face its current heading; shared by both aircraft types.
     // everything is drawn in local space with the nose at "up" (0, -height/2), then the whole
-    // thing is translated/rotated onto the canvas via an AffineTransform
-    protected void drawPlaneShape(Graphics drawer, int width, int height, Color fillColor) {
-        Graphics2D canvas = (Graphics2D) drawer;
-        AffineTransform originalTransform = canvas.getTransform();
-        Object originalAntialias = canvas.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
-        canvas.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    // thing is translated/rotated into place
+    //
+    // pixel-art style: the plane is drawn at 1/PLANE_PIXEL resolution into a small sprite with
+    // antialiasing off (so colours stay flat), then scaled back up with nearest-neighbour so every
+    // "pixel" is a crisp square block on screen no matter which way the plane is facing
+    private static final int PLANE_PIXEL = 2;
 
-        canvas.translate(getXPos(), getYPos());
+    protected void drawPlaneShape(Graphics drawer, int width, int height, Color fillColor) {
+        int cells = (int) (Math.max(width, height) * 1.6) / PLANE_PIXEL; // room for rotation + shadow
+        int size = cells * PLANE_PIXEL;
+        BufferedImage sprite = new BufferedImage(cells, cells, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D canvas = sprite.createGraphics();
+        canvas.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        canvas.scale(1.0 / PLANE_PIXEL, 1.0 / PLANE_PIXEL);
+        canvas.translate(size / 2.0, size / 2.0);
         // the shape's nose rests pointing "up" (angle -90deg), so rotate the extra amount
         // needed to bring it to the heading angle
         canvas.rotate(computeHeadingRadians() + Math.PI / 2);
@@ -290,8 +298,16 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
         canvas.setColor(Color.WHITE);
         canvas.fill(new Ellipse2D.Double(-lightSize / 3, height * 0.5 - lightSize / 3, lightSize / 1.5, lightSize / 1.5));
 
-        canvas.setTransform(originalTransform);
-        canvas.setRenderingHint(RenderingHints.KEY_ANTIALIASING, originalAntialias);
+        canvas.dispose();
+
+        // blow the sprite back up to full size without smoothing
+        Graphics2D screen = (Graphics2D) drawer;
+        Object originalInterpolation = screen.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
+        screen.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        screen.drawImage(sprite, getXPos() - size / 2, getYPos() - size / 2, size, size, null);
+        if (originalInterpolation != null) {
+            screen.setRenderingHint(RenderingHints.KEY_INTERPOLATION, originalInterpolation);
+        }
     }
 
     // body of the plane; subclasses can override to make it wider/narrower

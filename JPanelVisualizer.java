@@ -330,22 +330,9 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         "111100111001111", "111100111101111", "111001010010010", "111101111101111", "111101111001111"
     };
 
-    private BufferedImage runwayCache = null;
-    private int runwayCacheWidth = -1;
-
-    private void drawRunway(Graphics g, int width) {
-        if (runwayCache == null || runwayCacheWidth != width) { // rebuild only if the window was resized
-            runwayCache = buildRunwayImage(width);
-            runwayCacheWidth = width;
-        }
-        g.drawImage(runwayCache, 0, 0, null);
-        drawRunwayLights(g, width);
-    }
-
-    private BufferedImage buildRunwayImage(int width) {
+    // static runway art (tarmac, paint, skid marks); drawn into the cached ground image
+    private void drawRunwayStatic(Graphics g, int width) {
         int cols = (width + PX - 1) / PX;
-        BufferedImage image = new BufferedImage(cols * PX, RUNWAY_ROWS * PX, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = image.createGraphics();
 
         // speckled tarmac, with a concrete shoulder along the top and bottom rows
         for (int col = 0; col < cols; col++) {
@@ -405,9 +392,6 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         for (int col = 35; col + 9 <= cols - 35; col += 16) {
             paintCells(g, col, 14, 9, 2);
         }
-
-        g.dispose();
-        return image;
     }
 
     // edge lights along both shoulders; a brighter light "chases" along them from left to right
@@ -443,78 +427,220 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
 
     // white runway paint, with the odd worn-looking pixel
     private void paintCells(Graphics g, int col, int row, int w, int h) {
+        paintCells(g, col, row, w, h, PAINT, PAINT_WORN);
+    }
+
+    private void paintCells(Graphics g, int col, int row, int w, int h, Color paint, Color worn) {
         for (int x = col; x < col + w; x++) {
             for (int y = row; y < row + h; y++) {
-                setPixel(g, x, y, pixelHash(x, y) % 7 == 0 ? PAINT_WORN : PAINT);
+                setPixel(g, x, y, pixelHash(x, y) % 7 == 0 ? worn : paint);
             }
         }
     }
 
-    private void setPixel(Graphics g, int col, int row, Color color) {
-        g.setColor(color);
-        g.fillRect(col * PX, row * PX, PX, PX);
+    // same as paintCells but takes a rectangle in screen pixels and snaps it to the grid
+    private void paintArea(Graphics g, int x, int y, int w, int h, Color paint, Color worn) {
+        int col = Math.floorDiv(x, PX);
+        int row = Math.floorDiv(y, PX);
+        int cols = Math.max(1, Math.floorDiv(x + w - 1, PX) - col + 1);
+        int rows = Math.max(1, Math.floorDiv(y + h - 1, PX) - row + 1);
+        paintCells(g, col, row, cols, rows, paint, worn);
     }
 
-    // cheap deterministic noise so the texture looks random but is identical every frame
+    private void setPixel(Graphics g, int col, int row, Color color) {
+        PixelArt.cell(g, col, row, color);
+    }
+
     private static int pixelHash(int x, int y) {
-        int h = x * 73856093 ^ y * 19349663;
-        h ^= h >>> 13;
-        h *= 0x5bd1e995;
-        h ^= h >>> 15;
-        return h & 0x7fffffff;
+        return PixelArt.hash(x, y);
+    }
+
+    // ---------- rest of the ground: grass, connector roads, taxiway, gate aprons, terminal ----------
+    // all static, so it's rendered once (together with the runway) into groundCache
+    private static final Color[] GRASS = {
+        new Color(70, 130, 58), new Color(80, 145, 64), new Color(61, 116, 51), new Color(92, 156, 70)
+    };
+    private static final Color GRASS_TUFT = new Color(112, 176, 82);
+    private static final Color[] TAXI_TARMAC = { new Color(78, 78, 84), new Color(88, 88, 95), new Color(68, 68, 74) };
+    private static final Color[] APRON = { new Color(170, 168, 160), new Color(180, 178, 170), new Color(158, 156, 149) };
+    private static final Color APRON_SEAM = new Color(142, 140, 134);
+    private static final Color TAXI_YELLOW = new Color(234, 190, 42);
+    private static final Color TAXI_YELLOW_WORN = new Color(192, 158, 44);
+    private static final Color[] TERMINAL_ROOF = { new Color(74, 84, 112), new Color(82, 93, 122), new Color(66, 75, 100) };
+    private static final Color TERMINAL_RIDGE = new Color(92, 104, 134);
+    private static final Color GLASS = new Color(122, 190, 226);
+    private static final Color GLASS_SHINE = new Color(196, 232, 250);
+    private static final Color WINDOW_FRAME = new Color(38, 46, 66);
+
+    private BufferedImage groundCache = null;
+    private int groundCacheWidth = -1;
+    private int groundCacheHeight = -1;
+
+    private void drawGround(Graphics g, int width, int height) {
+        if (groundCache == null || groundCacheWidth != width || groundCacheHeight != height) {
+            groundCache = buildGroundImage(width, height); // rebuild only if the window was resized
+            groundCacheWidth = width;
+            groundCacheHeight = height;
+        }
+        g.drawImage(groundCache, 0, 0, null);
+    }
+
+    private BufferedImage buildGroundImage(int width, int height) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+
+        // grass everywhere, with the odd brighter tuft
+        PixelArt.texture(g, 0, 0, width, height, GRASS, 0);
+        for (int col = 0; col < width / PX; col++) {
+            for (int row = 0; row < height / PX; row++) {
+                if (pixelHash(col * 3, row * 7) % 47 == 0) {
+                    setPixel(g, col, row, GRASS_TUFT);
+                    setPixel(g, col + 1, row - 1, GRASS_TUFT);
+                }
+            }
+        }
+
+        drawRunwayStatic(g, width);
+        drawConnectorRoads(g, width);
+        drawTaxiway(g, width);
+        drawAprons(g);
+        drawTerminal(g, width, height);
+
+        g.dispose();
+        return image;
+    }
+
+    // short roads joining the runway (y 150) to the taxiway (y 300), same spots as the B nodes
+    private void drawConnectorRoads(Graphics g, int width) {
+        int seg = width / 7;
+        for (int i = 0; i < 8; i += 2) {
+            int x = seg * i;
+            int w = seg - 10;
+            PixelArt.texture(g, x, 150, w, 150, TAXI_TARMAC, 7);
+            // edge lines
+            paintArea(g, x + 5, 150, PX, 150, TAXI_YELLOW, TAXI_YELLOW_WORN);
+            paintArea(g, x + w - 10, 150, PX, 150, TAXI_YELLOW, TAXI_YELLOW_WORN);
+            // dashed centre line leading to the runway
+            for (int y = 205; y < 300; y += 30) {
+                paintArea(g, x + seg / 2 - 2, y, PX, 15, TAXI_YELLOW, TAXI_YELLOW_WORN);
+            }
+            // hold-short marking: two dashed lines (runway side) then two solid lines
+            for (int lineY : new int[] {155, 165}) {
+                for (int dx = 15; dx < w - 15; dx += 15) {
+                    paintArea(g, x + dx, lineY, 10, PX, TAXI_YELLOW, TAXI_YELLOW_WORN);
+                }
+            }
+            paintArea(g, x + 15, 175, w - 30, PX, TAXI_YELLOW, TAXI_YELLOW_WORN);
+            paintArea(g, x + 15, 185, w - 30, PX, TAXI_YELLOW, TAXI_YELLOW_WORN);
+        }
+    }
+
+    // main taxiway band across the middle (y 300-450)
+    private void drawTaxiway(Graphics g, int width) {
+        PixelArt.texture(g, 0, 300, width, 150, TAXI_TARMAC, 13);
+        paintArea(g, 0, 310, width, PX, TAXI_YELLOW, TAXI_YELLOW_WORN);
+        paintArea(g, 0, 435, width, PX, TAXI_YELLOW, TAXI_YELLOW_WORN);
+        for (int x = 0; x < width; x += 100) {
+            paintArea(g, x, 375, 50, PX, TAXI_YELLOW, TAXI_YELLOW_WORN);
+        }
+    }
+
+    // concrete stands in front of each gate (y 450-600) with slab seams and a yellow lead-in line
+    private void drawAprons(Graphics g) {
+        if (allGates.isEmpty()) {
+            return;
+        }
+        int apronWidth = JframeRef.getWidth() / allGates.size();
+        for (AirwayGate gate : allGates) {
+            int gateX = gate.getGateNode().getXPos();
+            int x = gateX - 100;
+            PixelArt.texture(g, x, 450, apronWidth, 150, APRON, 21);
+            // slab seams every 6 cells
+            for (int col = Math.floorDiv(x, PX); col <= Math.floorDiv(x + apronWidth - 1, PX); col++) {
+                for (int row = 450 / PX; row < 600 / PX; row++) {
+                    if (col % 6 == 0 || row % 6 == 0) {
+                        setPixel(g, col, row, APRON_SEAM);
+                    }
+                }
+            }
+            // lead-in line down to the stand, and a stop bar where the plane parks
+            paintArea(g, gateX - 2, 450, PX, 135, TAXI_YELLOW, TAXI_YELLOW_WORN);
+            paintArea(g, gateX - 15, 585, 30, PX, TAXI_YELLOW, TAXI_YELLOW_WORN);
+        }
+    }
+
+    // terminal building along the bottom: glass frontage, ribbed roof, rooftop AC units and a sign
+    private void drawTerminal(Graphics g, int width, int height) {
+        int top = height - 150;
+        int topRow = Math.floorDiv(top, PX);
+        int cols = (width + PX - 1) / PX;
+        PixelArt.texture(g, 0, top, width, 150, TERMINAL_ROOF, 31);
+
+        // ribbed roof
+        for (int row = topRow + 5; row < height / PX; row += 4) {
+            for (int col = 0; col < cols; col++) {
+                setPixel(g, col, row, TERMINAL_RIDGE);
+            }
+        }
+
+        // glass frontage facing the apron: frame row, two rows of windows, frame row
+        for (int col = 0; col < cols; col++) {
+            setPixel(g, col, topRow, WINDOW_FRAME);
+            setPixel(g, col, topRow + 3, WINDOW_FRAME);
+            boolean mullion = col % 4 == 3;
+            setPixel(g, col, topRow + 1, mullion ? WINDOW_FRAME : (col % 4 == 0 ? GLASS_SHINE : GLASS));
+            setPixel(g, col, topRow + 2, mullion ? WINDOW_FRAME : GLASS);
+        }
+
+        // rooftop AC units scattered along the roof
+        Map<Character, Color> acPalette = Map.of(
+            'o', new Color(40, 40, 46), 'g', new Color(150, 152, 158), 'l', new Color(190, 192, 198), 'f', new Color(70, 72, 80));
+        String[] acUnit = {
+            "oooooo",
+            "ollllo",
+            "olffgo",
+            "olffgo",
+            "oooooo"
+        };
+        for (int col = 40; col < cols - 10; col += 23) {
+            int h = pixelHash(col, 7);
+            if (h % 3 == 0) continue;
+            PixelArt.sprite(g, acUnit, col * PX, (topRow + 7 + h % 12) * PX, PX, acPalette);
+        }
+
+        // terminal name painted on the roof
+        PixelArt.shadowText(g, "TERMINAL 1", 20, top + 35, 4, new Color(236, 232, 214), new Color(30, 34, 48));
+    }
+
+    // small green taxi-guidance light for each navigation node, centred on the node
+    private void drawNavNode(Graphics g, Node node) {
+        int x = node.getXPos();
+        int y = node.getYPos();
+        g.setColor(new Color(18, 60, 28));
+        g.fillRect(x - 4, y - 4, 10, 10);
+        g.setColor(new Color(70, 200, 100));
+        g.fillRect(x - 2, y - 2, 6, 6);
+        g.setColor(new Color(190, 255, 200));
+        g.fillRect(x - 2, y - 2, 2, 2);
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         // put anything you want to redraw, like images or shapes here, otherwise they won't be redrawn
         super.paintComponent(g);// put anything drawn after this line
-        // background
-        g.setColor(new Color(0,100,0));
-        g.fillRect(0, 0, JframeRef.getWidth(), JframeRef.getHeight());
-        // draw airfield
-        drawRunway(g, JframeRef.getWidth());
-        // making road to airfield
-        g.setColor(Color.GRAY);
-        for (int i = 0; i < 8; i++) {
-            if (i%2 == 0) {
-                g.fillRect(JframeRef.getWidth()/7 * i, 150, JframeRef.getWidth()/7-10 , 150);
-            }
-        }
-        g.setColor(Color.YELLOW);
-        for (int i = 0; i < 8; i++) {
-            if (i%2 == 0) {
-                g.drawLine(JframeRef.getWidth()/7 * i + 5, 150, JframeRef.getWidth()/7 * i + 5, 300);
-                g.drawLine(JframeRef.getWidth()/7 * i + JframeRef.getWidth()/7-16, 150, JframeRef.getWidth()/7 * i + JframeRef.getWidth()/7-16, 300);
-                g.drawLine(JframeRef.getWidth()/7 * i + JframeRef.getWidth()/7/2, 150, JframeRef.getWidth()/7 * i + JframeRef.getWidth()/7/2, 300);
-            }
-        }
-        // making taxiway
-        g.setColor(Color.GRAY);
-        g.fillRect(0, 300, JframeRef.getWidth(), 150);
-        g.setColor(Color.YELLOW);
-        for (int i = 0; i < JframeRef.getWidth(); i+=100) {
-            g.drawLine(i, 375, i+50, 375);
-        }
-        g.drawLine(0, 310, JframeRef.getWidth(), 310);
-        g.drawLine(0, 440, JframeRef.getWidth(), 440);
-        // making road to gate
-        g.setColor(Color.LIGHT_GRAY);
-        for (int i = 0; i < allGates.size(); i++) {
-            g.fillRect(allGates.get(i).getGateNode().getXPos() - 100, 450, JframeRef.getWidth()/allGates.size(), 150);
-        }
+        // static ground (grass, runway, taxiways, aprons, terminal), cached as one image
+        drawGround(g, JframeRef.getWidth(), JframeRef.getHeight());
+        // animated runway edge lights
+        drawRunwayLights(g, JframeRef.getWidth());
 
-        // making gates
-        allGates.stream().forEach(gate -> gate.visualRepresentation(g, JframeRef.getWidth()/9, 200));
+        // making gates (gate houses sit between the aprons and the terminal, y 600-650)
+        allGates.stream().forEach(gate -> gate.visualRepresentation(g, JframeRef.getWidth()/9, 50));
 
-        // Making terminal
-        g.setColor(Color.BLUE);
-        g.fillRect(0, JframeRef.getHeight()-150, JframeRef.getWidth(), 200);
         // air traffic control
         airControl.visualRepresentation(g, 50,50);
-        // visualize noeds
+        // visualize nodes
         for (int i = 0; i < airportNav.size(); i++) {
-            g.setColor(Color.GREEN);
-            g.fillOval(airportNav.get(i).getXPos(), airportNav.get(i).getYPos(), 10, 10);
+            drawNavNode(g, airportNav.get(i));
         }
 
         /* visualize planes by splitting them into groups of flying or not flying
