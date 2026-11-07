@@ -12,11 +12,10 @@ public class AircraftGroundedState implements AircraftState {
     public void Move(AirTrafficControl aircontroller) {
         aircraft.influenceFuel();
         aircraft.CheckIfNextPathIsBlocked();
-        if (aircraft.canFly() == false && aircraft.isBlocked() == false) {
-            // moves through the airport
-            aircraft.MoveThroughFlightPath(1); 
-        } // if blocked while moving 
-        else if(aircraft.isBlocked() == true && !aircraft.getChosenToFly()) { 
+        // moves through the airport
+        aircraft.MoveThroughFlightPath(1); 
+         // if blocked while moving 
+        if(aircraft.isBlocked() == true && !aircraft.getChosenToFly()) { 
             // if a aircraft path is being blocked, it regenerates a new path or goes back 1 node
             int chosenAction = (int)(Math.random() * 3);
             aircraft.decreaseCountdown();
