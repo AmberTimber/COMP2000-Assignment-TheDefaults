@@ -99,7 +99,7 @@ public class AirwayGate implements drawable {
         if (currentPlane != null && currentPlane.getStatus().equalsIgnoreCase("DOCKED") && currentPlane.CooldownOver() && locationNode != null && !locationNode.isEmpty()) {
             try {
                 gateNode.isOccupied = false;
-                ArrayList<Node> path = airController.calculateRoute(locationNode, gateNode);
+                ArrayList<Node> path = airController.calculateRoute(locationNode, gateNode, false);
                 if (path == null && currentPlane.CooldownOver()) {
                     int waitingTime = (int)(Math.random() * 2001) + 1000;
                     currentPlane.setCountdown(waitingTime);

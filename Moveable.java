@@ -165,11 +165,19 @@ public class Moveable extends Vector2  {
                 selected = false;
             }
 
+            if (target == null) {
+                target = flightPath.get(NavigationIndex).getPosition();
+            }
+
             // moves towards the target
             if (flightPath.size() > NavigationIndex) {
                 moveTowards(speed);
                 checkIfReachTarget();
                 flightPath.get(NavigationIndex).setOccupied(true);
+            }
+
+            if (isBlocked() == true) {
+                currentNode.setOccupied(true);
             }
             
             // if not at last node
@@ -177,8 +185,8 @@ public class Moveable extends Vector2  {
                 // checks if next path is blocking
                 CheckIfNextPathIsBlocked();
                 // if not blocked and not selected for airfield, moves to next point
-                if (getReachedTarget() == true && WithinFlightpathRange(NavigationIndex + 1) && getNextNode().getOccupied() == false) {
-                    flightPath.get(NavigationIndex).setOccupied(false); // frees up node for other aircrafts to go to
+                if (WithinFlightpathRange(NavigationIndex + 1) && getNextNode().getOccupied() == false && !isBlocked()) {
+                    currentNode.setOccupied(false); // frees up node for other aircrafts to go to
                     NavigationIndex++;
                     setTarget(flightPath.get(NavigationIndex).getPosition());
                     currentNode = flightPath.get(NavigationIndex);
@@ -186,8 +194,10 @@ public class Moveable extends Vector2  {
                     flightPath.get(NavigationIndex).setOccupied(true); // ensure no other aircrafts can go to the node
                     System.out.println("New target set!");
                 } // if the aircraft is selected to go on airfield
-                else if (getReachedTarget() == true && WithinFlightpathRange(NavigationIndex + 1) && selected == true) {
-                    flightPath.get(NavigationIndex).setOccupied(false);
+                else if (WithinFlightpathRange(NavigationIndex + 1) && selected == true && getNextNode().getNodeTileRepresentation() != Node.locationTypes.TAXIWAY) {
+                    if (currentNode.getNodeTileRepresentation() != Node.locationTypes.AIRFIELD) {
+                        currentNode.setOccupied(false);
+                    }
                     NavigationIndex++;
                     setTarget(flightPath.get(NavigationIndex).getPosition());
                     currentNode = flightPath.get(NavigationIndex);

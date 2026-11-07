@@ -229,7 +229,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 Node selectedRunwayNode = runway.stream().filter(n -> !n.getOccupied()).findAny().orElse(null);
                 if (selectedGate != null && chosenBehaviour == 1) {
                     try {
-                    flightPath = airControl.initialCalculateRoute(selectedGate.getGateNode().getNodeID(), spawningNode);
+                    flightPath = airControl.calculateRoute(selectedGate.getGateNode().getNodeID(), spawningNode, true);
                     newAircaft.setVector2(spawningNode.getXPos(), spawningNode.getYPos());
                     newAircaft.setFlightPath(flightPath);
                     newAircaft.setColor(getRandomColorRGB());
@@ -238,11 +238,13 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                     aircraftsOnSite.add(newAircaft);
                     } catch (NullPointerException e) {
                         System.out.println("Error occured while making newAircraft go to gate: " + e);
+                        selectedGate.setAssigned(false);
+                        selectedGate.getGateNode().isOccupied = false;
                         newAircaft = null;
                     }
                 } else if (selectedRunwayNode != null && chosenBehaviour == 2) { // becomes airfied goer
                     try {
-                    flightPath = airControl.initialCalculateRoute(selectedRunwayNode.getNodeID(), spawningNode);
+                    flightPath = airControl.calculateRoute(selectedRunwayNode.getNodeID(), spawningNode, true);
                     newAircaft.setVector2(spawningNode.getXPos(), spawningNode.getYPos());
                     newAircaft.setFlightPath(flightPath);
                     newAircaft.setColor(getRandomColorRGB());
@@ -266,11 +268,13 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 }
             }
                 // adds aircrafts to existing list of aircrafts
-                if (newAircaft != null && !aircraftsOnSite.contains(newAircaft) && newAircaft.getTarget() != null) {
+                if (newAircaft != null && !aircraftsOnSite.contains(newAircaft) && newAircaft.getTarget() != null && newAircaft.getCurrentNode() != null) {
                     aircraftsOnSite.add(newAircaft);
                 }
                 
         }
+
+        airportNav.forEach(N -> N.setOccupied(false));
 
         timer = new Timer(secondsPerFrame, this); // every secondsPerFrame time, = 1 frame
         timer.start(); // starts the timer

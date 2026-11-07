@@ -1,10 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class AirTrafficControl implements drawable, Position {
@@ -57,32 +54,12 @@ public class AirTrafficControl implements drawable, Position {
     }
 
     // creating a flight path for planes
-    public ArrayList<Node> calculateRoute(String NodeID, Node StartingNode) {
+    public ArrayList<Node> calculateRoute(String NodeID, Node StartingNode, boolean ignoreOccupied) {
         ArrayList<Node> path = new ArrayList<>();
         if (NodeID != null && StartingNode != null) {
             try {
                 StartingNode.setOccupied(false);
-                path = findNode(NodeID, path, StartingNode);
-                StartingNode.setOccupied(true);
-                path = shortestPathNode(path);
-            } catch (NullPointerException e) {
-                System.out.println("NULL ERROR IN PATH: " + e);
-                return null;
-            }
-        } else {
-            throw new NullPointerException("Route calculations NodeID or startingNode is null or a incorrect data type!");
-        }
-
-        return path;
-    }
-
-    // done on start
-    public ArrayList<Node> initialCalculateRoute(String NodeID, Node StartingNode) {
-        ArrayList<Node> path = new ArrayList<>();
-        if (NodeID != null && StartingNode != null) {
-            try {
-                StartingNode.setOccupied(false);
-                path = findNodeStart(NodeID, path, StartingNode);
+                path = findNode(NodeID, path, StartingNode, ignoreOccupied);
                 StartingNode.setOccupied(true);
                 path = shortestPathNode(path);
             } catch (NullPointerException e) {
@@ -105,7 +82,7 @@ public class AirTrafficControl implements drawable, Position {
             for (int i = 0; i < givenArray.size(); i++) { // starting node to check if future nodes are neighbors
                 int furtherProgression = 0; // used to compare which node is further down
                 for (int c = i; c < givenArray.size(); c++) {
-                    if (copy.get(i).checkIfNeighboring(givenArray.get(c))) { // detects whether a neighboring node has a vector2
+                    if (copy.get(i).checkIfNeighboring(givenArray.get(c)) && givenArray.get(c).getOccupied() == false) { // detects whether a neighboring node has a vector2
                         if (furtherProgression <= c && (i+1) < givenArray.size()) {
                             copy.set(i + 1, givenArray.get(c));
                             furtherProgression = c;
@@ -131,8 +108,8 @@ public class AirTrafficControl implements drawable, Position {
     }
 
     // used to create a navigational arraylist of points on the airport
-        private ArrayList<Node> findNode(String TargetedNode, ArrayList<Node> givenArray, Node startingNode) {
-        if (startingNode == null || givenArray.contains(startingNode) || startingNode.isOccupied && startingNode.getNodeTileRepresentation() != Node.locationTypes.AIRFIELD) { // ensure that a node can only be gone on once
+        private ArrayList<Node> findNode(String TargetedNode, ArrayList<Node> givenArray, Node startingNode, boolean ignoreOccupied) {
+        if (startingNode == null || givenArray.contains(startingNode) || startingNode.isOccupied && startingNode.getNodeTileRepresentation() != Node.locationTypes.AIRFIELD && ignoreOccupied == false) { // ensure that a node can only be gone on once
             return null;
         }
 
@@ -145,62 +122,22 @@ public class AirTrafficControl implements drawable, Position {
 
         ArrayList<Node> finalPath; // used to hold all pathways and check if reached
         
-        finalPath = findNode(TargetedNode, givenArray, startingNode.upperNode);
+        finalPath = findNode(TargetedNode, givenArray, startingNode.upperNode, ignoreOccupied);
         if (finalPath != null) {
             return finalPath;
         }
 
-        finalPath = findNode(TargetedNode, givenArray, startingNode.bottomNode);
+        finalPath = findNode(TargetedNode, givenArray, startingNode.bottomNode, ignoreOccupied);
         if (finalPath != null) {
             return finalPath;
         }
 
-        finalPath = findNode(TargetedNode, givenArray, startingNode.leftNode);
+        finalPath = findNode(TargetedNode, givenArray, startingNode.leftNode, ignoreOccupied);
         if (finalPath != null) {
             return finalPath;
         }
 
-        finalPath = findNode(TargetedNode, givenArray, startingNode.rightNode);
-        if (finalPath != null) {
-            return finalPath;
-        }
-
-       givenArray.remove(givenArray.size()-1);
-        System.out.println("Returned null in path!");
-        return null; // after checking that all other slots are null, meaning this branch isn't it
-    }
-
-    // used to create a navigational arraylist of points on the airport on start to prevent null errors
-        private ArrayList<Node> findNodeStart(String TargetedNode, ArrayList<Node> givenArray, Node startingNode) {
-        if (startingNode == null || givenArray.contains(startingNode)) { // ensure that a node can only be gone on once
-            return null;
-        }
-
-        givenArray.add(startingNode); // adds
-
-        // if correct node
-        if (startingNode.getNodeID() != null && startingNode.getNodeID().equals(TargetedNode)) {
-            return givenArray;
-        }
-
-        ArrayList<Node> finalPath; // used to hold all pathways and check if reached
-        
-        finalPath = findNodeStart(TargetedNode, givenArray, startingNode.upperNode);
-        if (finalPath != null) {
-            return finalPath;
-        }
-
-        finalPath = findNodeStart(TargetedNode, givenArray, startingNode.bottomNode);
-        if (finalPath != null) {
-            return finalPath;
-        }
-
-        finalPath = findNodeStart(TargetedNode, givenArray, startingNode.leftNode);
-        if (finalPath != null) {
-            return finalPath;
-        }
-
-        finalPath = findNodeStart(TargetedNode, givenArray, startingNode.rightNode);
+        finalPath = findNode(TargetedNode, givenArray, startingNode.rightNode, ignoreOccupied);
         if (finalPath != null) {
             return finalPath;
         }
@@ -301,7 +238,7 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
                     SelectAircraft(selectedAircraft);
                     // creates stream from gates available and instantly assigns first one that is free
                     Node airfieldNode = runway.get(0);
-                    ArrayList<Node> flightPath = initialCalculateRoute(selectedGate.getGateNode().getNodeID(), airfieldNode);
+                    ArrayList<Node> flightPath = calculateRoute(selectedGate.getGateNode().getNodeID(), airfieldNode, true);
                     flightPath.add(0, entryNode);
                     flyingAircraft.setFlightPath(flightPath);
                     flyingAircraft.setGate(selectedGate);
@@ -357,7 +294,7 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
     // resets flight path of aircraft
     private void ResetAircraft (Aircraft selectedAircraft) {
         if (selectedAircraft != null) {
-            selectedAircraft.resetIndex();
+            //selectedAircraft.resetIndex();
             selectedAircraft.setReachedTarget(false);
         }
     }
@@ -390,7 +327,7 @@ public void checkIfAAircraftOnAirfield(Aircraft otherAircraft) {
     public ArrayList<Node> SendFlightPath(Aircraft plane) { // notifies airtraffic that they are blocked
         String NodeID = plane.getFlightPath().get(plane.getFlightPath().size()-1).getNodeID();
         Node currentNode = plane.getCurrentNode();
-        ArrayList<Node> flightPath = calculateRoute(NodeID, currentNode);
+        ArrayList<Node> flightPath = calculateRoute(NodeID, currentNode, false);
         return  flightPath;
     }
 

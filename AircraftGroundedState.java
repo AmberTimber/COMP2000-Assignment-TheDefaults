@@ -4,7 +4,7 @@ public class AircraftGroundedState implements AircraftState {
 
     private Aircraft aircraft;
 
-    public AircraftGroundedState(Aircraft aircraft) {
+    public <T extends Aircraft> AircraftGroundedState(T aircraft) {
         this.aircraft = aircraft;
     }
 
@@ -22,9 +22,10 @@ public class AircraftGroundedState implements AircraftState {
             aircraft.decreaseCountdown();
             if (chosenAction == 0 && aircraft.CooldownOver()) {
                 aircraft.reverseAircraft();
+                aircraft.setCountdown(100);
             } else if (chosenAction == 1 && aircraft.CooldownOver()) { // generates new path from flight control
                 ArrayList<Node> flightPath = aircontroller.SendFlightPath(aircraft);
-                if (flightPath == null) { 
+                if (flightPath == null || flightPath.isEmpty()) { 
                 // if path is null, it waits until it can find node or unoccupied
                     aircraft.setCountdown(100);
                 } else {

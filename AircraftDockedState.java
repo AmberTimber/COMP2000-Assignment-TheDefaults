@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 
 public class AircraftDockedState implements AircraftState {
     private Aircraft aircraft;

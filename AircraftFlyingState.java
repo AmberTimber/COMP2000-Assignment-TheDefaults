@@ -2,7 +2,7 @@ public class AircraftFlyingState implements AircraftState {
     private Aircraft aircraft;
     private int flightTime;
 
-    public AircraftFlyingState(Aircraft aircraft) {
+    public <T extends Aircraft> AircraftFlyingState(T aircraft) {
         this.aircraft = aircraft;
         flightTime = (int)(Math.random() * (int)aircraft.getFuelLevel()/0.5f) + 3000;
     }
