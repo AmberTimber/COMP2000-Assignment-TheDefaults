@@ -171,12 +171,11 @@ public class Moveable extends Vector2  {
                 checkIfReachTarget();
                 flightPath.get(NavigationIndex).setOccupied(true);
             }
-
-            // checks if next path is blocking
-            CheckIfNextPathIsBlocked();
             
             // if not at last node
-            if (!isAtLastNode()) {
+            if (!isAtLastNode() && getReachedTarget() == true) {
+                // checks if next path is blocking
+                CheckIfNextPathIsBlocked();
                 // if not blocked and not selected for airfield, moves to next point
                 if (getReachedTarget() == true && WithinFlightpathRange(NavigationIndex + 1) && getNextNode().getOccupied() == false) {
                     flightPath.get(NavigationIndex).setOccupied(false); // frees up node for other aircrafts to go to

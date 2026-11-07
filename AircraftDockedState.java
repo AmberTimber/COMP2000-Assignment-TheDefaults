@@ -7,7 +7,7 @@ public class AircraftDockedState implements AircraftState {
     private int moveCargoTime = 30;
     private int maxMoveCargoTime;
 
-    public AircraftDockedState(Aircraft aircraft) {
+    public <T extends Aircraft> AircraftDockedState(T aircraft) {
         this.aircraft = aircraft;
         cargoAmount = (int)(Math.random() * aircraft.getMaxCapacity()) + 1;
         maxMoveCargoTime = moveCargoTime;

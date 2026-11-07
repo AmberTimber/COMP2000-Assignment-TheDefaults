@@ -29,7 +29,7 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
     private ArrayList<Node> flightPath = new ArrayList<>();
     private ArrayList<Node> airportNav = new ArrayList<>();
     // aircrafts
-    private int aircraftCount = 10; //(int)(Math.random() * 8) + 1;
+    private int aircraftCount = (int)(Math.random() * 8) + 2;
     private ArrayList<Aircraft> aircraftsOnSite = new ArrayList<>();
     private ArrayList<Node> runway = new ArrayList<>();
     private ArrayList<AirwayGate> allGates = new ArrayList<>();
