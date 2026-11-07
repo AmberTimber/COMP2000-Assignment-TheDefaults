@@ -4,7 +4,9 @@ public class Vector2 implements Position {
     private int xPos;
     private int yPos;
 
-    public Vector2() {} // goes with just random position
+    public Vector2() {
+        randomPos();
+    } // goes with just random position
 
     public Vector2 (int xPos, int yPos) {
         this.xPos = xPos;
