@@ -287,12 +287,17 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         // this entire function is used to update this element every frame
         // key note: increase in xPos = more to right, increase in Y makes it go down
 
-        for (Aircraft selectedAircraft:aircraftsOnSite) {
-            if (selectedAircraft.getFuelLevel() <= 0 && selectedAircraft.getState() == selectedAircraft.getFlyingState()) {
-                aircraftsOnSite.remove(selectedAircraft);
-                System.err.println("A aircraft has crashed after having no more fuel");
-            }
+        // finds crashed aircrafts first, then removes them before the loop below,
+        // since removing from aircraftsOnSite while looping over it crashes the program
+        List<Aircraft> crashedAircrafts = aircraftsOnSite.stream()
+                .filter(a -> a.getFuelLevel() <= 0 && a.getState() == a.getFlyingState())
+                .collect(Collectors.toList());
+        crashedAircrafts.forEach(a -> {
+            aircraftsOnSite.remove(a);
+            System.err.println("A aircraft has crashed after having no more fuel");
+        });
 
+        for (Aircraft selectedAircraft:aircraftsOnSite) {
             // checks if the airfield is clear
             airControl.checkIfAAircraftOnAirfield(selectedAircraft);
             for (int i = 0; i < 2; i++) {
