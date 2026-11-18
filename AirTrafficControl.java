@@ -2,7 +2,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class AirTrafficControl implements drawable, Position {
     private static ArrayList<Aircraft> aircraftsInAirport;
@@ -79,31 +83,28 @@ public class AirTrafficControl implements drawable, Position {
         Node lastNode = null; // used to remove anything beyond the last waypoint
         if (givenArray != null && !givenArray.isEmpty() && copy != null) {
             lastNode = givenArray.get(givenArray.size() - 1);
-            for (int i = 0; i < givenArray.size(); i++) { // starting node to check if future nodes are neighbors
-                int furtherProgression = 0; // used to compare which node is further down
-                for (int c = i; c < givenArray.size(); c++) {
-                    if (copy.get(i).checkIfNeighboring(givenArray.get(c))) { // detects whether a neighboring node has a vector2
-                        if (furtherProgression <= c && (i+1) < givenArray.size()) {
-                            copy.set(i + 1, givenArray.get(c));
-                            furtherProgression = c;
-                        }
-                    }
-                    
-                }
-            }
+            // for each node, jump ahead to the furthest later node that is its direct neighbour,
+            // which cuts out any detours the depth-first search took
+            final int pathLength = givenArray.size();
+            IntStream.range(0, pathLength - 1).forEach(i ->
+                IntStream.range(i, pathLength)
+                    .filter(c -> copy.get(i).checkIfNeighboring(givenArray.get(c))) // detects whether a neighboring node has a vector2
+                    .reduce((earlier, later) -> later) // keeps the furthest matching index
+                    .ifPresent(c -> copy.set(i + 1, givenArray.get(c))));
          } else {
                 throw new NullPointerException("The path is null, something broke in the path!");
         }
 
-        boolean reachedEnd = false; // detect if the waypoint has reached last
-        for (int i = 0; i < copy.size(); i++) {
-            if (copy != null && copy.get(i).equals(lastNode)) {
-                reachedEnd = true;
-            } else if (reachedEnd == true) {
-                copy.remove(i); // removes any waypoints beyond the end waypoint
-                i--;
+        // removes any waypoints beyond the end waypoint
+        final Node endNode = lastNode;
+        boolean[] reachedEnd = {false}; // detect if the waypoint has reached last
+        copy.removeIf(node -> {
+            boolean beyondEnd = reachedEnd[0] && !node.equals(endNode);
+            if (node.equals(endNode)) {
+                reachedEnd[0] = true;
             }
-        }
+            return beyondEnd;
+        });
         return copy;
     }
 
@@ -120,26 +121,14 @@ public class AirTrafficControl implements drawable, Position {
             return givenArray;
         }
 
-        ArrayList<Node> finalPath; // used to hold all pathways and check if reached
-        
-        finalPath = findNode(TargetedNode, givenArray, startingNode.upperNode, ignoreOccupied);
-        if (finalPath != null) {
-            return finalPath;
-        }
-
-        finalPath = findNode(TargetedNode, givenArray, startingNode.bottomNode, ignoreOccupied);
-        if (finalPath != null) {
-            return finalPath;
-        }
-
-        finalPath = findNode(TargetedNode, givenArray, startingNode.leftNode, ignoreOccupied);
-        if (finalPath != null) {
-            return finalPath;
-        }
-
-        finalPath = findNode(TargetedNode, givenArray, startingNode.rightNode, ignoreOccupied);
-        if (finalPath != null) {
-            return finalPath;
+        // tries up, bottom, left, then right in that order; the stream is lazy, so it stops
+        // at the first neighbour that leads to the target (same as the old if-chain)
+        Optional<ArrayList<Node>> finalPath = Stream.of(startingNode.upperNode, startingNode.bottomNode, startingNode.leftNode, startingNode.rightNode)
+            .map(neighbour -> findNode(TargetedNode, givenArray, neighbour, ignoreOccupied))
+            .filter(Objects::nonNull)
+            .findFirst();
+        if (finalPath.isPresent()) {
+            return finalPath.get();
         }
 
        givenArray.remove(givenArray.size()-1);

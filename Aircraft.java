@@ -10,6 +10,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.stream.Collectors;
 
 public abstract class Aircraft extends Moveable implements drawable, Status, AircraftState, vehicle {
@@ -172,10 +173,9 @@ public abstract class Aircraft extends Moveable implements drawable, Status, Air
         drawPlaneShape(drawer, width, height, getColor() != null ? getColor() : Color.YELLOW);
         // status lines in the pixel font, light text with a dark shadow so it reads on any ground
         List<String> text = breakDownStatus(PlaneStatus);
-        for (int i = 0; i < text.size(); i++) {
+        IntStream.range(0, text.size()).forEach(i ->
             PixelArt.shadowText(drawer, text.get(i).toUpperCase(), getXPos() + 10, (getYPos() - 30) + (i * 15), 2,
-                    new Color(245, 245, 235), new Color(20, 20, 26));
-        }
+                    new Color(245, 245, 235), new Color(20, 20, 26)));
     }
 
     public void displayInfo() {

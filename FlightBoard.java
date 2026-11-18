@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 // draws a live flight information board (like an airport departures screen),
 // listing each aircraft currently on site with its status, location and gate
@@ -50,9 +51,8 @@ public class FlightBoard implements drawable {
         drawer.fillRect(x, y, BOARD_WIDTH, boardHeight);
         // faint stripe on every other row, like an old dot-matrix board
         drawer.setColor(new Color(24, 28, 36));
-        for (int i = 0; i < Math.max(rowCount, 1); i += 2) {
-            drawer.fillRect(x, y + HEADER_HEIGHT - 4 + i * ROW_HEIGHT, BOARD_WIDTH, ROW_HEIGHT);
-        }
+        IntStream.iterate(0, i -> i < Math.max(rowCount, 1), i -> i + 2)
+            .forEach(i -> drawer.fillRect(x, y + HEADER_HEIGHT - 4 + i * ROW_HEIGHT, BOARD_WIDTH, ROW_HEIGHT));
 
         Color shadow = new Color(0, 0, 0);
         PixelArt.shadowText(drawer, "FLIGHT BOARD", x + PADDING, y + 6, 2, new Color(255, 200, 70), shadow);
@@ -70,7 +70,7 @@ public class FlightBoard implements drawable {
         if (rowCount == 0) {
             PixelArt.text(drawer, "NO ACTIVE FLIGHTS", x + PADDING, headerY + ROW_HEIGHT, 2, rowColor);
         } else {
-            for (int i = 0; i < rowCount; i++) {
+            IntStream.range(0, rowCount).forEach(i -> {
                 Aircraft aircraft = aircraftsOnSite.get(i);
                 String type = aircraft instanceof CommercialPlane ? "PAX" : aircraft instanceof CargoPlane ? "CARGO" : "N/A";
                 String row = String.format("%-10s%-8s%-13s%s",
@@ -79,7 +79,7 @@ public class FlightBoard implements drawable {
                         trim(resolveStatus(aircraft), 12),
                         resolveGate(aircraft));
                 PixelArt.text(drawer, row, x + PADDING, headerY + ROW_HEIGHT * (i + 1), 2, rowColor);
-            }
+            });
         }
     }
 }

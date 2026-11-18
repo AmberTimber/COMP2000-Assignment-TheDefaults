@@ -1,3 +1,5 @@
+import java.util.stream.Stream;
+
 public class Node implements Position {
     private String NodeID;
     Node upperNode;
@@ -35,16 +37,8 @@ public class Node implements Position {
             return false;
         }
         
-        if (upperNode != null && upperNode.equals(targetedVector)) {
-            return true;
-        } else if (bottomNode != null && bottomNode == targetedVector) {
-            return true;
-        } else if (leftNode != null && leftNode == targetedVector) {
-            return true;
-        } else if (rightNode != null && rightNode == targetedVector) {
-            return true;
-        }
-        return false;
+        return Stream.of(upperNode, bottomNode, leftNode, rightNode)
+            .anyMatch(neighbour -> neighbour != null && neighbour.equals(targetedVector));
     }
 
     // setters

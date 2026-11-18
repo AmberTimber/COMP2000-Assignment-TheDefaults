@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Spliterator;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -174,19 +175,16 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         randomModel.add("Cessna 172 Skyhawk");
 
         // generates aircrafts
-        for (int i = 0; i < aircraftCount; i++) {
-            int aircraftType = (int)(Math.random() * 2) + 1; // random plane type selection
+        IntStream.range(0, aircraftCount).forEach(i -> {
+            int aircraftType= (int)(Math.random() * 2) + 1; // random plane type selection
             int nameSelection = (int)(Math.random() * firstName.size()); // random plane type selection
             int IDselected = (int)(Math.random() * randomID.size());
             int Modelselected = (int)(Math.random() * randomModel.size());
             Aircraft newAircaft = null;
-            for (int c = 0; c < aircraftsOnSite.size(); c++) {
-                while (randomID.get(IDselected).toString().equalsIgnoreCase(aircraftsOnSite.get(c).getAircraftID())) {
-                    // ensure all ID's are unique
-                    int newInteger = (int)((Math.random() * 9999) + 1000);
-                    randomID.set(IDselected, newInteger);
-                    c = 0;
-                }
+            // ensure all IDs are unique: keeps re-rolling while any aircraft already has this ID
+            while (aircraftsOnSite.stream().anyMatch(a -> randomID.get(IDselected).toString().equalsIgnoreCase(a.getAircraftID()))) {
+                int newInteger = (int)((Math.random() * 9999) + 1000);
+                randomID.set(IDselected, newInteger);
             }
             // selecting type of aircraft
             if (aircraftType == 1) {
@@ -273,8 +271,8 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
                 if (newAircaft != null && !aircraftsOnSite.contains(newAircaft) && newAircaft.getTarget() != null && newAircaft.getCurrentNode() != null) {
                     aircraftsOnSite.add(newAircaft);
                 }
-                
-        }
+
+        });
 
         airportNav.forEach(N -> N.setOccupied(false));
 
@@ -287,25 +285,26 @@ public class JPanelVisualizer extends JPanel implements ActionListener {
         // this entire function is used to update this element every frame
         // key note: increase in xPos = more to right, increase in Y makes it go down
 
-        for (Aircraft selectedAircraft:aircraftsOnSite) {
-            if (selectedAircraft.getFuelLevel() <= 0 && selectedAircraft.getState() == selectedAircraft.getFlyingState()) {
+        // iterates over a copy because crashed aircraft are removed from the real list inside the loop
+        new ArrayList<>(aircraftsOnSite).forEach(selectedAircraft -> {
+            if (selectedAircraft.getFuelLevel() <= 0&& selectedAircraft.getState() == selectedAircraft.getFlyingState()) {
                 aircraftsOnSite.remove(selectedAircraft);
                 System.err.println("A aircraft has crashed after having no more fuel");
             }
 
             // checks if the airfield is clear
             airControl.checkIfAAircraftOnAirfield(selectedAircraft);
-            for (int i = 0; i < 2; i++) {
+            IntStream.range(0, 2).forEach(step -> {
             // moves aircraft
             selectedAircraft.Move(airControl);
             airControl.checkIfAAircraftOnAirfield(selectedAircraft);
-            }
+            });
             // gets any if runway and airport is free
             airControl.GetRandomAircraft();
 
             airControl.AirfieldNodeChanger();
-        }
-        
+        });
+
         airControl.freeNodes();
         // updates the panel
         repaint();
